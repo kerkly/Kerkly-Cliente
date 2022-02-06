@@ -59,7 +59,7 @@ class HomeFragment : Fragment() {
         spinner = root.findViewById(R.id.spinnerNormal)
         textProblem = root.findViewById(R.id.inputProblematica)
         layoutProblem = root.findViewById(R.id.layoutProblematica)
-        botonDireccion = root.findViewById(R.id.button_dir)
+        //botonDireccion = root.findViewById(R.id.button_dir)
         botonPresupuesto = root.findViewById(R.id.button_presupuesto)
         //imageboton = root.findViewById(R.id.kerkly_boton)
 
@@ -116,11 +116,14 @@ class HomeFragment : Fragment() {
         oficio = spinner.selectedItem.toString()
 
         telefono = arguments?.getString("Telefono")!!
+
        // Log.d("tel", telefono)
         b.putString("Oficio", oficio)
         b.putString("Telefono", telefono)
 
         problema = textProblem.text.toString()
+
+        b.putString("Problema", problema)
 
         if (problema.isEmpty()) {
             layoutProblem.error = getString(R.string.campo_requerido)

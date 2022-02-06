@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.kerklyv5">
+    package="com.example.kerklyv5" >
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -16,10 +17,13 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="false" />
 
     <application
@@ -28,27 +32,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KerklyV5">
+        android:theme="@style/Theme.KerklyV5" >
 
-
-        <activity
-            android:name=".express.MensajesExpress"
-            android:exported="true" />
-        <activity
-            android:name=".express.ComprobantePagoExpress"
-            android:exported="true" />
-        <activity
-            android:name=".express.TranferenciaBancariaExpress"
-            android:exported="true" />
-        <activity
-            android:name=".Pago"
-            android:exported="true" />
-
-        <activity android:name=".express.FormaPagoExrpess"
-            android:exported="true"/>
-        <activity
-            android:name=".Contrato"
-            android:exported="true" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -61,6 +46,28 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".MapsActivityKer"
+            android:exported="false"
+            android:label="@string/title_activity_maps_ker" />
+        <activity
+            android:name=".express.MensajesExpress"
+            android:exported="true" />
+        <activity
+            android:name=".express.ComprobantePagoExpress"
+            android:exported="true" />
+        <activity
+            android:name=".express.TranferenciaBancariaExpress"
+            android:exported="true" />
+        <activity
+            android:name=".Pago"
+            android:exported="true" />
+        <activity
+            android:name=".express.FormaPagoExrpess"
+            android:exported="true" />
+        <activity
+            android:name=".Contrato"
+            android:exported="true" />
         <activity
             android:name=".vista.MapsActivity"
             android:exported="true"
@@ -96,7 +103,7 @@
             android:theme="@style/Theme.KerklyV5.NoActionBar" />
         <activity
             android:name=".vista.MainActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -108,11 +115,10 @@
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.kerklyv5"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths">
-
+                android:resource="@xml/file_paths" >
             </meta-data>
         </provider>
     </application>

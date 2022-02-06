@@ -1,5 +1,6 @@
 package com.example.kerklyv5.vista.fragmentos
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import com.example.kerklyv5.controlador.AdapterKerkly
 import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
 import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.url.Url
+import com.example.kerklyv5.vista.MapsActivity
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -37,8 +39,11 @@ class KerklyFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var oficio: String
+    private lateinit var problema: String
+    private lateinit var telefono: String
     private lateinit var recyclerview: RecyclerView
     private lateinit var adapter: AdapterKerkly
+    private lateinit var b: Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +64,10 @@ class KerklyFragment : Fragment() {
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager= LinearLayoutManager(context)
         oficio = arguments?.getString("Oficio").toString()
+        /*
+        telefono = arguments?.getString("Telefono").toString()
+        problema = arguments?.getString("Problema").toString()*/
+        b = requireArguments()
         getOficios()
 
         return v
@@ -92,6 +101,19 @@ class KerklyFragment : Fragment() {
                         as ArrayList<Kerkly>
 
                 adapter = AdapterKerkly(postList)
+
+                adapter.setOnClickListener {
+                    Log.d("curp", postList[recyclerview.getChildAdapterPosition(it)].Curp)
+                    Toast.makeText(activity, postList[recyclerview.getChildAdapterPosition(it)].Curp,
+                            Toast.LENGTH_SHORT).show()
+
+                    b.putBoolean("Ker", true)
+
+                    var i = Intent(activity, MapsActivity::class.java)
+                    i.putExtras(b)
+                    startActivity(i)
+
+                }
 
                 recyclerview.adapter = adapter
 

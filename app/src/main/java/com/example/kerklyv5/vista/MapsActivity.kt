@@ -48,6 +48,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        val bandK = b?.getBoolean("Ker")
+
         getLocalizacion()
 
         BotonT = findViewById(R.id.button2)
@@ -64,26 +66,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
-        BotonEnviarU.setOnClickListener(){
+        BotonEnviarU.setOnClickListener {
 
             val la = java.lang.Double.toString(latitud)
             val lo = java.lang.Double.toString(longitud)
-            lateinit var intent: Intent
-            //   intent.putExtra("dato1", la)
-            // intent.putExtra("dato2", lo)
 
-            if (band == true) {
-                intent = Intent(this, PedirServicioExpress::class.java)
+            if (bandK!!) {
+                Toast.makeText(this, "Mi latitud ${la}", Toast.LENGTH_SHORT).show()
             } else {
-                intent = Intent(this, SolicitarServicio::class.java)
+
+                lateinit var intent: Intent
+                //   intent.putExtra("dato1", la)
+                // intent.putExtra("dato2", lo)
+
+                if (band == true) {
+                    intent = Intent(this, PedirServicioExpress::class.java)
+                } else {
+                    intent = Intent(this, SolicitarServicio::class.java)
+                }
+
+                //codigo que va antes de llamar al activity
+
+                b?.putString("Latitud", la)
+                b?.putString("Longitud", lo)
+                intent.putExtras(b!!)
+                startActivity(intent)
             }
 
-            //codigo que va antes de llamar al activity
 
-            b?.putString("Latitud", la)
-            b?.putString("Longitud", lo)
-            intent.putExtras(b!!)
-            startActivity(intent)
 
         }
     }
