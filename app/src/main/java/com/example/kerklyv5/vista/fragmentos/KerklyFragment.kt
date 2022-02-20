@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kerklyv5.MapsActivityKer
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterKerkly
 import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
@@ -110,6 +111,11 @@ class KerklyFragment : Fragment() {
                     b.putBoolean("Ker", true)
 
                     var i = Intent(activity, MapsActivity::class.java)
+                    //b.putString("Nombre Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Nombre)
+                  //  b.putString("AP Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Apellido_Paterno)
+                   // b.putString("AM Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Apellido_Materno)
+                    b.putString("Curp Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Curp)
+
                     i.putExtras(b)
                     startActivity(i)
 

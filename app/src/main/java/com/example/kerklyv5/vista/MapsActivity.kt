@@ -36,12 +36,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var BotonEnviarU: Button
     var tipo = 1
     lateinit var mapa: String
+    private lateinit var b: Bundle
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        val b = intent.extras
+        b = intent.extras!!
         val band: Boolean? = b?.getBoolean("Express")
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -71,9 +72,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val la = java.lang.Double.toString(latitud)
             val lo = java.lang.Double.toString(longitud)
 
-            if (bandK!!) {
+            //if (bandK!!) {
                 Toast.makeText(this, "Mi latitud ${la}", Toast.LENGTH_SHORT).show()
-            } else {
+            //} else {
 
                 lateinit var intent: Intent
                 //   intent.putExtra("dato1", la)
@@ -91,7 +92,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 b?.putString("Longitud", lo)
                 intent.putExtras(b!!)
                 startActivity(intent)
-            }
+          //  }
 
 
 

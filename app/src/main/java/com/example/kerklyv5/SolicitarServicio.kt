@@ -22,6 +22,7 @@ import com.example.kerklyv5.modelo.serial.ClienteModelo
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.fragmentos.HistorialFragment
+import com.example.kerklyv5.vista.fragmentos.ListaChatsFragment
 import com.example.kerklyv5.vista.fragmentos.MensajesFragment
 import com.example.kerklyv5.vista.fragmentos.OrdenesPendientesFragment
 import okhttp3.OkHttpClient
@@ -159,7 +160,7 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun setFragmentMensajes() {
-        val f = MensajesFragment()
+        val f = ListaChatsFragment()
         // val args = Bundle()
         //args.putString("Tel", telefono)
         f.arguments = b

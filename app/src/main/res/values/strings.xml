@@ -152,6 +152,7 @@
     <string name="notificaciones">Notificaciones</string>
     <string name="escocger_kerkly">Elija a su Kerkly</string>
     <string name="historial_contratos">Historial de contratos</string>
+    <string name="lista_chats">Chats</string>
 
     <string-array name="generos">
         <item>Hombre</item>
