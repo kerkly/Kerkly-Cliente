@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.express.PedirServicioExpress
+import com.example.kerklyv5.interfaces.IngresarPresupuestoClienteInterface
+import com.example.kerklyv5.interfaces.IngresarPresupuestoInterface
+import com.example.kerklyv5.url.Url
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,6 +28,13 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import retrofit.Callback
+import retrofit.RestAdapter
+import retrofit.RetrofitError
+import retrofit.client.Response
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -37,19 +47,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var tipo = 1
     lateinit var mapa: String
     private lateinit var b: Bundle
+    private lateinit var curp: String
+    private lateinit var problema: String
+    private lateinit var telefono: String
+    private lateinit var oficio: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         b = intent.extras!!
-        val band: Boolean? = b?.getBoolean("Express")
+
+        curp = b.getString("Curp Kerkly").toString()
+        problema = b.getString("Problema").toString()
+        telefono = b.getString("Telefono").toString()
+        oficio = b.getString("Oficio").toString()
+
+        val band: Boolean = b.getBoolean("Express")
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val bandK = b?.getBoolean("Ker")
+        val bandK = b.getBoolean("Ker")
 
         getLocalizacion()
 
@@ -62,7 +82,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 4 -> terreno2()
                 else-> print(" ")
             }
-            Toast.makeText(applicationContext, mapa, Toast.LENGTH_LONG)
+            //Toast.makeText(applicationContext, mapa, Toast.LENGTH_LONG).show()
 
         }
 
@@ -84,19 +104,56 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     intent = Intent(this, PedirServicioExpress::class.java)
                 } else {
                     intent = Intent(this, SolicitarServicio::class.java)
+                    ingresarPresupuesto()
                 }
 
                 //codigo que va antes de llamar al activity
 
-                b?.putString("Latitud", la)
-                b?.putString("Longitud", lo)
-                intent.putExtras(b!!)
+                b.putString("Latitud", la)
+                b.putString("Longitud", lo)
+                intent.putExtras(b)
                 startActivity(intent)
           //  }
 
 
 
         }
+    }
+
+    private fun ingresarPresupuesto() {
+        val ROOT_URL = Url().url
+        val adapter = RestAdapter.Builder()
+            .setEndpoint(ROOT_URL)
+            .build()
+        val api = adapter.create(IngresarPresupuestoClienteInterface::class.java)
+        api.presupuesto(curp, problema, telefono, oficio, latitud, longitud,
+            object : Callback<Response?> {
+                override fun success(t: Response?, response: Response?) {
+                    var salida: BufferedReader? = null
+                    var entrada = ""
+                    try {
+                        salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                        entrada = salida.readLine()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                    Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
+
+
+                    val cadena = "Datos enviados"
+                    if (cadena.equals(entrada)){
+                        Toast.makeText(applicationContext,"Datos enviados", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun failure(error: RetrofitError?) {
+                    println("error$error")
+                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
+                }
+
+            }
+        )
     }
 
 

@@ -32,10 +32,11 @@
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_contrato.xml" value="0.12771739130434784" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_contrato_express.xml" value="0.33" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_correo.xml" value="0.12771739130434784" />
+        <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_cuerpo_mensaje_recibido.xml" value="0.28515625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_forma_pago_express.xml" value="0.33" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_forma_pago_exrpess.xml" value="0.30625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_maps.xml" value="0.12771739130434784" />
+        <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_maps.xml" value="0.2" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_maps_ker.xml" value="0.30625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_mensajes.xml" value="0.12771739130434784" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/activity_mensajes_express.xml" value="0.33" />
@@ -61,6 +62,7 @@
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/fragment_kerkly.xml" value="0.275" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/fragment_lista_chats.xml" value="0.27265625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/fragment_mensajes.xml" value="0.22" />
+        <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/fragment_mensajes_presupuesto.xml" value="0.30625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/fragment_ordenes_pendientes.xml" value="0.30625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/mensajes_recycler.xml" value="0.5" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/KerklyV5/app/src/main/res/layout/nav_header_solicitar_servicio.xml" value="0.30625" />

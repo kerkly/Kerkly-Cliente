@@ -21,10 +21,7 @@ import com.example.kerklyv5.interfaces.SesionAbiertaInterface
 import com.example.kerklyv5.modelo.serial.ClienteModelo
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
-import com.example.kerklyv5.vista.fragmentos.HistorialFragment
-import com.example.kerklyv5.vista.fragmentos.ListaChatsFragment
-import com.example.kerklyv5.vista.fragmentos.MensajesFragment
-import com.example.kerklyv5.vista.fragmentos.OrdenesPendientesFragment
+import com.example.kerklyv5.vista.fragmentos.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -96,7 +93,7 @@ class SolicitarServicio : AppCompatActivity() {
                 R.id.nav_home -> setFragmentHome()
                 R.id.nav_ordenesPendientes -> setFragmentOrdenesPendientes()
                 R.id.historialFragment -> setFragmentHistorial()
-                R.id.nav_mensajes -> setFragmentMensajes()
+                R.id.nav_mensajes -> setMensajesPresupuesto()
 
             }
 
@@ -168,6 +165,15 @@ class SolicitarServicio : AppCompatActivity() {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
     }
+
+    private fun setMensajesPresupuesto() {
+        val f = MensajesPresupuestoFragment()
+        f.arguments = b
+        var fm = supportFragmentManager.beginTransaction().apply {
+            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+        }
+    }
+
 
 
     private fun sesion(correo: String) {

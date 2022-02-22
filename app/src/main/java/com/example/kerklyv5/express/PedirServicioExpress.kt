@@ -321,10 +321,7 @@ class PedirServicioExpress : AppCompatActivity() {
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(IngresarPresupuestoInterface::class.java)
-        Log.e("id", "$id")
-        Log.e("curp", Curp)
-        Log.e("problematica", problematica)
-        Log.e("id", oficio)
+
         api.aceptar(Curp, problematica, id, oficio,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
@@ -336,7 +333,7 @@ class PedirServicioExpress : AppCompatActivity() {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-                    Log.d("entrada presupuesto", entrada)
+                    //Log.d("entrada presupuesto", entrada)
                     val cadena = "Registro Exitoso"
                     if (cadena.equals(entrada)){
                         Toast.makeText(applicationContext,"Dirección enviada", Toast.LENGTH_LONG).show()
