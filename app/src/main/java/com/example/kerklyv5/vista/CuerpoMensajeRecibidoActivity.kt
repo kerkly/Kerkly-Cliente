@@ -134,7 +134,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
         }
 
         override fun onCancelled(error: DatabaseError) {
-            TODO("Not yet implemented")
+            Toast.makeText(applicationContext, "Error en el sistema $error", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -147,6 +147,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
     fun aceptar(view: View) {
         // acpetarP()
         val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+        b.putBoolean("Express", false)
         intent.putExtras(b)
         startActivity(intent)
     }

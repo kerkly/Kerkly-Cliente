@@ -164,6 +164,7 @@ class MensajesExpress : AppCompatActivity() {
     fun aceptar(view: View) {
        // acpetarP()
         val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+        b.putBoolean("Express", true)
         intent.putExtras(b)
         startActivity(intent)
     }

@@ -13,10 +13,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.Gravity
-import android.view.ViewGroup
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -51,18 +48,22 @@ class ComprobantePagoExpress : AppCompatActivity() {
     lateinit var progressBar: ProgressBar
     val  REQUEST_TAKE_PHOTO = 1
     lateinit var currentPhotoPath: String
-
+    private lateinit var txt: TextView
+    private var band = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comprobante_pago_express)
 
         storageReference = FirebaseStorage.getInstance().reference
+        txt = findViewById(R.id.txt_comprobante_pago_label)
 
         b = intent.extras!!
 
         folio = b.getInt("Folio")
         Log.d("folio", folio.toString())
+
+        band = b.getBoolean("Express")
 
         btn = findViewById(R.id.btn_contrato)
         btn_tomarFoto = findViewById(R.id.tomarFoto_btn)
@@ -95,6 +96,10 @@ class ComprobantePagoExpress : AppCompatActivity() {
                 }
             }
             builder.show()
+        }
+
+        if (!band) {
+            txt.visibility = View.GONE
         }
     }
 

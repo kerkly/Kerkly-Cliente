@@ -150,7 +150,7 @@
 
 
     <TextView
-        android:id="@+id/button11"
+        android:id="@+id/prueba_txt_contrato"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:height="37dp"
@@ -171,7 +171,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/button11"
+        app:layout_constraintBottom_toTopOf="@+id/prueba_txt_contrato"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 

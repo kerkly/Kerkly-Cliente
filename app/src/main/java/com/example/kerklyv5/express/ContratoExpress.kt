@@ -13,7 +13,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.kerklyv5.R
+import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
+import com.example.kerklyv5.interfaces.AceptarPresupuestoNormalInterface
 import com.example.kerklyv5.interfaces.ActualizarMensajeInterface
 import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
@@ -34,6 +36,7 @@ class ContratoExpress : AppCompatActivity() {
     private lateinit var txt_fecha: TextView
     private lateinit var txt_folio: TextView
     private lateinit var txt_hora: TextView
+    private lateinit var txt_prueba: TextView
     private var folio: Int = 0
     private lateinit var formaPago: TextView
     private lateinit var boton_dow: MaterialButton
@@ -42,6 +45,7 @@ class ContratoExpress : AppCompatActivity() {
     private lateinit var b: Bundle
     private var intentos = 0
     private lateinit var telefono: String
+    private var band = false
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.N)
@@ -57,6 +61,7 @@ class ContratoExpress : AppCompatActivity() {
         txt_folio = findViewById(R.id.textViewFolioContrato)
         boton_dow = findViewById(R.id.button_descargsr)
         boton_inicio = findViewById(R.id.button_inicio)
+        txt_prueba = findViewById(R.id.prueba_txt_contrato)
         dialog = Dialog(this)
 
 
@@ -66,7 +71,12 @@ class ContratoExpress : AppCompatActivity() {
         }
 
         boton_inicio.setOnClickListener {
-            val intent = Intent(this, PedirServicioExpress::class.java)
+            var intent: Intent
+            if (band) {
+                intent = Intent(this, PedirServicioExpress::class.java)
+            } else {
+                intent = Intent(this, SolicitarServicio::class.java)
+            }
             intent.putExtras(b)
             startActivity(intent)
         }
@@ -115,8 +125,45 @@ class ContratoExpress : AppCompatActivity() {
 
         intentos += 1
 
-        acpetarP()
-        actualizarMensaje()
+
+
+        if (!band) {
+            txt_prueba.visibility = View.GONE
+            txt_intentos.visibility = View.GONE
+            aceptarNormal()
+        } else {
+            acpetarP()
+            actualizarMensaje()
+        }
+
+    }
+
+    private fun aceptarNormal() {
+        val ROOT_URL = Url().url
+        val adaptar = RestAdapter.Builder()
+            .setEndpoint(ROOT_URL)
+            .build()
+        val api = adaptar.create(AceptarPresupuestoNormalInterface ::class.java)
+        api.Aceptar(folio.toString(), "1",
+                    object : Callback<Response?> {
+                        override fun success(t: Response?, response: Response?) {
+                            var entrada: BufferedReader? =  null
+                            var Respuesta = ""
+                            try {
+                                entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                                Respuesta = entrada.readLine()
+                            }catch (e: Exception){
+                                e.printStackTrace()
+                            }
+                            Toast.makeText(applicationContext, Respuesta, Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun failure(error: RetrofitError?) {
+                            Toast.makeText(applicationContext, "error $error", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+        )
 
     }
 

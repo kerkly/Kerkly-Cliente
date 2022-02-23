@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.kerklyv5.R
 import com.google.android.material.button.MaterialButton
@@ -19,6 +21,8 @@ class PagoExpress : AppCompatActivity() {
     private lateinit var b: Bundle
     private val peso_signo: String = "$"
     private lateinit var btn: MaterialButton
+    private var band = false
+    private lateinit var layout: LinearLayout
 
 
     @SuppressLint("SetTextI18n")
@@ -31,6 +35,7 @@ class PagoExpress : AppCompatActivity() {
         btn = findViewById(R.id.subir_voucher_btn)
         edit_banco = findViewById(R.id.edit_banco)
         edit_tarjeta = findViewById(R.id.edit_tarjeta)
+        layout = findViewById(R.id.layout_linear_pago)
 
         edit_titular.isEnabled = false
         edit_banco.isEnabled = false
@@ -42,6 +47,7 @@ class PagoExpress : AppCompatActivity() {
 
         b = intent.extras!!
         pago = b.getDouble("Pago total")
+        band = b.getBoolean("Express")
 
         val pagoS = "$peso_signo $pago"
         pago_Txt.text = pagoS
@@ -50,6 +56,10 @@ class PagoExpress : AppCompatActivity() {
             val i = Intent(applicationContext, ComprobantePagoExpress::class.java)
             i.putExtras(b)
             startActivity(i)
+        }
+
+        if (!band) {
+            layout.visibility = View.GONE
         }
     }
 }
