@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -36,6 +38,9 @@ class MensajesFragment : Fragment() {
     private lateinit var adapter: AdapterChat
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var databaseReference: DatabaseReference
+    private lateinit var txt_nombreKerkly: TextView
+    private lateinit var b: Bundle
+    var id_ = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +60,17 @@ class MensajesFragment : Fragment() {
         boton = v.findViewById(R.id.boton_chat)
         editText = v.findViewById(R.id.editTextChat)
         recyclerView = v.findViewById(R.id.recycler_chat)
+        txt_nombreKerkly = v.findViewById(R.id.txt_nombre_kerkly_chats)
+
+        b = requireArguments()
+
+        val nombre = b.getString("Nombre_completo_Kerkly")
+        id_ = b.getInt("IdContrato")
+
+        txt_nombreKerkly.text = nombre
 
         firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReference = firebaseDatabase.getReference("chat")
+        databaseReference = firebaseDatabase.getReference("Chat $id_")
 
         adapter = AdapterChat(requireContext())
 

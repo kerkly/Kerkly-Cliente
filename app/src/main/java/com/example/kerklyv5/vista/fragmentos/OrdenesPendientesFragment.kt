@@ -40,6 +40,7 @@ class OrdenesPendientesFragment : Fragment() {
     private lateinit var recyclerview: RecyclerView
     private lateinit var adapter: AdapterOrdenPendiente
     private lateinit var telefono: String
+    private lateinit var b: Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +60,10 @@ class OrdenesPendientesFragment : Fragment() {
         recyclerview = v.findViewById(R.id.recycler_ordenesPendientes)
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(context)
-        telefono = arguments?.getString("Telefono").toString()
+
+        b = requireArguments()
+
+        telefono = b.getString("Telefono").toString()
         Log.d("telefono", telefono)
         getOrdenes()
 
@@ -95,6 +99,28 @@ class OrdenesPendientesFragment : Fragment() {
 
                 adapter = AdapterOrdenPendiente(postList)
 
+                adapter.setOnClickListener {
+
+                    val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
+                    val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
+                    val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
+
+                    val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
+
+                    b = Bundle()
+                    b.putString("Nombre_Kerkly", nombre_kerkly)
+                    b.putString("Ap_Kerkly", ap_kerkly)
+                    b.putString("Nombre_completo_Kerkly", nomre_completo_kerkly)
+                    b.putInt("IdContrato", id)
+
+                    val f = MensajesFragment()
+                    f.arguments = b
+                    var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+                    }
+
+                }
+
                 recyclerview.adapter = adapter
 
 
@@ -107,5 +133,18 @@ class OrdenesPendientesFragment : Fragment() {
             }
 
         })
+    }
+
+   // private fun setChats(n: String, ap: String, nCompleto: String, id: Int) {
+    private fun setChats(b_: Bundle) {
+       val f = MensajesFragment()
+       f.arguments = b_
+       /* f.arguments?.putInt("IdContrato", id)
+        f.arguments?.putString("Nombre Kerkly", n)
+        f.arguments?.putString("Ap Kerkly", ap)
+        f.arguments?.putString("Nombre completo Kerkly", nCompleto)*/
+        var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
+            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+        }
     }
 }

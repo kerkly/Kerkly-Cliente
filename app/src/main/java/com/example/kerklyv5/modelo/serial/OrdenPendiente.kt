@@ -17,27 +17,27 @@ class OrdenPendiente {
     @Expose
     var Fecha_Inicio: String = ""
 
-    @SerializedName("Nombre")
+    @SerializedName("cliente_nombre")
     @Expose
     var Nombre: String = ""
 
-    @SerializedName("Apellido_Paterno")
+    @SerializedName("cliente_ap")
     @Expose
     var Apellido_Paterno: String = ""
 
-    @SerializedName("Apellido_Materno")
+    @SerializedName("cliente_am")
     @Expose
     var Apellido_Materno: String = ""
 
-    @SerializedName("kerkly.Nombre")
+    @SerializedName("Nombre")
     @Expose
     var NombreK: String = ""
 
-    @SerializedName("kerkly.Apellido_Paterno")
+    @SerializedName("Apellido_Paterno")
     @Expose
     var Apellido_PaternoK: String = ""
 
-    @SerializedName("kerkly.Apellido_Materno")
+    @SerializedName("Apellido_Materno")
     @Expose
     var Apellido_MaternoK: String = ""
 }
