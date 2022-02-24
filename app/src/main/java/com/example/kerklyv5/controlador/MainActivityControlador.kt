@@ -14,6 +14,7 @@ import com.example.kerklyv5.modelo.Cliente
 import com.example.kerklyv5.R
 import com.example.kerklyv5.interfaces.*
 import com.example.kerklyv5.url.Url
+import com.example.kerklyv5.vista.MainActivity
 import com.google.android.material.textfield.TextInputLayout
 import retrofit.Callback
 import retrofit.RestAdapter
@@ -184,9 +185,11 @@ class MainActivityControlador {
                         e.printStackTrace()
                     }
 
-                    Log.e("nosee", output)
                     if(output == "0") {
-                        return
+                        val  intent = Intent(contexto, MainActivity::class.java)
+                        intent.putExtra("Telefono", output)
+                        contexto.startActivity(intent)
+                        contexto.finish()
                     } else {
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", output)

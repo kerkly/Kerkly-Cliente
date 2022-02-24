@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
-        controlador.verificarSesion(id, this)
+       // controlador.verificarSesion(id, this)
 
 
         super.onCreate(savedInstanceState)
@@ -67,8 +67,6 @@ class MainActivity : AppCompatActivity() {
         layoutUsuario = findViewById(R.id.textnputUser)
         layoutContra = findViewById(R.id.textnputPassword)
         dialog = Dialog(this)
-
-
 
 
         //  val constraints = Constraints.Builder().setRequiresCharging(true).build()
