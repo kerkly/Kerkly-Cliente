@@ -87,4 +87,8 @@ dependencies {
 
     implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
     implementation 'com.google.firebase:firebase-storage:20.0.0'
+
+    dependencies {
+        implementation 'com.airbnb.android:paris:2.0.0'
+    }
 }

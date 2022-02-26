@@ -22,4 +22,6 @@
     <color name="letra_pruebaSinR">#D9000000</color>
 
     <color name="fondo_formaOxxo">#A8EADD</color>
+
+    <color name="transparente">#FFFFFF</color>
 </resources>

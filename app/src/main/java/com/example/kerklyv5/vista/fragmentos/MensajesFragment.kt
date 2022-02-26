@@ -1,7 +1,8 @@
 package com.example.kerklyv5.vista.fragmentos
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -16,6 +18,8 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterChat
 import com.example.kerklyv5.modelo.Mensaje
 import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,7 +91,7 @@ class MensajesFragment : Fragment() {
 
         boton.setOnClickListener {
             //adapter.addMensaje(Mensaje(editText.text.toString(), "00:00"))
-            databaseReference.push().setValue(Mensaje(editText.text.toString(), "00:00"))
+            databaseReference.push().setValue(Mensaje(editText.text.toString(), getTime()))
             editText.setText("")
         }
 
@@ -120,6 +124,16 @@ class MensajesFragment : Fragment() {
 
     private fun setScrollBar() {
         recyclerView.scrollToPosition(adapter.itemCount-1)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun getTime(): String {
+        val formatter = SimpleDateFormat("HH:mm")
+        val curDate = Date(System.currentTimeMillis())
+        // Obtener la hora actual
+        val str: String = formatter.format(curDate)
+
+        return str
     }
 
 }
