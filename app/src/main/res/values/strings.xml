@@ -14,7 +14,7 @@
 
     <string name="klerkly">Kerkly</string>
     <string name="iniciarSesion">Iniciar Sesión</string>
-    <string name="usuario">Usuario</string>
+    <string name="usuario">Número Celular</string>
     <string name="contrasenia">Contraseña</string>
     <string name="iniciar">Iniciar</string>
     <string name="crear">Crear cuenta</string>
@@ -72,7 +72,7 @@
     <string name="continuar">Continuar</string>
     <string name="ingreseCaracteres">Ingrese los 16 dígitos de la tarjeta</string>
     <string name="ingreseCCV">Ingrese los 3 dígitos del número CCV</string>
-    <string name="tucuenta">Tu cuenta en KERKLY</string>
+    <string name="tucuenta">Registrate en KERKLY</string>
     <string name="introduce_datos">Introduce tus datos</string>
     <string name="nombre">Nombre</string>
     <string name="apellido_paterno">Apellido Paterno</string>
@@ -91,7 +91,7 @@
     <string name="campo_requerido">Campo Requerido</string>
     <string name="correo_igual_error">Este correo ya existe</string>
     <string name="telefono_igual_error">Este teléfono ya existe</string>
-    <string name="telefonoNoRegistrado_confirmar">Para continuar, confirme su núemro telefónico</string>
+    <string name="telefonoNoRegistrado_confirmar">Para continuar, confirme su nùmero telefónico</string>
     <string name="presupuesto">Presupuesto</string>
     <string name="mensaje">Mensaje</string>
     <string name="deFrom">De</string>
@@ -165,7 +165,11 @@
         <item>Mecánico</item>
     </string-array>
     <string name="title_activity_maps">MapsActivity</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps_ker">MapsActivityKer</string>
+
+    <string name="llave_api_google_maps">AIzaSyCKtLDUW6EKmzmlonLmg3wxcFxFjuxRePA</string>
+
 </resources>

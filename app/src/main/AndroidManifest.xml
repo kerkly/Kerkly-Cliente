@@ -33,16 +33,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KerklyV5">
         <activity
+            android:name=".extras.IntroSliderActivity"
+            android:exported="false" />
+        <activity
             android:name=".vista.PantallaInicio"
             android:exported="true"
             android:screenOrientation="fullSensor">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".vista.CuerpoMensajeRecibidoActivity"
@@ -55,9 +56,7 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+
 
         <activity
             android:name=".MapsActivityKer"
@@ -113,11 +112,16 @@
             android:name=".SolicitarServicio"
             android:exported="true"
             android:label="@string/title_activity_solicitar_servicio"
-            android:theme="@style/Theme.KerklyV5.NoActionBar" />
+            />
+
         <activity
             android:name=".vista.MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
+
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCKtLDUW6EKmzmlonLmg3wxcFxFjuxRePA" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

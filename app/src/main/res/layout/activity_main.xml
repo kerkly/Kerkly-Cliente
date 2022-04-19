@@ -1,145 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo"
-    android:forceDarkAllowed="false"
-    tools:context=".vista.MainActivity">
+android:background="@color/black"
 
-    <ScrollView
+ >
+
+
+    <VideoView
+        android:id="@+id/vv_fondo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_centerInParent="true">
+
+
+    </VideoView>
+
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+
+
+
+        <ImageView
+            android:id="@+id/logokerkly"
+            android:layout_width="200dp"
+
+            android:layout_height="200dp"
+            app:srcCompat="@drawable/kerklylogo22" />
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/quicksand_bold"
+            android:text="@string/iniciarSesion"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textnputUser"
+
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:enabled="true"
+            android:textColorHint="@color/white"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/usuario"
+            app:boxStrokeColor="@color/white"
+            app:errorEnabled="true"
+            app:boxCornerRadiusTopEnd="50dp"
 
 
-            <Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="@color/colorBoton"
-                android:forceDarkAllowed="false"
-                android:onClick="click"
-                android:text="@string/iniciar"
-                android:textColor="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textnputPassword"
-                tools:ignore="TouchTargetSizeCheck" />
+            app:startIconDrawable="@drawable/ic_baseline_account_circle_24">
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="362dp"
-                android:layout_height="558dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/hexa" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_user"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="15dp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/quicksand_bold"
+                android:inputType="phone"
+                tools:ignore="SpeakableTextPresentCheck" />
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="185dp"
-                android:text="@string/iniciarSesion"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textnputPassword"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+             android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:textColorHint="@color/white"
+            app:boxStrokeColor="@color/white"
+            app:boxCornerRadiusBottomStart="50dp"
 
-                android:id="@+id/textnputUser"
-                android:layout_width="224dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="16dp"
-                app:errorEnabled="true"
-                android:hint="@string/usuario"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2"
-                app:startIconDrawable="@drawable/ic_baseline_account_circle_24">
+            android:layout_marginTop="10dp"
+            android:hint="@string/contrasenia"
+            app:endIconMode="password_toggle"
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_user"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="12sp"
-                    tools:ignore="SpeakableTextPresentCheck" />
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24">
 
-            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_password"
+                android:layout_width="match_parent"
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:id="@+id/textnputPassword"
-                android:layout_width="224dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="10dp"
-                android:hint="@string/contrasenia"
-                app:endIconMode="password_toggle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textnputUser"
-                app:startIconDrawable="@drawable/ic_baseline_vpn_key_24">
+                android:textColor="@color/white"
+                 android:fontFamily="@font/quicksand_bold"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:textSize="15dp"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="textPassword"
-                    android:textSize="12sp"
-                    tools:ignore="SpeakableTextPresentCheck" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/colorBoton"
+            android:fontFamily="@font/quicksand_bold"
+            android:onClick="click"
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="crearCuenta"
-                android:text="@string/crear"
-                android:textColor="@color/colorLetras"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/button"
-                tools:ignore="TouchTargetSizeCheck" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="restablecerContrasenia"
-                android:text="@string/olvidarContrasenia"
-                android:textColor="@color/colorLetras"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView"
-                tools:ignore="TouchTargetSizeCheck" />
+            android:padding="15dp"
+            android:text="@string/iniciar"
+            android:textColor="@color/black"
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            tools:ignore="TouchTargetSizeCheck" />
 
-    </ScrollView>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="crearCuenta"
+            android:text="@string/crear"
+            android:layout_marginTop="20dp"
+            android:textSize="15dp"
+
+            android:textColor="@color/colorBoton"
+            android:textStyle="bold"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:onClick="restablecerContrasenia"
+
+            android:text="@string/olvidarContrasenia"
+            android:textColor="@color/colorBoton"
+            android:textSize="15dp"
+            tools:ignore="TouchTargetSizeCheck" />
+
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:height="30dp"
         android:backgroundTint="@color/colorBoton"
-        android:minHeight="32dp"
-        android:onClick="servicioExpress"
+        android:onClick="mostrarSalir"
         android:text="@string/pruebaSinRegistro"
         android:textAlignment="textEnd"
         android:textColor="@color/black"
@@ -151,4 +173,6 @@
         app:layout_constraintStart_toStartOf="parent" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</RelativeLayout>

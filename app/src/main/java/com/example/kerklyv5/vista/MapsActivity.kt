@@ -111,6 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 b.putString("Latitud", la)
                 b.putString("Longitud", lo)
+                b.putBoolean("PresupuestoListo", true)
                 intent.putExtras(b)
                 startActivity(intent)
           //  }

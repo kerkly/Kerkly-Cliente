@@ -54,6 +54,7 @@ class MainActivityControlador {
                     if (Res.equals(Respuesta)){
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", usuario.getUsuario())
+                        intent.putExtra("PresupuestoListo", false)
                         contexto.startActivity(intent)
                         contexto.finish()
                     }
@@ -193,6 +194,7 @@ class MainActivityControlador {
                     } else {
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", output)
+                        intent.putExtra("PresupuestoListo", false)
                         contexto.startActivity(intent)
                         contexto.finish()
                     }

@@ -1,5 +1,7 @@
 package com.example.kerklyv5
 
+import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -16,11 +18,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
+import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
 import com.example.kerklyv5.interfaces.SesionAbiertaInterface
 import com.example.kerklyv5.modelo.serial.ClienteModelo
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
+import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -47,6 +51,8 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var correo: String
     private lateinit var id: String
     private lateinit var drawerLayout: DrawerLayout
+    private var presupuestoListo = false
+    private lateinit var dialog: Dialog
 
 
 
@@ -56,6 +62,8 @@ class SolicitarServicio : AppCompatActivity() {
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        dialog = Dialog(this)
+
         //txt_nombre = findViewById(R.id.nombre_txt)
       //  txt_correo = findViewById(R.id.correo_txt)
 
@@ -64,6 +72,7 @@ class SolicitarServicio : AppCompatActivity() {
         b = intent.extras!!
         telefono = b.getString("Telefono")!!
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        presupuestoListo = b.getBoolean("PresupuestoListo")
 
 
         drawerLayout = binding.drawerLayout
@@ -94,12 +103,19 @@ class SolicitarServicio : AppCompatActivity() {
                 R.id.nav_ordenesPendientes -> setFragmentOrdenesPendientes()
                 R.id.historialFragment -> setFragmentHistorial()
                 R.id.nav_mensajes -> setMensajesPresupuesto()
+                R.id.nav_cerrarSesion -> cerrarSesion()
 
             }
 
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
+
+        if (presupuestoListo) {
+            dialog.setContentView(R.layout.presupuesto_solicitud)
+            dialog.show()
+        }
+
 
         getJson()
 
@@ -209,6 +225,46 @@ class SolicitarServicio : AppCompatActivity() {
 
             }
         )
+    }
+
+    private fun cerrarSesion() {
+        Log.e("correo", correo)
+        val ROOT_URL = Url().url
+        val adapter = RestAdapter.Builder()
+            .setEndpoint(ROOT_URL)
+            .build()
+        val api = adapter.create(CerrarSesionInterface::class.java)
+        api.cerrar(correo,
+                    object: retrofit.Callback<retrofit.client.Response?> {
+                        override fun success(
+                            t: retrofit.client.Response?,
+                            response: retrofit.client.Response?
+                        ) {
+                            var reader: BufferedReader? = null
+                            var output = ""
+                            try {
+                                reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
+
+                                output = reader.readLine()
+
+
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                            }
+                            Log.e("output", output)
+
+                            if (output == "1") {
+                                Toast.makeText(applicationContext, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                                val i = Intent(applicationContext, MainActivity::class.java)
+                                startActivity(i)
+                            }
+                        }
+
+                        override fun failure(error: RetrofitError?) {
+                            TODO("Not yet implemented")
+                        }
+
+                    })
     }
 
     private fun getJson() {
