@@ -23,8 +23,6 @@
         android:layout_centerInParent="true"
         app:srcCompat="@drawable/logo_sin_fondo" />
 
-
-
     <com.scwang.wave.MultiWaveHeader
         android:id="@+id/waveHeader2"
         android:scaleY="-1"

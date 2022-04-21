@@ -100,6 +100,7 @@ class SolicitarServicio : AppCompatActivity() {
         navView.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_home -> setFragmentHome()
+                R.id.nav_notificaciones -> setNoficiaciontes()
                 R.id.nav_ordenesPendientes -> setFragmentOrdenesPendientes()
                 R.id.historialFragment -> setFragmentHistorial()
                 R.id.nav_mensajes -> setMensajesPresupuesto()
@@ -188,6 +189,10 @@ class SolicitarServicio : AppCompatActivity() {
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
+    }
+
+    private fun setNoficiaciontes() {
+
     }
 
 

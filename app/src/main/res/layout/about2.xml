@@ -44,7 +44,7 @@ android:orientation="vertical"
                 <ImageButton
                     android:layout_weight="2"
                     android:layout_gravity="center"
-android:id="@+id/buttonclosed"
+                    android:id="@+id/buttonclosed"
                     android:layout_width="match_parent"
                     android:background="@color/transparente"
                     android:layout_height="wrap_content"
@@ -59,13 +59,14 @@ android:id="@+id/buttonclosed"
                 android:layout_height="200dp"
                 android:layout_marginTop="30dp"
                 android:scaleType="centerCrop"
-android:layout_gravity="center"
+                android:layout_gravity="center"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/verifu">
-
-
+                app:lottie_rawRes="@raw/verifu"
+                tools:ignore="MissingClass">
             </com.airbnb.lottie.LottieAnimationView>
+
+
             <TextView
                 android:id="@+id/msjResultado"
                 android:layout_margin="20dp"

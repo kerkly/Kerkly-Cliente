@@ -76,6 +76,7 @@ class MensajesPresupuestoFragment : Fragment() {
     }
 
     private fun getJson() {
+        Log.d("tel", telefono)
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
             .setLenient()
@@ -103,9 +104,9 @@ class MensajesPresupuestoFragment : Fragment() {
 
                 adapter = AdapterMensajesNormal(postList)
                 adapter.setOnClickListener{
-                    /*Toast.makeText(activity,
+                    Toast.makeText(activity,
                         postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente,
-                        Toast.LENGTH_SHORT).show()*/
+                        Toast.LENGTH_SHORT).show()
                     val nombre = postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente
                     val ap = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoPaterno
                     val am = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoMaterno

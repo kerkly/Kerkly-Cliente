@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'com.google.gms.google-services'
+    id 'kotlin-android-extensions'
 }
 
 android {
@@ -91,4 +92,9 @@ dependencies {
     dependencies {
         implementation 'com.airbnb.android:paris:2.0.0'
     }
+
+    // Lottie
+    implementation 'com.scwang.wave:MultiWaveHeader:1.0.0'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation "com.airbnb.android:lottie:3.0.7"
 }

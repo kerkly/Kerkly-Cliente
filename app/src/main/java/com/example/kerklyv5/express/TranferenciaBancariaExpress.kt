@@ -33,6 +33,7 @@ class TranferenciaBancariaExpress : AppCompatActivity() {
 
         boton.setOnClickListener {
             val i = Intent(application, ComprobantePagoExpress::class.java)
+            // val i = Intent(application, Contrato::class.java)
             i.putExtras(b)
             startActivity(i)
         }
