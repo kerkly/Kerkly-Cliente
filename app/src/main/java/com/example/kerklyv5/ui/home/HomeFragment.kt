@@ -1,5 +1,6 @@
 package com.example.kerklyv5.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.example.kerklyv5.controlador.AdapterSpinner
 import com.example.kerklyv5.interfaces.ObtenerOficiosInterface
 import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.url.Url
+import com.example.kerklyv5.vista.MapsActivity
 import com.example.kerklyv5.vista.fragmentos.KerklyFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -129,13 +131,15 @@ class HomeFragment : Fragment() {
             layoutProblem.error = getString(R.string.campo_requerido)
         } else {
             layoutProblem.error = null
-            val f = KerklyFragment()
+           /* val f = KerklyFragment()
             f.arguments = b
             var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
-                replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+                replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()*/
+            val i = Intent(context, MapsActivity::class.java)
+            b.putBoolean("Express", false)
+            i.putExtras(b)
+            startActivity(i)
             }
         }
 
     }
-
-}

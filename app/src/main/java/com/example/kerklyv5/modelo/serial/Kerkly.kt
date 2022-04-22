@@ -19,4 +19,16 @@ class Kerkly {
     @SerializedName("Apellido_Materno")
     @Expose
     var Apellido_Materno: String = ""
+
+    @SerializedName("latitud")
+    @Expose
+    var latitud: Double = 0.0
+
+    @SerializedName("longitud")
+    @Expose
+    var longitud: Double = 0.0
+
+    var hora: Int = 0
+    var minutos: Int = 0
+    var distancia: Double = 0.0
 }

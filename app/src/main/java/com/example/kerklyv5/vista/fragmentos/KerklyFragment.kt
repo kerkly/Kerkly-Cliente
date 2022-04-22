@@ -69,70 +69,11 @@ class KerklyFragment : Fragment() {
         telefono = arguments?.getString("Telefono").toString()
         problema = arguments?.getString("Problema").toString()*/
         b = requireArguments()
-        getOficios()
+       // getOficios()
 
         return v
     }
 
-    private fun getOficios () {
-        val ROOT_URL = Url().url
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
 
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client: OkHttpClient = OkHttpClient.Builder().build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl("$ROOT_URL/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-        val presupuestoGET = retrofit.create(ObtenerKerklyInterface::class.java)
-        val call = presupuestoGET.kerklys(oficio)
-
-        call?.enqueue(object : retrofit2.Callback<List<Kerkly?>?> {
-
-            override fun onResponse(
-                call: Call<List<Kerkly?>?>,
-                response: retrofit2.Response<List<Kerkly?>?>
-            ) {
-                val postList: ArrayList<Kerkly> = response.body()
-                        as ArrayList<Kerkly>
-
-                adapter = AdapterKerkly(postList)
-
-                adapter.setOnClickListener {
-                    Log.d("curp", postList[recyclerview.getChildAdapterPosition(it)].Curp)
-                    Toast.makeText(activity, postList[recyclerview.getChildAdapterPosition(it)].Curp,
-                            Toast.LENGTH_SHORT).show()
-
-                    b.putBoolean("Ker", true)
-
-                    var i = Intent(activity, MapsActivity::class.java)
-                    //b.putString("Nombre Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Nombre)
-                  //  b.putString("AP Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Apellido_Paterno)
-                   // b.putString("AM Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Apellido_Materno)
-                    b.putString("Curp Kerkly", postList[recyclerview.getChildAdapterPosition((it))].Curp)
-
-                    i.putExtras(b)
-                    startActivity(i)
-
-                }
-
-                recyclerview.adapter = adapter
-
-
-            }
-
-            override fun onFailure(call: Call<List<Kerkly?>?>, t: Throwable) {
-
-                Log.d("error del retrofit", t.toString())
-                Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
-            }
-
-        })
-    }
 
 }

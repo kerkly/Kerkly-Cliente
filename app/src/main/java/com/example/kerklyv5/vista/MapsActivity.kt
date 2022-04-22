@@ -9,6 +9,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -58,10 +59,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         b = intent.extras!!
 
-        curp = b.getString("Curp Kerkly").toString()
+
+
+       /* curp = b.getString("Curp Kerkly").toString()
         problema = b.getString("Problema").toString()
         telefono = b.getString("Telefono").toString()
-        oficio = b.getString("Oficio").toString()
+        oficio = b.getString("Oficio").toString()*/
 
         val band: Boolean = b.getBoolean("Express")
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -69,7 +72,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val bandK = b.getBoolean("Ker")
+       // val bandK = b.getBoolean("Ker")
 
         getLocalizacion()
 
@@ -89,7 +92,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
         BotonEnviarU.setOnClickListener {
 
-            val la = java.lang.Double.toString(latitud)
+            b.putDouble("Latitud", latitud)
+            b.putDouble("Longitud", longitud)
+            Log.d("latitud", "$latitud")
+            Log.d("longitud", "$longitud"
+            )
+
+            if(!band) {
+                val i = Intent(applicationContext, KerklyListActivity::class.java)
+                i.putExtras(b)
+                startActivity(i)
+            }
+
+            /*val la = java.lang.Double.toString(latitud)
             val lo = java.lang.Double.toString(longitud)
 
             //if (bandK!!) {
@@ -117,7 +132,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
           //  }
 
 
-
+*/
         }
     }
 
@@ -187,7 +202,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 latitud = location.latitude
                 longitud = location.longitude
 
-                mMap.addMarker(MarkerOptions().position(miUbicacion).title("ubicacion de Luis Luis"))
+                mMap.addMarker(MarkerOptions().position(miUbicacion).title("Mi ubicación"))
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion))
                 val cameraPosition = CameraPosition.Builder()
                     .target(miUbicacion)
