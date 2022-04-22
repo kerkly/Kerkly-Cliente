@@ -136,42 +136,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun ingresarPresupuesto() {
-        val ROOT_URL = Url().url
-        val adapter = RestAdapter.Builder()
-            .setEndpoint(ROOT_URL)
-            .build()
-        val api = adapter.create(IngresarPresupuestoClienteInterface::class.java)
-        api.presupuesto(curp, problema, telefono, oficio, latitud, longitud,
-            object : Callback<Response?> {
-                override fun success(t: Response?, response: Response?) {
-                    var salida: BufferedReader? = null
-                    var entrada = ""
-                    try {
-                        salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
-                        entrada = salida.readLine()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
-
-
-                    val cadena = "Datos enviados"
-                    if (cadena.equals(entrada)){
-                        Toast.makeText(applicationContext,"Datos enviados", Toast.LENGTH_LONG).show()
-                    }
-                }
-
-                override fun failure(error: RetrofitError?) {
-                    println("error$error")
-                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
-                }
-
-            }
-        )
-    }
-
 
     /**
      * Manipulates the map once available.

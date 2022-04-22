@@ -30,5 +30,5 @@ class Kerkly {
 
     var hora: Int = 0
     var minutos: Int = 0
-    var distancia: Double = 0.0
+    var horaMin: Int = 0
 }

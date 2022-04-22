@@ -1,5 +1,6 @@
 package com.example.kerklyv5.controlador
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +17,14 @@ class AdapterKerkly(val datset: ArrayList<Kerkly>):
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtNombre: TextView = view.findViewById(R.id.nombre_kekrly_txt)
 
+        val txt_tiempo: TextView = view.findViewById(R.id.tiempo_kerkly)
+
         init {}
 
     }
 
     // Replace the contents of a view (invoked by the layout manager)
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(viewHolder: AdapterKerkly.ViewHolder, position: Int) {
         val n = datset[position].Nombre
         val ap = datset[position].Apellido_Paterno
@@ -28,6 +32,24 @@ class AdapterKerkly(val datset: ArrayList<Kerkly>):
         val nombre = "$n $ap $am"
 
         viewHolder.txtNombre.text = nombre
+        //var h = datset[position].hora
+       // var m = datset[position].minutos
+
+        var h = ""
+        var m = ""
+
+        if (datset[position].hora  < 10) {
+            h = "0${datset[position].hora}"
+        } else {
+            h = "${datset[position].hora}"
+        }
+
+        if (datset[position].minutos  < 10) {
+            m = "0${datset[position].minutos}"
+        } else {
+            m = "${datset[position].minutos}"
+        }
+        viewHolder.txt_tiempo.text = "$h:$m"
 
 
     }
