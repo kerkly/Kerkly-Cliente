@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +43,8 @@ class OrdenesPendientesFragment : Fragment() {
     private lateinit var adapter: AdapterOrdenPendiente
     private lateinit var telefono: String
     private lateinit var b: Bundle
+    private lateinit var img: ImageView
+    private lateinit var txt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +64,9 @@ class OrdenesPendientesFragment : Fragment() {
         recyclerview = v.findViewById(R.id.recycler_ordenesPendientes)
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(context)
+
+        img = v.findViewById(R.id.img_ordenesPendientes)
+        txt = v.findViewById(R.id.txt_ordenesPendientes)
 
         b = requireArguments()
 
@@ -97,33 +104,40 @@ class OrdenesPendientesFragment : Fragment() {
                 val postList: ArrayList<OrdenPendiente> = response.body()
                         as ArrayList<OrdenPendiente>
 
-                adapter = AdapterOrdenPendiente(postList)
+                if (postList.size == 0) {
+                    recyclerview.visibility = View.GONE
+                } else {
+                    img.visibility = View.GONE
+                    txt.visibility = View.GONE
 
-                adapter.setOnClickListener {
+                    adapter = AdapterOrdenPendiente(postList)
 
-                    val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
-                    val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
-                    val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
+                    adapter.setOnClickListener {
 
-                    val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
+                        val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
+                        val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
+                        val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
 
-                    b = Bundle()
-                    b.putString("Nombre_Kerkly", nombre_kerkly)
-                    b.putString("Ap_Kerkly", ap_kerkly)
-                    b.putString("Nombre_completo_Kerkly", nomre_completo_kerkly)
-                    b.putInt("IdContrato", id)
+                        val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
 
-                    val f = MensajesFragment()
-                    f.arguments = b
-                    var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+                        b = Bundle()
+                        b.putString("Nombre_Kerkly", nombre_kerkly)
+                        b.putString("Ap_Kerkly", ap_kerkly)
+                        b.putString("Nombre_completo_Kerkly", nomre_completo_kerkly)
+                        b.putInt("IdContrato", id)
+
+                        val f = MensajesFragment()
+                        f.arguments = b
+                        var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+                        }
+
                     }
 
+                    recyclerview.adapter = adapter
+
+
                 }
-
-                recyclerview.adapter = adapter
-
-
             }
 
             override fun onFailure(call: Call<List<OrdenPendiente?>?>, t: Throwable) {

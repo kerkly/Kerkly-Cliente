@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +50,8 @@ class MensajesPresupuestoFragment : Fragment() {
     private lateinit var recyclerview: RecyclerView
     private lateinit var adapter: AdapterMensajesNormal
     private lateinit var b: Bundle
+    private lateinit var img: ImageView
+    private lateinit var txt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +71,13 @@ class MensajesPresupuestoFragment : Fragment() {
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager= LinearLayoutManager(context)
 
+        img = v.findViewById(R.id.img_mensajes)
+        txt = v.findViewById(R.id.txt_mensajes)
+
         b = requireArguments()
 
         telefono = arguments?.getString("Telefono").toString()
+        Log.d("teeel", telefono)
 
         getJson()
         return v
@@ -102,63 +110,72 @@ class MensajesPresupuestoFragment : Fragment() {
                 val postList: ArrayList<PresupuestoNormal> = response.body()
                         as ArrayList<PresupuestoNormal>
 
-                adapter = AdapterMensajesNormal(postList)
-                adapter.setOnClickListener{
-                    Toast.makeText(activity,
-                        postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente,
-                        Toast.LENGTH_SHORT).show()
-                    val nombre = postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente
-                    val ap = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoPaterno
-                    val am = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoMaterno
-                    val telefonoT = postList[recyclerview.getChildAdapterPosition(it)].Telefono
-                    val calle = postList[recyclerview.getChildAdapterPosition(it)].Calle
-                    val colonia = postList[recyclerview.getChildAdapterPosition(it)].Colonia
-                    val fecha = postList[recyclerview.getChildAdapterPosition(it)].fechaP
-                    val num_ext = postList[recyclerview.getChildAdapterPosition(it)].No_Exterior
-                    val problema = postList[recyclerview.getChildAdapterPosition(it)].problema
-                    val folio = postList[recyclerview.getChildAdapterPosition(it)].idPresupuesto
-                    val pago = postList[recyclerview.getChildAdapterPosition(it)].pago_total
-                    val mensaje = postList[recyclerview.getChildAdapterPosition(it)].cuerpo_mensaje
-                    var pagado = postList[recyclerview.getChildAdapterPosition(it)].estado
-                    val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
-                    val referencia = postList[recyclerview.getChildAdapterPosition(it)].Referencia
-                    val cp = postList[recyclerview.getChildAdapterPosition(it)].Codigo_Postal
-                    val nombreT = postList[recyclerview.getChildAdapterPosition(it)].nombreKerkly
-                    val apT = postList[recyclerview.getChildAdapterPosition(it)].Apellido_Paterno
-                    val amT = postList[recyclerview.getChildAdapterPosition(it)].apellidoMaterno_kerkly
+                if (postList.size == 0) {
+                    recyclerview.visibility = View.GONE
+                } else {
+                    img.visibility = View.GONE
+                    txt.visibility = View.GONE
 
-                    val i = Intent(activity, CuerpoMensajeRecibidoActivity::class.java)
-                    val n = "$nombre $ap $am"
-                    val n2 = "$nombreT $apT $amT"
+                    adapter = AdapterMensajesNormal(postList)
+                    adapter.setOnClickListener{
+                        Toast.makeText(activity,
+                            postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente,
+                            Toast.LENGTH_SHORT).show()
+                        val nombre = postList[recyclerview.getChildAdapterPosition(it)].nombre_cliente
+                        val ap = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoPaterno
+                        val am = postList[recyclerview.getChildAdapterPosition(it)].nombre_apellidoMaterno
+                        val telefonoT = postList[recyclerview.getChildAdapterPosition(it)].Telefono
+                        val calle = postList[recyclerview.getChildAdapterPosition(it)].Calle
+                        val colonia = postList[recyclerview.getChildAdapterPosition(it)].Colonia
+                        val fecha = postList[recyclerview.getChildAdapterPosition(it)].fechaP
+                        val num_ext = postList[recyclerview.getChildAdapterPosition(it)].No_Exterior
+                        val problema = postList[recyclerview.getChildAdapterPosition(it)].problema
+                        val folio = postList[recyclerview.getChildAdapterPosition(it)].idPresupuesto
+                        val pago = postList[recyclerview.getChildAdapterPosition(it)].pago_total
+                        val mensaje = postList[recyclerview.getChildAdapterPosition(it)].cuerpo_mensaje
+                        var pagado = postList[recyclerview.getChildAdapterPosition(it)].estado
+                        val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
+                        val referencia = postList[recyclerview.getChildAdapterPosition(it)].Referencia
+                        val cp = postList[recyclerview.getChildAdapterPosition(it)].Codigo_Postal
+                        val nombreT = postList[recyclerview.getChildAdapterPosition(it)].nombreKerkly
+                        val apT = postList[recyclerview.getChildAdapterPosition(it)].Apellido_Paterno
+                        val amT = postList[recyclerview.getChildAdapterPosition(it)].apellidoMaterno_kerkly
 
-                    if (pagado !=  null) {
-                        pagado = pagado.trim()
+                        val i = Intent(activity, CuerpoMensajeRecibidoActivity::class.java)
+                        val n = "$nombre $ap $am"
+                        val n2 = "$nombreT $apT $amT"
+
+                        if (pagado !=  null) {
+                            pagado = pagado.trim()
+                        }
+
+                        b.putString("Nombre", n)
+                        b.putString("Telefono", telefono)
+                        b.putString("Calle", calle)
+                        b.putString("Colonia", colonia)
+                        b.putString("Fecha", fecha)
+                        b.putInt("Numero exterior", num_ext)
+                        b.putString("Problema", problema)
+                        b.putInt("Folio", folio)
+                        b.putDouble("Pago total", pago)
+                        b.putString("Oficio", oficio)
+                        b.putString("Referencia", referencia)
+                        b.putString("CP", cp)
+                        b.putString("NombreT", n2)
+                        b.putString("Pagado", pagado)
+
+                        if (pagado == "1") {
+                            b.putString("Mensaje", mensaje)
+                        }
+
+                        i.putExtras(b)
+
+                        startActivity(i)
                     }
-
-                    b.putString("Nombre", n)
-                    b.putString("Telefono", telefono)
-                    b.putString("Calle", calle)
-                    b.putString("Colonia", colonia)
-                    b.putString("Fecha", fecha)
-                    b.putInt("Numero exterior", num_ext)
-                    b.putString("Problema", problema)
-                    b.putInt("Folio", folio)
-                    b.putDouble("Pago total", pago)
-                    b.putString("Oficio", oficio)
-                    b.putString("Referencia", referencia)
-                    b.putString("CP", cp)
-                    b.putString("NombreT", n2)
-                    b.putString("Pagado", pagado)
-
-                    if (pagado == "1") {
-                        b.putString("Mensaje", mensaje)
-                    }
-
-                    i.putExtras(b)
-
-                    startActivity(i)
+                    recyclerview.adapter = adapter
                 }
-                recyclerview.adapter = adapter
+
+
             }
 
             override fun onFailure(call: Call<List<PresupuestoNormal?>?>, t: Throwable) {

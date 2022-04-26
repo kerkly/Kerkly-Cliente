@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.navigation.NavigationView
@@ -64,9 +65,6 @@ class SolicitarServicio : AppCompatActivity() {
 
         dialog = Dialog(this)
 
-        //txt_nombre = findViewById(R.id.nombre_txt)
-      //  txt_correo = findViewById(R.id.correo_txt)
-
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
 
         b = intent.extras!!
@@ -122,6 +120,10 @@ class SolicitarServicio : AppCompatActivity() {
 
         setFragmentHome()
 
+    }
+
+    fun cerrarVentana(v: View) {
+        dialog.dismiss()
     }
 
     override fun onBackPressed() {

@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +41,8 @@ class HistorialFragment : Fragment() {
     private lateinit var recyclerview: RecyclerView
     private lateinit var adapter: AdapterHistorial
     private lateinit var telefono: String
+    private lateinit var img: ImageView
+    private lateinit var txt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,9 @@ class HistorialFragment : Fragment() {
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(context)
         telefono = arguments?.getString("Telefono").toString()
+
+        img = v.findViewById(R.id.img_historial)
+        txt = v.findViewById(R.id.txt_historial)
 
         getHistorial()
 
@@ -92,9 +99,23 @@ class HistorialFragment : Fragment() {
                 val postList: ArrayList<Historial> = response.body()
                         as ArrayList<Historial>
 
-                adapter = AdapterHistorial(postList)
+                if (postList.size == 0) {
+                    recyclerview.visibility = View.GONE
+                } else {
+                    img.visibility = View.GONE
+                    txt.visibility = View.GONE
 
-                recyclerview.adapter = adapter
+
+                    adapter = AdapterHistorial(postList)
+
+                    adapter.setOnClickListener {
+                        val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
+
+                        Toast.makeText(context, oficio, Toast.LENGTH_SHORT).show()
+                    }
+
+                    recyclerview.adapter = adapter
+                }
 
 
             }
