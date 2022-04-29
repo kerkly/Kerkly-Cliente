@@ -45,6 +45,14 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     var i2: Int? = 0
     var postlist: ArrayList<Kerkly>? =null
     private lateinit var context: Context
+    private lateinit var ciudad: String
+    private lateinit var calle: String
+    private lateinit var cp: String
+    private lateinit var colonia: String
+    private lateinit var num_ext: String
+    private lateinit var referencia: String
+    private lateinit var estado: String
+    private lateinit var pais: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +65,14 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
         latitud = b.getDouble("Latitud")
         longitud = b.getDouble("Longitud")
+        ciudad = b.getString("Ciudad").toString()
+        calle = b.getString("Calle").toString()
+        estado = b.getString("Estado").toString()
+        cp = b.getString("Código Postal").toString()
+        colonia = b.getString("Colonia").toString()
+        num_ext = b.getString("Exterior").toString()
+        referencia = b.getString("Referencia").toString()
+        pais = b.getString("Pais").toString()
 
         recyclerview = findViewById(R.id.recycler_kerkly)
         recyclerview.setHasFixedSize(true)
@@ -182,7 +198,20 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(IngresarPresupuestoClienteInterface::class.java)
-        api.presupuesto(curp, problema, telefono, oficio, latitud, longitud,
+        api.presupuesto(curp,
+            problema,
+            telefono,
+            oficio,
+            latitud,
+            longitud,
+            ciudad,
+            estado,
+            pais,
+            calle,
+            colonia,
+            num_ext,
+            cp,
+            referencia,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null

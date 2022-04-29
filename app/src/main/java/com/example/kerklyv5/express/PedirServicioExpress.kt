@@ -83,6 +83,7 @@ class PedirServicioExpress : AppCompatActivity() {
     private lateinit var lyout_referencia: TextInputLayout
     private lateinit var referencia:String
     private lateinit var boton: MaterialButton
+    private lateinit var btn_direccion: MaterialButton
     private lateinit var toolbar: Toolbar
     private lateinit var nombre: String
     private lateinit var apellidoP: String
@@ -248,7 +249,7 @@ class PedirServicioExpress : AppCompatActivity() {
         }
     }
 
-    fun aceptarDireccion(view:View) {
+    fun aceptarDireccion() {
         referencia = edit_referecia.text.toString()
         dialog.dismiss()
     }
@@ -417,7 +418,7 @@ class PedirServicioExpress : AppCompatActivity() {
 
     }
 
-    fun actualizar( view: View) {
+    fun actualizar() {
         locationStart()
     }
 
@@ -538,6 +539,15 @@ class PedirServicioExpress : AppCompatActivity() {
             numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
             edit_referecia = dialog.findViewById(R.id.edit_referencia)
             lyout_referencia = dialog.findViewById(R.id.layout_referencia)
+            btn_direccion = dialog.findViewById(R.id.btn_direccion_exrpess)
+
+            btn_direccion.setOnClickListener {
+                aceptarDireccion()
+            }
+
+            boton.setOnClickListener {
+                actualizar()
+            }
 
             boton.isEnabled = true
             locationStart()

@@ -174,5 +174,6 @@
     <string name="title_activity_maps_ker">MapsActivityKer</string>
 
     <string name="llave_api_google_maps">AIzaSyCKtLDUW6EKmzmlonLmg3wxcFxFjuxRePA</string>
+    <string name="marker_detail">(%1$.2f %2$.3f)</string>
 
 </resources>

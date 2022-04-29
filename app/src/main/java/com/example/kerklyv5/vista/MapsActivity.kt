@@ -1,17 +1,18 @@
 package com.example.kerklyv5.vista
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.kerklyv5.R
@@ -25,10 +26,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.confirmar_direccion.*
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
@@ -36,8 +38,9 @@ import retrofit.client.Response
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var marcador: Marker
@@ -52,6 +55,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var problema: String
     private lateinit var telefono: String
     private lateinit var oficio: String
+    private lateinit var dialog: Dialog
+    private lateinit var boton_confirmar: MaterialButton
+    private lateinit var boton_actualizar: MaterialButton
+    private lateinit var editCiudad: TextInputEditText
+    private lateinit var edit_cp: TextInputEditText
+    private lateinit var calle_edit: TextInputEditText
+    private lateinit var colonia_edit: TextInputEditText
+    private lateinit var numero_extEdit: TextInputEditText
+    private lateinit var edit_referecia: TextInputEditText
+    private lateinit var lyout_referencia: TextInputLayout
+    private lateinit var ciudad: String
+    private lateinit var calle: String
+    private lateinit var cp: String
+    private lateinit var colonia: String
+    private lateinit var num_ext: String
+    private lateinit var referencia: String
+    private lateinit var estado: String
+    private lateinit var pais: String
+    private var band = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,20 +81,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         b = intent.extras!!
 
+        dialog = Dialog(this)
 
+        /* curp = b.getString("Curp Kerkly").toString()
+         problema = b.getString("Problema").toString()
+         telefono = b.getString("Telefono").toString()
+         oficio = b.getString("Oficio").toString()*/
 
-       /* curp = b.getString("Curp Kerkly").toString()
-        problema = b.getString("Problema").toString()
-        telefono = b.getString("Telefono").toString()
-        oficio = b.getString("Oficio").toString()*/
-
-        val band: Boolean = b.getBoolean("Express")
+        band = b.getBoolean("Express")
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-       // val bandK = b.getBoolean("Ker")
+        // val bandK = b.getBoolean("Ker")
 
         getLocalizacion()
 
@@ -92,17 +114,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
         BotonEnviarU.setOnClickListener {
 
-            b.putDouble("Latitud", latitud)
-            b.putDouble("Longitud", longitud)
-            Log.d("latitud", "$latitud")
-            Log.d("longitud", "$longitud"
-            )
-
-            if(!band) {
-                val i = Intent(applicationContext, KerklyListActivity::class.java)
-                i.putExtras(b)
-                startActivity(i)
-            }
 
             /*val la = java.lang.Double.toString(latitud)
             val lo = java.lang.Double.toString(longitud)
@@ -156,7 +167,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             return
         }
-        mMap.isMyLocationEnabled = true
+        // mMap.isMyLocationEnabled = true
         mMap.uiSettings.isZoomControlsEnabled = true
 
         val locationManager = this@MapsActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -165,25 +176,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val miUbicacion = LatLng(location.getLatitude(), location.getLongitude())
                 latitud = location.latitude
                 longitud = location.longitude
+                locationManager.removeUpdates(this)
+                marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title("Mi Ubicacion").snippet("holaaa").icon(
+                    BitmapDescriptorFactory.fromResource(
+                        R.drawable.miubicacion4
+                    )))!!
 
-                mMap.addMarker(MarkerOptions().position(miUbicacion).title("Mi ubicación"))
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion))
-                val cameraPosition = CameraPosition.Builder()
-                    .target(miUbicacion)
-                    .zoom(14f)
-                    .bearing(90f)
-                    .tilt(45f)
-                    .build()
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))
 
             }
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+                when (status) {
+                    LocationProvider.AVAILABLE -> Log.d("debug", "LocationProvider.AVAILABLE")
+                    LocationProvider.OUT_OF_SERVICE -> Log.d("debug", "LocationProvider.OUT_OF_SERVICE")
+                    LocationProvider.TEMPORARILY_UNAVAILABLE -> Log.d("debug", "LocationProvider.TEMPORARILY_UNAVAILABLE")
+                }
+            }
+            override fun onProviderEnabled(provider: String) {
+                //   Toast.makeText(context, "GPS activado", Toast.LENGTH_SHORT).show()
 
-            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-            override fun onProviderEnabled(provider: String) {}
-            override fun onProviderDisabled(provider: String) {}
+            }
+            override fun onProviderDisabled(provider: String) {
+                //  Toast.makeText(context, "GPS Desactivado", Toast.LENGTH_SHORT).show()
+            }
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
 
+        //los marcadores
+        // Utils_k.Marcador(mMap, applicationContext, telefono)
+        //  mMap!!.setOnMapLongClickListener(this)
+        googleMap.setOnMarkerClickListener(this)
+        googleMap.setOnMarkerDragListener(this)
+
+       // mMap!!.setOnMarkerClickListener(this)
     }
 
     private fun getLocalizacion() {
@@ -208,6 +233,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    fun aceptarDireccion() {
+        referencia = edit_referecia.text.toString()
+        dialog.dismiss()
+    }
+
     private fun Hibrido() {
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mapa = "HÍBRIDO";
@@ -227,5 +257,131 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mapa = "TERRENO";
         tipo = 1;
+    }
+    override fun onMarkerClick(p0: Marker): Boolean {
+        if (p0!!.equals(marcador!!)) {
+            System.out.println("entro")
+            latitud = p0.position.latitude
+            longitud = p0.position.longitude
+            //  Toast.makeText(context, "latitud ${latitud.toString()} longitud $longitud", Toast.LENGTH_LONG).show()
+
+            /*
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage("Por favor, confirme su ubicación")
+            builder.setTitle(title)
+            builder.setCancelable(false)
+            builder.setPositiveButton("Si") { dialog, which ->
+                //Toast.makeText(this, "elegido", Toast.LENGTH_LONG).show()
+                //TrazarLineas(latLng)
+            }
+            builder.setNegativeButton("No") { dialog, which -> dialog.cancel() }
+            val alertDialog = builder.create()
+            alertDialog.show()*/
+            dialog.setContentView(R.layout.confirmar_direccion)
+
+            boton_confirmar = dialog.findViewById(R.id.btn_direccion_exrpess)
+            boton_actualizar = dialog.findViewById(R.id.actualizar_btn)
+            boton_actualizar.visibility = View.GONE
+            editCiudad = dialog.findViewById<TextInputEditText>(R.id.edit_ciudad)
+            edit_cp = dialog.findViewById<TextInputEditText>(R.id.edit_codigoP)
+            calle_edit = dialog.findViewById<TextInputEditText>(R.id.edit_calle)
+            colonia_edit = dialog.findViewById<TextInputEditText>(R.id.edit_colonia)
+            numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
+            edit_referecia = dialog.findViewById(R.id.edit_referencia)
+            lyout_referencia = dialog.findViewById(R.id.layout_referencia)
+
+            setLocation(latitud, longitud)
+
+            boton_confirmar.setOnClickListener {
+                aceptarDireccion()
+                if(!band) {
+                    val i = Intent(applicationContext, KerklyListActivity::class.java)
+                    b.putString("Calle", calle)
+                    b.putString("Colonia", colonia)
+                    b.putString("Código Postal", cp)
+                    b.putString("Exterior", num_ext)
+                    b.putString("Referencia", referencia)
+                    b.putDouble("Latitud", latitud)
+                    b.putDouble("Longitud", longitud)
+                    b.putString("Ciudad", ciudad)
+                    b.putString("Estado", estado)
+                    b.putString("Pais", pais)
+
+                    i.putExtras(b)
+
+                    startActivity(i)
+                }
+            }
+
+            /*boton_actualizar.setOnClickListener {
+
+            }*/
+
+
+            dialog.show()
+        }
+
+        return false
+    }
+
+
+    override fun onMarkerDragEnd(p0: Marker) {
+        if (p0.equals(marcador)) {
+            // Toast.makeText(context, "finish", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onMarkerDragStart(p0: Marker) {
+        if (p0.equals(marcador)) {
+            //Toast.makeText(context, "start", Toast.LENGTH_SHORT).show()
+        }
+    }
+    override fun onMarkerDrag(p0: Marker) {
+        if (p0!!.equals(marcador!!)){
+            val nuevoTitulo  = String.format(
+                Locale.getDefault(),getString(R.string.marker_detail),
+                marcador.position.latitude,
+                marcador.position.longitude)
+
+            setTitle(nuevoTitulo)
+            latitud = p0.position.latitude
+            longitud = p0.position.longitude
+            setLocation(latitud, longitud)
+        }
+    }
+
+    fun setLocation(latitud: Double, longitud: Double) {
+        if (latitud !== 0.0 && longitud !== 0.0) {
+            try {
+                val geocoder: Geocoder
+                val direccion: List<Address>
+                geocoder = Geocoder(this, Locale.getDefault())
+
+                direccion = geocoder.getFromLocation(latitud, longitud, 1) // 1 representa la cantidad de resultados a obtener
+                val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                ciudad = direccion[0].locality // ciudad
+                estado = direccion[0].adminArea //estado
+                pais = direccion[0].countryName // pais
+                cp = direccion[0].postalCode //codigo Postal
+                calle = direccion[0].thoroughfare // la calle
+                colonia =  direccion[0].subLocality// colonia
+                num_ext = direccion[0].subThoroughfare
+
+                 //txtDireccion.setText(address)
+                 editCiudad.setText(ciudad)
+                 //edit.setText(estado)
+              //   txtPais.setText(pais)
+                 calle_edit.setText(calle)
+                 colonia_edit.setText(colonia)
+                 numero_extEdit.setText(num_ext)
+                 edit_cp.setText(cp)
+                //texViewDireecion.setText("ciudad $ciudad \n Estado  $estado \n pais $pais \n codigo Postal $codigoPostal \n calle $calle \n colonia $colonia")
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+
+
     }
 }

@@ -131,11 +131,10 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button5"
+                    android:id="@+id/btn_direccion_exrpess"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/fondo_boton"
-                    android:onClick="aceptarDireccion"
                     android:text="@string/confirmar"
                     android:textColor="@color/black"
                     app:backgroundTint="@color/colorBoton"
@@ -148,7 +147,6 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/fondo_boton"
                     android:enabled="false"
-                    android:onClick="actualizar"
                     android:text="@string/actualizar"
                     android:textColor="@color/black"
                     app:backgroundTint="@color/colorBoton"

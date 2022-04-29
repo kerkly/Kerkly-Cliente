@@ -17,6 +17,14 @@ interface IngresarPresupuestoClienteInterface {
         @Field("nombreO") nombreO: String,
         @Field("latitud") latitud: Double,
         @Field("longitud") longitud: Double,
+        @Field("Ciudad")  Ciudad: String,
+        @Field("Estado") Estado: String,
+        @Field("Pais") Pais: String,
+        @Field("Calle") Calle: String,
+        @Field("Colonia") Colonia: String,
+        @Field("No_Exterior") No_Exterior: String,
+        @Field("Codigo_Postal") Codigo_Postal: String,
+        @Field("Referencia") Referencia: String,
         callback: Callback<Response?>
     )
 
