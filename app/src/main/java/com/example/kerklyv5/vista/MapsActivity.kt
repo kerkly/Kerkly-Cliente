@@ -20,6 +20,7 @@ import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.express.PedirServicioExpress
 import com.example.kerklyv5.interfaces.IngresarPresupuestoClienteInterface
 import com.example.kerklyv5.interfaces.IngresarPresupuestoInterface
+import com.example.kerklyv5.interfaces.IngresarPresupuestoUrgente
 import com.example.kerklyv5.url.Url
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -98,6 +99,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         getLocalizacion()
 
+        telefono = b.get("Telefono").toString()
+        oficio = b.getString("Oficio").toString()
+        problema = b.get("Problema").toString()
+
         BotonT = findViewById(R.id.button2)
         BotonT.setOnClickListener {
             when(tipo) {
@@ -114,7 +119,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
         BotonEnviarU.setOnClickListener {
 
+            //setLocation(latitud, longitud)
+           // ingresarPresupuesto()
+           /* intent = Intent(applicationContext, SolicitarServicio::class.java)
+           // aceptarDireccion()
+            ingresarPresupuesto()
 
+            b.putBoolean("PresupuestoListo", true)
+            intent.putExtras(b)
+            startActivity(intent)*/
             /*val la = java.lang.Double.toString(latitud)
             val lo = java.lang.Double.toString(longitud)
 
@@ -265,53 +278,62 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             longitud = p0.position.longitude
             //  Toast.makeText(context, "latitud ${latitud.toString()} longitud $longitud", Toast.LENGTH_LONG).show()
 
-            /*
+
             val builder = AlertDialog.Builder(this)
             builder.setMessage("Por favor, confirme su ubicación")
             builder.setTitle(title)
             builder.setCancelable(false)
-            builder.setPositiveButton("Si") { dialog, which ->
+            builder.setPositiveButton("Si") { d, which ->
                 //Toast.makeText(this, "elegido", Toast.LENGTH_LONG).show()
                 //TrazarLineas(latLng)
+                dialog.setContentView(R.layout.confirmar_direccion)
+
+                boton_confirmar = dialog.findViewById(R.id.btn_direccion_exrpess)
+                boton_actualizar = dialog.findViewById(R.id.actualizar_btn)
+                boton_actualizar.visibility = View.GONE
+                editCiudad = dialog.findViewById<TextInputEditText>(R.id.edit_ciudad)
+                edit_cp = dialog.findViewById<TextInputEditText>(R.id.edit_codigoP)
+                calle_edit = dialog.findViewById<TextInputEditText>(R.id.edit_calle)
+                colonia_edit = dialog.findViewById<TextInputEditText>(R.id.edit_colonia)
+                numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
+                edit_referecia = dialog.findViewById(R.id.edit_referencia)
+                lyout_referencia = dialog.findViewById(R.id.layout_referencia)
+
+                setLocation(latitud, longitud)
+
+                boton_confirmar.setOnClickListener {
+                    aceptarDireccion()
+                    if(!band) {
+                        val i = Intent(applicationContext, KerklyListActivity::class.java)
+                        b.putString("Calle", calle)
+                        b.putString("Colonia", colonia)
+                        b.putString("Código Postal", cp)
+                        b.putString("Exterior", num_ext)
+                        b.putString("Referencia", referencia)
+                        b.putDouble("Latitud", latitud)
+                        b.putDouble("Longitud", longitud)
+                        b.putString("Ciudad", ciudad)
+                        b.putString("Estado", estado)
+                        b.putString("Pais", pais)
+
+                        i.putExtras(b)
+
+                        startActivity(i)
+                    } else {
+                        val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                           //Toast.makeText(this, referencia, Toast.LENGTH_SHORT).show()
+                        aceptarDireccion()
+                        ingresarPresupuesto()
+
+                        b.putBoolean("PresupuestoListo", true)
+                        intent.putExtras(b)
+                        startActivity(intent)
+                    }
+                }
             }
             builder.setNegativeButton("No") { dialog, which -> dialog.cancel() }
             val alertDialog = builder.create()
-            alertDialog.show()*/
-            dialog.setContentView(R.layout.confirmar_direccion)
-
-            boton_confirmar = dialog.findViewById(R.id.btn_direccion_exrpess)
-            boton_actualizar = dialog.findViewById(R.id.actualizar_btn)
-            boton_actualizar.visibility = View.GONE
-            editCiudad = dialog.findViewById<TextInputEditText>(R.id.edit_ciudad)
-            edit_cp = dialog.findViewById<TextInputEditText>(R.id.edit_codigoP)
-            calle_edit = dialog.findViewById<TextInputEditText>(R.id.edit_calle)
-            colonia_edit = dialog.findViewById<TextInputEditText>(R.id.edit_colonia)
-            numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
-            edit_referecia = dialog.findViewById(R.id.edit_referencia)
-            lyout_referencia = dialog.findViewById(R.id.layout_referencia)
-
-            setLocation(latitud, longitud)
-
-            boton_confirmar.setOnClickListener {
-                aceptarDireccion()
-                if(!band) {
-                    val i = Intent(applicationContext, KerklyListActivity::class.java)
-                    b.putString("Calle", calle)
-                    b.putString("Colonia", colonia)
-                    b.putString("Código Postal", cp)
-                    b.putString("Exterior", num_ext)
-                    b.putString("Referencia", referencia)
-                    b.putDouble("Latitud", latitud)
-                    b.putDouble("Longitud", longitud)
-                    b.putString("Ciudad", ciudad)
-                    b.putString("Estado", estado)
-                    b.putString("Pais", pais)
-
-                    i.putExtras(b)
-
-                    startActivity(i)
-                }
-            }
+            alertDialog.show()
 
             /*boton_actualizar.setOnClickListener {
 
@@ -322,6 +344,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
 
         return false
+    }
+
+    private fun ingresarPresupuesto() {
+        val ROOT_URL = Url().url
+        val adapter = RestAdapter.Builder()
+            .setEndpoint(ROOT_URL)
+            .build()
+        val api = adapter.create(IngresarPresupuestoUrgente::class.java)
+        api.presupuesto_urgente(problema,
+            telefono,
+            oficio,
+            latitud,
+            longitud,
+            ciudad,
+            estado,
+            pais,
+            calle,
+            colonia,
+            num_ext,
+            cp,
+            referencia,
+            object : Callback<Response?> {
+                override fun success(t: Response?, response: Response?) {
+                    var salida: BufferedReader? = null
+                    var entrada = ""
+                    try {
+                        salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                        entrada = salida.readLine()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                    //Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
+
+                   // Toast.makeText(applicationContext, entrada, Toast.LENGTH_LONG).show()
+
+                    val cadena = "Datos enviados"
+                    if (cadena.equals(entrada)){
+                        Toast.makeText(applicationContext,"Datos enviados", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun failure(error: RetrofitError?) {
+                    println("error$error")
+                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
+                }
+            }
+        )
     }
 
 

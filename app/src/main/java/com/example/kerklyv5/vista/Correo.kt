@@ -9,7 +9,6 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import com.example.kerklyv5.R
-import com.example.kerklyv5.controlador.Login
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.util.regex.Pattern
@@ -112,15 +111,28 @@ class Correo : AppCompatActivity() {
                     contra1_contendor.error = null
                     if (contra1.equals(contra2)) {
                         contra2_layot.error = null
-
+                        //verficar numero
                         val g = genero[0].toString()
-
+                        val bundle = Bundle()
+                        bundle.putString("clave", "registrar")
+                        bundle.putString("correo", correo)
+                        bundle.putString("nombre", nombre)
+                        bundle.putString("apellidoP", apellidoP)
+                        bundle.putString("apellidoM", apellidoM)
+                        bundle.putString("telefono", telefono.toString())
+                        bundle.putString("g", g)
+                        bundle.putString("contra1", contra1)
+                        bundle.putString("id", id)
+                        val intent = Intent(this, MainActivityVerificarSMS::class.java)
+                        intent.putExtras(bundle)
+                        startActivity(intent)
+                        /*val g = genero[0].toString()
                         var login = Login()
                         login.InsertarMysql(correo,nombre,apellidoP,apellidoM,telefono,g,
-                            contra1, "0", id)
+                            contra1, "0", id)*/
 
-                        dialog.setContentView(R.layout.cuenta_creada)
-                        dialog.show()
+                      //  dialog.setContentView(R.layout.cuenta_creada)
+                        //dialog.show()
                     } else {
                         contra2_layot.error = getString(R.string.contras_no_coinciden)
                     }
@@ -142,11 +154,6 @@ class Correo : AppCompatActivity() {
         val pattern = Pattern.compile(PASSWORD_PATTERN)
         val matcher = pattern.matcher(contra1)
         return matcher.matches()
-    }
-
-    fun iniciarSesion (view: View) {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
     }
 
 

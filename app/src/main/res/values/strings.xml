@@ -156,6 +156,7 @@
     <string name="lista_vacia_mensajes">No hay mensajes nuevos</string>
     <string name="lista_vacia_ordenesPendientes">No hay servicios pendientes o en progreso</string>
     <string name="lista_vacia_historial">No tiene servicios completados</string>
+    <string name="servicio_urgente">Servicio Urgente</string>
 
     <string-array name="generos">
         <item>Hombre</item>

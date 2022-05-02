@@ -45,6 +45,7 @@ class HomeFragment : Fragment() {
     private lateinit var b: Bundle
     private lateinit var telefono: String
     private lateinit var problema: String
+    private lateinit var boton_servicioUrgente: MaterialButton
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +64,7 @@ class HomeFragment : Fragment() {
         layoutProblem = root.findViewById(R.id.layoutProblematica)
         //botonDireccion = root.findViewById(R.id.button_dir)
         botonPresupuesto = root.findViewById(R.id.button_presupuesto)
+        boton_servicioUrgente = root.findViewById(R.id.boton_servicio_urgente)
         //imageboton = root.findViewById(R.id.kerkly_boton)
 
         getOficios()
@@ -70,6 +72,35 @@ class HomeFragment : Fragment() {
         botonPresupuesto.setOnClickListener {
             seleccionarKerkly()
         }
+
+        boton_servicioUrgente.setOnClickListener {
+            oficio = spinner.selectedItem.toString()
+
+            telefono = arguments?.getString("Telefono")!!
+
+            // Log.d("tel", telefono)
+            b.putString("Oficio", oficio)
+            b.putString("Telefono", telefono)
+
+            problema = textProblem.text.toString()
+
+            b.putString("Problema", problema)
+
+            if (problema.isEmpty()) {
+                layoutProblem.error = getString(R.string.campo_requerido)
+            } else {
+                layoutProblem.error = null
+                /* val f = KerklyFragment()
+                 f.arguments = b
+                 var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
+                     replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()*/
+                val i = Intent(context, MapsActivity::class.java)
+                b.putBoolean("Express", true)
+                i.putExtras(b)
+                startActivity(i)
+            }
+        }
+
         return root
     }
 
@@ -141,5 +172,4 @@ class HomeFragment : Fragment() {
             startActivity(i)
             }
         }
-
     }

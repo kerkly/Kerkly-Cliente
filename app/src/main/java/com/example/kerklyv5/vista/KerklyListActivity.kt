@@ -138,8 +138,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
                     curp = postlist!![recyclerview.getChildAdapterPosition(it)].Curp
 
-                        intent = Intent(applicationContext, SolicitarServicio::class.java)
-                        ingresarPresupuesto()
+                    intent = Intent(applicationContext, SolicitarServicio::class.java)
+                    ingresarPresupuesto()
 
                     b.putBoolean("PresupuestoListo", true)
                     intent.putExtras(b)

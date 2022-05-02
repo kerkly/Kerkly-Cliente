@@ -80,4 +80,12 @@ class PresupuestoNormal {
     @SerializedName("nombreO")
     @Expose
     var nombreO: String = ""
+
+    @SerializedName("idPresupuestoNoRegistrado")
+    @Expose
+    var idPresupuestoNoRegistrado: Int = 0
+
+    @SerializedName("fechaPresupuesto")
+    @Expose
+    var fechaPresupuesto: String = ""
 }

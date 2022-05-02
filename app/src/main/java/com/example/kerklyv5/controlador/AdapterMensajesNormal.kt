@@ -31,8 +31,16 @@ class AdapterMensajesNormal(val datset: ArrayList<PresupuestoNormal>):
 
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.txtFolio.text = datset[position].idPresupuesto.toString()
-        viewHolder.txtFecha.text  = datset[position].fechaP
+        if (datset[position].idPresupuesto == 0) {
+            viewHolder.txtFolio.text = datset[position].idPresupuestoNoRegistrado.toString()
+            viewHolder.txtFecha.text  = datset[position].fechaPresupuesto
+
+        } else {
+            viewHolder.txtFolio.text = datset[position].idPresupuesto.toString()
+            viewHolder.txtFecha.text  = datset[position].fechaP
+        }
+
+
 
         if (datset[position].estado == "1") {
             viewHolder.image.setImageResource(R.drawable.ic_clarity_email_outline_alerted)

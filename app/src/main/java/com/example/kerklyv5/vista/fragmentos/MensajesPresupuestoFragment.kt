@@ -141,36 +141,44 @@ class MensajesPresupuestoFragment : Fragment() {
                         val apT = postList[recyclerview.getChildAdapterPosition(it)].Apellido_Paterno
                         val amT = postList[recyclerview.getChildAdapterPosition(it)].apellidoMaterno_kerkly
 
-                        val i = Intent(activity, CuerpoMensajeRecibidoActivity::class.java)
                         val n = "$nombre $ap $am"
                         val n2 = "$nombreT $apT $amT"
 
-                        if (pagado !=  null) {
-                            pagado = pagado.trim()
-                        }
-
+                        val i = Intent(activity, CuerpoMensajeRecibidoActivity::class.java)
                         b.putString("Nombre", n)
                         b.putString("Telefono", telefono)
                         b.putString("Calle", calle)
                         b.putString("Colonia", colonia)
-                        b.putString("Fecha", fecha)
                         b.putInt("Numero exterior", num_ext)
                         b.putString("Problema", problema)
-                        b.putInt("Folio", folio)
                         b.putDouble("Pago total", pago)
-                        b.putString("Oficio", oficio)
+                        b.putString("NombreT", n2)
                         b.putString("Referencia", referencia)
                         b.putString("CP", cp)
-                        b.putString("NombreT", n2)
-                        b.putString("Pagado", pagado)
+                        if (folio == 0) {
+                            b.putBoolean("Urgente", true)
+                           // Log.d("foliooo",postList[recyclerview.getChildAdapterPosition(it)].idPresupuestoNoRegistrado )
+                            b.putInt("Folio", postList[recyclerview.getChildAdapterPosition(it)].idPresupuestoNoRegistrado)
+                        } else {
 
-                        if (pagado == "1") {
-                            b.putString("Mensaje", mensaje)
+                            if (pagado !=  null) {
+                                pagado = pagado.trim()
+                            }
+                            b.putString("Fecha", fecha)
+                            b.putInt("Folio", folio)
+                            b.putString("Oficio", oficio)
+                            b.putString("Pagado", pagado)
+                            b.putBoolean("Urgente", false)
+
+                            if (pagado == "1") {
+                                b.putString("Mensaje", mensaje)
+                            }
                         }
 
                         i.putExtras(b)
 
                         startActivity(i)
+
                     }
                     recyclerview.adapter = adapter
                 }

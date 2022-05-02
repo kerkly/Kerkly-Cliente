@@ -41,6 +41,8 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
     private lateinit var b: Bundle
     private lateinit var pagado: String
     private lateinit var mensaje_txt: TextView
+    private var band = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cuerpo_mensaje_recibido)
@@ -62,6 +64,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
         b = intent.extras!!
 
         pagado = b.getString("Pagado").toString()
+        band = b.getBoolean("Urgente")
         //Toast.makeText(this, pagado, Toast.LENGTH_SHORT).show()
 
         if (pagado == "1") {
@@ -113,7 +116,14 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
 
     val postListener = object: ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            val coleccion = snapshot.child("Presupuesto Normal $folio").value as MutableList<*>
+            var cadena_presupuesto = ""
+            if (band) {
+                cadena_presupuesto = "Presupuesto $folio"
+            } else {
+                cadena_presupuesto = "Presupuesto Normal $folio"
+            }
+            Log.d("cadenaaa",cadena_presupuesto)
+            val coleccion = snapshot.child(cadena_presupuesto).value as MutableList<*>
             val c = coleccion[1] as HashMap<*,*>
             val l1 = ArrayList<ArrayList<String>>()
             lista = l1.toMutableList()

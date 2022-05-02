@@ -4,9 +4,13 @@ package com.example.kerklyv5.vista
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest*/
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -20,11 +24,9 @@ import android.view.Window
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.VideoView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.MainActivityControlador
 import com.example.kerklyv5.controlador.Notificacion
@@ -197,12 +199,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @SuppressLint("StaticFieldLeak")
+
     inner class RetreiveFeedTask: AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String?): String? {
             //controlador.getNombreNoR(usuario)
             controlador.pruebaRegistrarNumero(usuario,
-                applicationContext, layoutTelefono)
+                this@MainActivity, layoutTelefono)
             return null
         }
 
@@ -236,10 +238,6 @@ class MainActivity : AppCompatActivity() {
         editTelefono = epicDialog2.findViewById(R.id.edit_telefonoNoRegistrado)
         layoutTelefono = epicDialog2.findViewById(R.id.layoutTelefonoNoRegistrado)
 
-        var band = false
-
-        if (!controlador.verificarNumeroTelNoR(this)) {
-            editTelefono.isEnabled = true
             usuario = Cliente(editTelefono.text.toString())
 
             if (usuario.getTelefonoNoR().isEmpty()) {
@@ -250,18 +248,15 @@ class MainActivity : AppCompatActivity() {
                     layoutTelefono.error = getText(R.string.telefono_error)
                 } else {
                     layoutTelefono.error = null
+                    if (!(usuario.getTelefonoNoR().isEmpty())) {
+                        barra = ProgressDialog.show(this, "", "Ingresando...")
+                       // Toast.makeText(this, "entro", Toast.LENGTH_SHORT).show()
+                        val task = RetreiveFeedTask()
+                        task.execute()
+                    }
                 }
 
             }
-        } else {
-            editTelefono.isEnabled = false
-        }
-
-        if (!(usuario.getTelefonoNoR().isEmpty())) {
-            barra = ProgressDialog.show(this, "", "Ingresando...")
-            val task = RetreiveFeedTask()
-            task.execute()
-        }
     }
 
 
@@ -278,6 +273,32 @@ class MainActivity : AppCompatActivity() {
 
         epicDialog2.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         epicDialog2.show()
+        requestPermission(this)
+    }
+    private val sms = 0
+    private fun requestPermission(contexto: Activity) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(contexto,
+                Manifest.permission.RECEIVE_SMS)) {
+            //El usuario ya ha rechazado el permiso anteriormente, debemos informarle que vaya a ajustes.
+
+            AlertDialog.Builder(contexto)
+                .setTitle("Alerta")
+                .setMessage("Ve a configuracion y verifica los permisos de la aplicacion")
+                .setPositiveButton(android.R.string.ok,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        //botón OK pulsado
+                    })
+                .setNegativeButton(android.R.string.cancel,
+                    DialogInterface.OnClickListener { dialog, which ->
+                        //botón cancel pulsado
+                    })
+                .show()
+        } else {
+            //El usuario nunca ha aceptado ni rechazado, así que le pedimos que acepte el permiso.
+            ActivityCompat.requestPermissions(contexto,
+                arrayOf(Manifest.permission.RECEIVE_SMS),
+                sms)
+        }
     }
 
     override fun onRequestPermissionsResult(

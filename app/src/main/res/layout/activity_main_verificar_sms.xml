@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".vista.MainActivityVerificarSMS">
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutCodigoSMS"
+        android:layout_width="match_parent"
+        app:errorEnabled="true"
+        android:layout_marginTop="200dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_marginRight="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_VerificarSMS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="codigo SMS"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <Button
+        android:id="@+id/botonSMS"
+        android:layout_width="234dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="52dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/btn_redondo"
+        android:backgroundTint="#009688"
+        android:text="Verificar"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        />
+</LinearLayout>
