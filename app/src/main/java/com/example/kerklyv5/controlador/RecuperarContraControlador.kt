@@ -24,12 +24,7 @@ class RecuperarContraControlador {
         return matcher.matches()
     }
 
-    fun modificarContra(contra1: String,
-                        contra2: String,
-                        correo: String,
-                        contexto: AppCompatActivity,
-                        dialog: Dialog
-    ) {
+    fun modificarContra(contra1: String, contra2: String, correo: String, contexto: AppCompatActivity, dialog: Dialog) {
         //primero validamos que la contraseña sean igual
         if (contra1.equals(contra2)) {
             val Url = Url().url

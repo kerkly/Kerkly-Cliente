@@ -43,10 +43,22 @@
 
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/register">
-
+                app:lottie_rawRes="@raw/register"
+                >
 
             </com.airbnb.lottie.LottieAnimationView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/subirFotoPerfil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Foto de perfil"
+                android:textColor="@color/black"
+                android:layout_gravity="center"
+                app:backgroundTint="@color/colorBoton"
+                android:background="@drawable/fondo_boton"
+                android:layout_margin="25dp"
+                />
 
             <TextView
                 android:id="@+id/textView17"
@@ -61,6 +73,8 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/introduce_datos" />
+
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutNombre"

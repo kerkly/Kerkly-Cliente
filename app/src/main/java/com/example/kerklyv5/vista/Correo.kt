@@ -39,6 +39,7 @@ class Correo : AppCompatActivity() {
     private lateinit var contra2_layot: TextInputLayout
     private lateinit var dialog: Dialog
     private lateinit var id: String
+    private lateinit var fotoperfil: String
 
 
 
@@ -57,6 +58,7 @@ class Correo : AppCompatActivity() {
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
         val b = intent.extras
+        fotoperfil= b?.getString("fotoperfil").toString()
         nombre = b?.getString("Nombre").toString()
         apellidoP = b?.getString("Apellido Paterno").toString()
         apellidoM = b?.getString("Apellido Materno").toString()
@@ -114,6 +116,7 @@ class Correo : AppCompatActivity() {
                         //verficar numero
                         val g = genero[0].toString()
                         val bundle = Bundle()
+                        bundle.putString("fotoperfil", fotoperfil)
                         bundle.putString("clave", "registrar")
                         bundle.putString("correo", correo)
                         bundle.putString("nombre", nombre)
@@ -126,6 +129,7 @@ class Correo : AppCompatActivity() {
                         val intent = Intent(this, MainActivityVerificarSMS::class.java)
                         intent.putExtras(bundle)
                         startActivity(intent)
+
                         /*val g = genero[0].toString()
                         var login = Login()
                         login.InsertarMysql(correo,nombre,apellidoP,apellidoM,telefono,g,

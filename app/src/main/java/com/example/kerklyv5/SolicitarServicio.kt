@@ -1,23 +1,38 @@
 package com.example.kerklyv5
 
+import android.Manifest
+import android.R.attr.src
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.material.navigation.NavigationView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.Nullable
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawable
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
+import com.android.volley.toolbox.StringRequest
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
@@ -27,6 +42,8 @@ import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
+import com.google.android.material.navigation.NavigationView
+import com.squareup.picasso.Picasso
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -38,15 +55,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+
 
 class SolicitarServicio : AppCompatActivity() {
-
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivitySolicitarServicioBinding
     private lateinit var b: Bundle
     private lateinit var txt_nombre: TextView
-    private lateinit var txt_correo: TextView
+   private lateinit var txt_correo: TextView
     lateinit var telefono: String
     private lateinit var nombre: String
     private lateinit var correo: String
@@ -56,15 +76,17 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var dialog: Dialog
 
 
-
+    //subir foto
+    //subir foto de perfil
+    lateinit var fotoPerfil: ImageView
+    var bitmap: Bitmap? = null
+    var PICK_IMAGE_REQUEST = 1
+    var filePath: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         dialog = Dialog(this)
-
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
 
         b = intent.extras!!
@@ -80,6 +102,10 @@ class SolicitarServicio : AppCompatActivity() {
         val view = navView.getHeaderView(0)
         txt_nombre = view.findViewById(R.id.nombre_txt)
         txt_correo = view.findViewById(R.id.correo_txt)
+        fotoPerfil = view.findViewById(R.id.ImagenDePerfil)
+        fotoPerfil.setOnClickListener {
+            SeleecionarFoto()
+        }
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -103,23 +129,91 @@ class SolicitarServicio : AppCompatActivity() {
                 R.id.historialFragment -> setFragmentHistorial()
                 R.id.nav_mensajes -> setMensajesPresupuesto()
                 R.id.nav_cerrarSesion -> cerrarSesion()
-
             }
-
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
         if (presupuestoListo) {
             dialog.setContentView(R.layout.presupuesto_solicitud)
             dialog.show()
         }
-
-
-        getJson()
-
+       getJson()
         setFragmentHome()
+    }
 
+    private fun SeleecionarFoto() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            when {
+
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    pickPhotoFromGallery()
+                }
+
+                else -> requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }else {
+            // Se llamará a la función para APIs 22 o inferior
+            // Esto debido a que se aceptaron los permisos
+            // al momento de instalar la aplicación
+            pickPhotoFromGallery()
+        }
+
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ){ isGranted ->
+
+        if (isGranted){
+            pickPhotoFromGallery()
+        }else{
+            Toast.makeText(
+                this,
+                "Permission denied",
+                Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickPhotoFromGallery() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
+            filePath = data.data!!
+            try {
+                //Cómo obtener el mapa de bits de la Galería
+                bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                // imagen = getStringImagen(bitmap!!)!!
+                var originalBitmap = bitmap
+                // val imagen = getStringImagen(bitmap!!)!!
+                if (originalBitmap!!.width > originalBitmap.height) {
+                    originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
+
+                } else if (originalBitmap.width < originalBitmap.height) {
+                    originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
+                    )
+                }
+
+                //Configuración del mapa de bits en ImageView
+                val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
+
+                roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
+                fotoPerfil!!.setImageDrawable(roundedDrawable)
+
+                //  enviarTodoFoto(imagen,"goku@gmail.com","Luis","salazar","Luis","7471503417","h","Alfredo@0599","0","dssdfad")
+                System.out.println("AQui la imagen" +filePath.toString())
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun cerrarVentana(v: View) {
@@ -222,8 +316,6 @@ class SolicitarServicio : AppCompatActivity() {
                         e.printStackTrace()
                     }
 
-                    Log.e("nosee", output)
-
                 }
 
                 override fun failure(error: RetrofitError) {
@@ -276,6 +368,7 @@ class SolicitarServicio : AppCompatActivity() {
 
     private fun getJson() {
         val ROOT_URL = Url().url
+
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
@@ -299,12 +392,13 @@ class SolicitarServicio : AppCompatActivity() {
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
 
                 //carsModels = response.body() as ArrayList<presupuestok>
-                Log.d("Lista", postList[0].toString())
+            //    Log.d("Lista", postList[0].toString())
                 val n = postList[0].Nombre
                 val ap = postList[0].Apellido_Paterno
                 val am = postList[0].Apellido_Materno
+                val foto = postList[0].fotoPerfil
 
-                Log.d("nombre", n)
+            //    Log.d("nombre", n)
 
 
                 nombre = "$n $ap $am"
@@ -313,9 +407,14 @@ class SolicitarServicio : AppCompatActivity() {
 
                 txt_nombre.text = nombre
                 txt_correo.text = correo
+                if (foto ==null){
+                    //Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                    //hay que poner una imagen por defecto
+                }else{
+                    cargarImagen(foto);
+                }
 
                 sesion(correo)
-
 
             }
 
@@ -330,5 +429,30 @@ class SolicitarServicio : AppCompatActivity() {
         })
     }
 
+    private fun cargarImagen(urlImagen: String) {
+        val file: Uri
+        file = Uri.parse(urlImagen)
+        System.out.println("imagen aqui: "+ file)
 
+        Picasso.get().load(urlImagen).into(object : com.squareup.picasso.Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                // loaded bitmap is here (bitmap)
+               // fotoPerfil.setImageBitmap(bitmap)
+                System.out.println("Respuesta 1 " )
+                //Configuración del mapa de bits en ImageView
+                val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
+                roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
+                fotoPerfil!!.setImageDrawable(roundedDrawable)
+              //  fotoPerfil.setImageBitmap(bitmap)
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+               // fotoPerfil.setImageDrawable(placeHolderDrawable)
+                System.out.println("Respuesta 2 " )
+            }
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                System.out.println("Respuesta error 3 "+ e.toString())
+            }
+        })
+    }
 }

@@ -16,6 +16,7 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.RecuperarCuentaControlador
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.activity_recuperar_cuenta.*
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -58,9 +59,13 @@ class RecuperarCuenta : AppCompatActivity() {
         editCodigo = findViewById(R.id.codigoSeguridad_edit)
         layoutCodigp = findViewById(R.id.layout_codigoSeguridad)
         controlador = RecuperarCuentaControlador()
+
+        botonVerificarCorreo.setOnClickListener {
+            enviarEmail()
+        }
     }
 
-    fun enviarEmail(view: View) {
+    fun enviarEmail() {
         correo = editCorreo.text.toString()
 
         if (correo.isEmpty()) {

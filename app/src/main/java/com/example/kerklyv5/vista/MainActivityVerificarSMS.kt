@@ -1,29 +1,46 @@
 package com.example.kerklyv5.vista
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.android.volley.AuthFailureError
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.example.kerklyv5.R
-import com.example.kerklyv5.controlador.Login
 import com.example.kerklyv5.express.PedirServicioExpress
+import com.example.kerklyv5.url.Url
+import com.google.android.material.internal.ContextUtils.getActivity
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main_verificar_sms.*
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 class MainActivityVerificarSMS : AppCompatActivity() {
 
@@ -38,8 +55,10 @@ class MainActivityVerificarSMS : AppCompatActivity() {
     var claveNoRE = "sinRegistro"
     var claveRe = "registrar"
     var numeroSMS = ""
+    var f: String? = ""
     private lateinit var dialog: Dialog
-
+     var imagen: String? = null
+    lateinit var bitmap: Bitmap
     var Callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
@@ -173,7 +192,7 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                                     }else{
                                         val intent1 = getIntent()
                                         if (clave.equals(claveRe)){
-
+                                            val fotop= intent1.getStringExtra("fotoperfil")
                                             val correo =  intent1.getStringExtra("correo")!!
                                             val nombre = intent1.getStringExtra("nombre")!!
                                             val apellidoP = intent1.getStringExtra("apellidoP")!!
@@ -182,11 +201,33 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                                             val g = intent1.getStringExtra("g")!!
                                             val contra1 = intent1.getStringExtra("contra1")!!
                                             val id = intent1.getStringExtra("id")!!
-                                            var login = Login()
-                                            login.InsertarMysql(correo,nombre,apellidoP,apellidoM,telefono,g,
-                                                contra1, "0", id)
+                                           // var login = Login()
+                                           // login.InsertarMysql(correo,nombre,apellidoP,apellidoM,telefono,g,
+                                             //   contra1, "0", id)
 
-                                           dialog2()
+                                           try {
+                                                //verificamos si el usuario selecciono una foto
+
+                                                  f = fotop.toString()
+                                                  //Toast.makeText(this, "no hay foto $f",Toast.LENGTH_SHORT).show()
+                                                  if (f.equals("null")){
+                                                      System.out.println("no hay foto $fotop")
+                                                   //  Toast.makeText(this, "no hay foto $fotop",Toast.LENGTH_SHORT).show()
+                                                      enviarTodo(correo,nombre,apellidoP,apellidoM,telefono,g,contra1,"0",id)
+
+                                                  }else{
+                                                      System.out.println("si hay foto $fotop")
+                                                      val uri: Uri = Uri.parse(fotop.toString())
+                                                      val  bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                                                      val imagen = getStringImagen(bitmap!!)!!
+                                                      enviarTodoFoto(imagen, correo, nombre, apellidoP, apellidoM, telefono, g, contra1, "0", id)
+
+                                                  }
+                                            } catch (e: IOException) {
+                                                e.printStackTrace()
+
+                                            }
+
                                         }
                                     }
 
@@ -220,6 +261,126 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun enviarTodo(Correo: String, Nombre: String, Apellido_Paterno: String, Apellido_Materno: String, telefonoCliente: String, generoCliente: String, Contrasena: String, fue_NoRegistrado: String, deviceID: String) {
+        val ROOT_URL = Url().url
+        //Mostrar el diálogo de progreso
+       val loading = ProgressDialog.show(this, "Registrando...", "Espere por favor...", false, false)
+        val stringRequest: StringRequest = object : StringRequest(
+            Request.Method.POST, ROOT_URL+"/Login.php",
+            object : Response.Listener<String?> {
+                override fun onResponse(s: String?) {
+                    //Descartar el diálogo de progreso
+                   loading.dismiss()
+                    //Mostrando el mensaje de la respuesta
+                  //  Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                    //ystem.out.println("error aqui 1 $s")
+                    if(s.equals("Registrado")){
+                        dialog2()
+                    }else{
+                        Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                        val intent = Intent(this@MainActivityVerificarSMS, Registro::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            },
+            object : Response.ErrorListener {
+                override fun onErrorResponse(volleyError: VolleyError) {
+                    //Descartar el diálogo de progreso
+                     loading.dismiss()
+                    //Showing toast
+                    Toast.makeText(this@MainActivityVerificarSMS, volleyError.message.toString(), Toast.LENGTH_LONG).show()
+                    System.out.println("error aqui 2 ${volleyError.message}")
+                }
+            }) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+
+                //Creación de parámetros
+                val params: MutableMap<String, String> = Hashtable<String, String>()
+
+                //Agregando de parámetros
+                params["Correo"] = Correo
+                params["Nombre"] = Nombre
+                params["Apellido_Paterno"] = Apellido_Paterno
+                params["Apellido_Materno"] = Apellido_Materno
+                params["telefonoCliente"] = telefonoCliente
+                params["generoCliente"] = generoCliente
+                params["Contrasena"] = Contrasena
+                params["fue_NoRegistrado"] = fue_NoRegistrado
+                params["deviceID"] = deviceID
+
+                //Parámetros de retorno
+                return params
+            }
+        }
+
+        //Creación de una cola de solicitudes
+        val requestQueue = Volley.newRequestQueue(this)
+
+        //Agregar solicitud a la cola
+        requestQueue.add(stringRequest)
+    }
+
+    private fun enviarTodoFoto(fotoPerfil: String?, Correo: String, Nombre: String, Apellido_Paterno: String, Apellido_Materno: String, telefonoCliente: String, generoCliente: String, Contrasena: String, fue_NoRegistrado: String, deviceID: String) {
+        val ROOT_URL = Url().url
+        //Mostrar el diálogo de progreso
+        val loading = ProgressDialog.show(this, "Registrando...", "Espere por favor...", false, false)
+        val stringRequest: StringRequest = object : StringRequest(
+            Request.Method.POST, ROOT_URL+"/LoginFoto.php",
+            object : Response.Listener<String?> {
+                override fun onResponse(s: String?) {
+                    //Descartar el diálogo de progreso
+                    loading.dismiss()
+                    //Mostrando el mensaje de la respuesta
+                    Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                    System.out.println("error aqui 1 $s")
+                }
+            },
+            object : Response.ErrorListener {
+                override fun onErrorResponse(volleyError: VolleyError) {
+                    //Descartar el diálogo de progreso
+                    loading.dismiss()
+
+                    //Showing toast
+                    Toast.makeText(this@MainActivityVerificarSMS, volleyError.message.toString(), Toast.LENGTH_LONG).show()
+                    System.out.println("error aqui 2 ${volleyError.message}")
+                }
+            }) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+
+                //Creación de parámetros
+                val params: MutableMap<String, String> = Hashtable<String, String>()
+
+                //Agregando de parámetros
+                if (fotoPerfil != null) {
+                    params["fotoPerfil"] = fotoPerfil
+                }
+
+
+                params["Correo"] = Correo
+                params["Nombre"] = Nombre
+                params["Apellido_Paterno"] = Apellido_Paterno
+                params["Apellido_Materno"] = Apellido_Materno
+                params["telefonoCliente"] = telefonoCliente
+                params["generoCliente"] = generoCliente
+                params["Contrasena"] = Contrasena
+                params["fue_NoRegistrado"] = fue_NoRegistrado
+                params["deviceID"] = deviceID
+
+                //Parámetros de retorno
+                return params
+            }
+        }
+
+        //Creación de una cola de solicitudes
+        val requestQueue = Volley.newRequestQueue(this)
+
+        //Agregar solicitud a la cola
+        requestQueue.add(stringRequest)
     }
 
     private fun requestPermission(contexto: Activity) {
@@ -285,9 +446,22 @@ class MainActivityVerificarSMS : AppCompatActivity() {
         dialog.show()
     }
 
+    @SuppressLint("RestrictedApi")
     fun iniciarSesion (view: View) {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+       // cerrar actividad
+        dialog.dismiss()
+      finish()
+
+    }
+
+
+    fun getStringImagen(bmp: Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
+        val imageBytes = baos.toByteArray()
+        return Base64.encodeToString(imageBytes, Base64.DEFAULT)
     }
 
 }

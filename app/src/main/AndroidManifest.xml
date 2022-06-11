@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

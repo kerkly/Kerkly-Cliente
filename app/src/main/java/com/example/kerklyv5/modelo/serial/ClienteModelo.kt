@@ -20,4 +20,8 @@ class ClienteModelo {
     @SerializedName("Apellido_Materno")
     @Expose
     var Apellido_Materno: String = ""
+
+    @SerializedName("fotoPerfil")
+    @Expose
+    var fotoPerfil: String = ""
 }

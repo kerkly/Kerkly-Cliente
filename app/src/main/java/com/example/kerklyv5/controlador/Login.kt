@@ -25,8 +25,7 @@ class Login {
         genero: String,
         contra: String,
         isRegistrado: String,
-        id: String
-    ) {
+        id: String) {
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
             .build()

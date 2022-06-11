@@ -141,7 +141,7 @@
     <string name="banco">Banco</string>
     <string name="referencia_bancaria">Referencia Bancaria</string>
     <string name="advertencia_comision_oxxo">El total a pagar no incluye la comisión de la tienda OXXO</string>
-    <string name="subir_voucher">Subir  voucher</string>
+    <string name="subir_voucher">Subir voucher</string>
     <string name="transferencia_bancaria_aviso">Desde tu celular dirígete a la aplicación de tú
         banco para realizar la transferencia bancaria por el monto establecido en tu presupuesto.
     </string>
@@ -176,5 +176,5 @@
 
     <string name="llave_api_google_maps">AIzaSyCKtLDUW6EKmzmlonLmg3wxcFxFjuxRePA</string>
     <string name="marker_detail">(%1$.2f %2$.3f)</string>
-
+    <string name="RecuperarCuenta">Enviar</string>
 </resources>

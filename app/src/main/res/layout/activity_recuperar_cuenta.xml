@@ -63,6 +63,17 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/botonVerificarCorreo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/RecuperarCuenta"
+                android:background="@drawable/fondo_boton"
+                app:backgroundTint="@color/colorBoton"
+                android:layout_gravity="end"
+                android:layout_marginEnd="20dp"
+                android:textColor="@color/black" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,7 +87,6 @@
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:onClick="enviarEmail"
                     android:orientation="horizontal"
                     tools:ignore="TouchTargetSizeCheck">
 
