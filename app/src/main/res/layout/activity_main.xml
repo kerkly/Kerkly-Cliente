@@ -60,8 +60,9 @@
                 android:layout_height="match_parent"
                 android:textSize="15dp"
                 android:textColor="@color/white"
+                android:maxLength="10"
                 android:fontFamily="@font/quicksand_bold"
-                android:inputType="phone"
+                android:inputType="number"
                 tools:ignore="SpeakableTextPresentCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -133,7 +134,7 @@
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/button2"
+        android:id="@+id/btn_pruebaSinRegistro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

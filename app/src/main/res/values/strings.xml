@@ -160,9 +160,10 @@
 
     <string-array name="generos">
         <item>Hombre</item>
-        <item>Femenino</item>
+        <item>Mujer</item>
         <item>Otro</item>
     </string-array>
+
     <string-array name="oficios">
         <item>Electricista</item>
         <item>Plomero</item>
