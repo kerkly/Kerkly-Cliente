@@ -1,15 +1,14 @@
 package com.example.kerklyv5.vista
 
 import android.Manifest
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Base64
 import android.view.View
 import android.widget.ImageView
 import android.widget.Spinner
@@ -20,19 +19,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
-import com.android.volley.AuthFailureError
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.kerklyv5.R
-import com.example.kerklyv5.url.Url
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.lowagie.text.pdf.codec.Base64
 import kotlinx.android.synthetic.main.activity_registro.*
-import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.util.*
 
 
@@ -127,6 +121,8 @@ class Registro : AppCompatActivity() {
             try {
                 //Cómo obtener el mapa de bits de la Galería
                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                //escalamos la imagen para que no pese tanto
+
                // imagen = getStringImagen(bitmap!!)!!
                 var originalBitmap = bitmap
                // val imagen = getStringImagen(bitmap!!)!!
@@ -149,6 +145,7 @@ class Registro : AppCompatActivity() {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+
         }
     }
  /*   fun getStringImagen(bmp: Bitmap): String? {
