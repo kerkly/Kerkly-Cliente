@@ -411,7 +411,7 @@ class SolicitarServicio : AppCompatActivity() {
                     //Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                     //hay que poner una imagen por defecto
                 }else{
-                    cargarImagen(foto);
+                    cargarImagen(foto)
                 }
 
                 sesion(correo)
