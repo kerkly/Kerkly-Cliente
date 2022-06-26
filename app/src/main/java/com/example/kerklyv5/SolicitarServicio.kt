@@ -1,12 +1,11 @@
 package com.example.kerklyv5
 
 import android.Manifest
-import android.R.attr.src
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -14,6 +13,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +21,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Nullable
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
@@ -32,7 +33,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.android.volley.toolbox.StringRequest
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
@@ -55,10 +55,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStream
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 
 
 class SolicitarServicio : AppCompatActivity() {
@@ -75,13 +72,14 @@ class SolicitarServicio : AppCompatActivity() {
     private var presupuestoListo = false
     private lateinit var dialog: Dialog
 
-
     //subir foto
     //subir foto de perfil
     lateinit var fotoPerfil: ImageView
     var bitmap: Bitmap? = null
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
@@ -111,11 +109,12 @@ class SolicitarServicio : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
-                R.id.nav_ordenesPendientes,
-                R.id.historialFragment,
-                R.id.nav_mensajes
+                //R.id.ordenesPendientesFragment,
+              //  R.id.historialFragment,
+               // R.id.nav_mensajes
             ), drawerLayout
         )
+
 
        // sesion(correo)
 
@@ -125,8 +124,8 @@ class SolicitarServicio : AppCompatActivity() {
             when (it.itemId) {
                 R.id.nav_home -> setFragmentHome()
                 R.id.nav_notificaciones -> setNoficiaciontes()
-                R.id.nav_ordenesPendientes -> setFragmentOrdenesPendientes()
-                R.id.historialFragment -> setFragmentHistorial()
+                R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
+                R.id.fragment_historial -> setFragmentHistorial()
                 R.id.nav_mensajes -> setMensajesPresupuesto()
                 R.id.nav_cerrarSesion -> cerrarSesion()
             }
@@ -137,9 +136,11 @@ class SolicitarServicio : AppCompatActivity() {
             dialog.setContentView(R.layout.presupuesto_solicitud)
             dialog.show()
         }
+
        getJson()
         setFragmentHome()
     }
+
 
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -224,7 +225,13 @@ class SolicitarServicio : AppCompatActivity() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            val alert: AlertDialog.Builder = AlertDialog.Builder(this)
+            alert.setTitle(getString(R.string.cerrar_app))
+            alert.setMessage(getString(R.string.mensaje_alertaCerrarApp))
+            alert.setCancelable(false)
+            alert.setPositiveButton(getString(R.string.confirmar_alertCerrarApp)) { dialogo1, id -> finish() }
+            alert.setNegativeButton(getString(R.string.cancelar_alertCerrarApp)) { dialogo1, id -> dialogo1.dismiss() }
+            alert.show()
         }
     }
 
