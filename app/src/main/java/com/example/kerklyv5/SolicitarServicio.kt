@@ -3,6 +3,7 @@ package com.example.kerklyv5
 import android.Manifest
 import android.app.Dialog
 import android.content.DialogInterface
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Base64
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
@@ -33,6 +35,15 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+
+import com.android.volley.AuthFailureError
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
@@ -56,21 +67,24 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.io.*
+import java.util.*
 
 
 class SolicitarServicio : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivitySolicitarServicioBinding
-    private lateinit var b: Bundle
+     var b: Bundle? = null
     private lateinit var txt_nombre: TextView
    private lateinit var txt_correo: TextView
     lateinit var telefono: String
-    private lateinit var nombre: String
+    private var nombre: String? = null
     private lateinit var correo: String
     private lateinit var id: String
     private lateinit var drawerLayout: DrawerLayout
     private var presupuestoListo = false
     private lateinit var dialog: Dialog
+    var NombreF: String?=null
 
     //subir foto
     //subir foto de perfil
@@ -88,9 +102,9 @@ class SolicitarServicio : AppCompatActivity() {
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
 
         b = intent.extras!!
-        telefono = b.getString("Telefono")!!
+        telefono = b!!.getString("Telefono")!!
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        presupuestoListo = b.getBoolean("PresupuestoListo")
+        presupuestoListo = b!!.getBoolean("PresupuestoListo")
 
 
         drawerLayout = binding.drawerLayout
@@ -122,7 +136,7 @@ class SolicitarServicio : AppCompatActivity() {
         navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_home -> setFragmentHome()
+                R.id.nav_home -> setFragmentHome(nombre.toString())
                 R.id.nav_notificaciones -> setNoficiaciontes()
                 R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
                 R.id.fragment_historial -> setFragmentHistorial()
@@ -138,7 +152,7 @@ class SolicitarServicio : AppCompatActivity() {
         }
 
        getJson()
-        setFragmentHome()
+
     }
 
 
@@ -191,32 +205,65 @@ class SolicitarServicio : AppCompatActivity() {
             filePath = data.data!!
             try {
                 //Cómo obtener el mapa de bits de la Galería
-                bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
-                // imagen = getStringImagen(bitmap!!)!!
-                var originalBitmap = bitmap
-                // val imagen = getStringImagen(bitmap!!)!!
-                if (originalBitmap!!.width > originalBitmap.height) {
-                    originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
+              var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                if (bitmap!!.width <= 500){
+                  //  Toast.makeText(this, "Es mejor que 500", Toast.LENGTH_SHORT).show()
+                    val imagen = getStringImagen( bitmap!!)!!
+                    // val imagen = getStringImagen(bitmap!!)!!
+                    if (bitmap!!.width > bitmap.height) {
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.height, bitmap.height)
 
-                } else if (originalBitmap.width < originalBitmap.height) {
-                    originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
-                    )
+                    } else if (bitmap.width < bitmap.height) {
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.width
+                        )
+                    }
+
+                    //Configuración del mapa de bits en ImageView
+                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
+
+                    roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
+                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
+                    fotoPerfil.setImageDrawable(roundedDrawable)
+
+                }else{
+                   // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
+                    val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
+                    val imagen = getStringImagen(bmp!!)!!
+                    var originalBitmap = bmp
+
+                    // val imagen = getStringImagen(bitmap!!)!!
+                  if (originalBitmap!!.width > originalBitmap.height) {
+                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
+
+                    } else if (originalBitmap.width < originalBitmap.height) {
+                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
+                        )
+                    }
+
+                    //Configuración del mapa de bits en ImageView
+                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
+
+                    roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
+                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
+                    fotoPerfil.setImageDrawable(roundedDrawable)
+                    System.out.println("AQui la imagen" +filePath.toString())
+
+
+
                 }
 
-                //Configuración del mapa de bits en ImageView
-                val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
-
-                roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
-                fotoPerfil!!.setImageDrawable(roundedDrawable)
-
-                //  enviarTodoFoto(imagen,"goku@gmail.com","Luis","salazar","Luis","7471503417","h","Alfredo@0599","0","dssdfad")
-                System.out.println("AQui la imagen" +filePath.toString())
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
     }
 
+    fun getStringImagen(bmp: Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
+        val imageBytes = baos.toByteArray()
+        return Base64.encodeToString(imageBytes, Base64.DEFAULT)
+    }
     fun cerrarVentana(v: View) {
         dialog.dismiss()
     }
@@ -246,10 +293,11 @@ class SolicitarServicio : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setFragmentHome() {
+    private fun setFragmentHome(nombre: String) {
         val f = HomeFragment()
-       // val args = Bundle()
-        //args.putString("Tel", telefono)
+        b!!.putString("Nombre", nombre.toString())
+
+       // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
@@ -260,6 +308,7 @@ class SolicitarServicio : AppCompatActivity() {
         val f = OrdenesPendientesFragment()
         // val args = Bundle()
         //args.putString("Tel", telefono)
+        b!!.putString("Nombre", nombre.toString())
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
@@ -363,6 +412,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 Toast.makeText(applicationContext, "Sesión cerrada", Toast.LENGTH_SHORT).show()
                                 val i = Intent(applicationContext, MainActivity::class.java)
                                 startActivity(i)
+                                finish()
                             }
                         }
 
@@ -400,7 +450,7 @@ class SolicitarServicio : AppCompatActivity() {
 
                 //carsModels = response.body() as ArrayList<presupuestok>
             //    Log.d("Lista", postList[0].toString())
-                val n = postList[0].Nombre
+                NombreF = postList[0].Nombre
                 val ap = postList[0].Apellido_Paterno
                 val am = postList[0].Apellido_Materno
                 val foto = postList[0].fotoPerfil
@@ -408,19 +458,20 @@ class SolicitarServicio : AppCompatActivity() {
             //    Log.d("nombre", n)
 
 
-                nombre = "$n $ap $am"
+                nombre = "$NombreF $ap $am"
 
                 correo = postList[0].Correo
 
                 txt_nombre.text = nombre
                 txt_correo.text = correo
                 if (foto ==null){
-                    //Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                  //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                     //hay que poner una imagen por defecto
                 }else{
-                    cargarImagen(foto);
+                    cargarImagen(foto)
                 }
 
+                setFragmentHome(nombre!!)
                 sesion(correo)
 
             }
@@ -447,19 +498,121 @@ class SolicitarServicio : AppCompatActivity() {
                // fotoPerfil.setImageBitmap(bitmap)
                 System.out.println("Respuesta 1 " )
                 //Configuración del mapa de bits en ImageView
-                val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
-                roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
-                fotoPerfil!!.setImageDrawable(roundedDrawable)
+                // val imagen = getStringImagen(bitmap!!)!!
+            /*   var bitmapO = bitmap
+                if (bitmapO != null) {
+                    if (bitmapO.width > bitmapO.height) {
+                        bitmapO = Bitmap.createBitmap(bitmapO, 0, 0, bitmapO.height, bitmapO.height)
+
+                    } else
+                        if (bitmapO.width < bitmapO.height) {
+                            bitmapO = Bitmap.createBitmap(bitmapO, 0, 0, bitmapO.width, bitmapO.width)
+                        }
+                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmapO)
+                    roundedDrawable.cornerRadius = bitmapO!!.getWidth().toFloat()
+                  //  fotoPerfil!!.setImageDrawable(roundedDrawable)
+                  //  Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 1", Toast.LENGTH_SHORT).show()
+
+                }*/
+
               //  fotoPerfil.setImageBitmap(bitmap)
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-               // fotoPerfil.setImageDrawable(placeHolderDrawable)
-                System.out.println("Respuesta 2 " )
+                val multi = MultiTransformation<Bitmap>(
+                    RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
+
+                Glide.with(this@SolicitarServicio).load(file)
+                    .apply(RequestOptions.bitmapTransform(multi))
+                    .into(fotoPerfil)
+
+                /* Picasso.get().load(file)
+                    .resize(50,50)
+                    .into(fotoPerfil)*/
+                // Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 2", Toast.LENGTH_SHORT).show()
+
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 System.out.println("Respuesta error 3 "+ e.toString())
+                Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
             }
+
+
         })
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private fun EnviarFotoPerfil(fotoPerfil: String?, telefonoCliente: String, nombref: String) {
+        val ROOT_URL = Url().url
+        //Mostrar el diálogo de progreso
+        val loading = ProgressDialog.show(this, "Subiendo...", "Espere por favor...", false, false)
+        val stringRequest: StringRequest = object : StringRequest(
+            Request.Method.POST, ROOT_URL+"/actualizacionFoto.php",
+            object : com.android.volley.Response.Listener<String?> {
+                override fun onResponse(s: String?) {
+                    //Descartar el diálogo de progreso
+
+                    loading.dismiss()
+                    //Mostrando el mensaje de la respuesta
+                    Toast.makeText(this@SolicitarServicio, s, Toast.LENGTH_LONG).show()
+                    System.out.println("error aqui 1 $s")
+
+                }
+            },
+            object : com.android.volley.Response.ErrorListener {
+                override fun onErrorResponse(volleyError: VolleyError) {
+                    //Descartar el diálogo de progreso
+                    loading.dismiss()
+
+                    //Showing toast
+                    Toast.makeText(this@SolicitarServicio, volleyError.message.toString(), Toast.LENGTH_LONG).show()
+                    System.out.println("error aqui 2 ${volleyError.message}")
+                }
+            }) {
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+
+                //Creación de parámetros
+                val params: MutableMap<String, String> = Hashtable<String, String>()
+
+                //Agregando de parámetros
+                if (fotoPerfil != null) {
+                    params["fotoPerfil"] = fotoPerfil
+                }
+                params["telefonoCliente"] = telefonoCliente
+                params["nombre"] = nombref
+                //Parámetros de retorno
+                return params
+            }
+        }
+
+        //Creación de una cola de solicitudes
+        val requestQueue = Volley.newRequestQueue(this)
+
+        //Agregar solicitud a la cola
+        requestQueue.add(stringRequest)
+
     }
 }

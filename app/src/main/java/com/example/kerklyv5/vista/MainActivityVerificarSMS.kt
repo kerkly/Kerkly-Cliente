@@ -20,6 +20,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawable
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.Response
@@ -57,8 +59,7 @@ class MainActivityVerificarSMS : AppCompatActivity() {
     var numeroSMS = ""
     var f: String? = ""
     private lateinit var dialog: Dialog
-     var imagen: String? = null
-    lateinit var bitmap: Bitmap
+
     var Callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
@@ -212,15 +213,29 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                                                   //Toast.makeText(this, "no hay foto $f",Toast.LENGTH_SHORT).show()
                                                   if (f.equals("null")){
                                                       System.out.println("no hay foto $fotop")
-                                                   //  Toast.makeText(this, "no hay foto $fotop",Toast.LENGTH_SHORT).show()
+                                                   // Toast.makeText(this, "no hay foto $fotop",Toast.LENGTH_SHORT).show()
                                                       enviarTodo(correo,nombre,apellidoP,apellidoM,telefono,g,contra1,"0",id)
 
                                                   }else{
                                                       System.out.println("si hay foto $fotop")
                                                       val uri: Uri = Uri.parse(fotop.toString())
-                                                      val  bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                                                      val imagen = getStringImagen(bitmap!!)!!
-                                                      enviarTodoFoto(imagen, correo, nombre, apellidoP, apellidoM, telefono, g, contra1, "0", id)
+                                                      var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                                                    /* val bmp= Bitmap.createScaledBitmap(bitmap, 400, 400,true)
+                                                      val imagen = getStringImagen(bmp!!)!!
+                                                      enviarTodoFoto(imagen, correo, nombre, apellidoP, apellidoM, telefono, g, contra1, "0", id)*/
+
+                                                      if (bitmap!!.width <= 500){
+                                                          // Toast.makeText(this, "Es mejor que 500", Toast.LENGTH_SHORT).show()
+                                                          val imagen = getStringImagen( bitmap!!)!!
+                                                          enviarTodoFoto(imagen, correo, nombre, apellidoP, apellidoM, telefono, g, contra1, "0", id)
+
+                                                      }else{
+                                                         // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
+                                                          val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
+                                                          val imagen = getStringImagen(bmp!!)!!
+                                                          enviarTodoFoto(imagen, correo, nombre, apellidoP, apellidoM, telefono, g, contra1, "0", id)
+
+                                                      }
 
                                                   }
                                             } catch (e: IOException) {
@@ -460,6 +475,7 @@ class MainActivityVerificarSMS : AppCompatActivity() {
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
+      //  bmp= Bitmap.createScaledBitmap(bmp, 1001, 100,true)
         val imageBytes = baos.toByteArray()
         return Base64.encodeToString(imageBytes, Base64.DEFAULT)
     }
