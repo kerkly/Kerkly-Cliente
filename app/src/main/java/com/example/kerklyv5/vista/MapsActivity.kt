@@ -75,6 +75,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var estado: String
     private lateinit var pais: String
     private var band = false
+    var NombreUbi: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,6 +91,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
          oficio = b.getString("Oficio").toString()*/
 
         band = b.getBoolean("Express")
+        NombreUbi = b.getString("Nombre")
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -117,6 +119,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
 
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
+
         BotonEnviarU.setOnClickListener {
 
             //setLocation(latitud, longitud)
@@ -157,19 +160,35 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
 
 */
+            setLocation(latitud, longitud)
+            if(!band) {
+                val i = Intent(applicationContext, KerklyListActivity::class.java)
+                b.putString("Calle", calle)
+                b.putString("Colonia", colonia)
+                b.putString("Código Postal", cp)
+                b.putString("Exterior", num_ext)
+               // b.putString("Referencia", referencia)
+                b.putDouble("Latitud", latitud)
+                b.putDouble("Longitud", longitud)
+                b.putString("Ciudad", ciudad)
+                b.putString("Estado", estado)
+                b.putString("Pais", pais)
+                i.putExtras(b)
+                startActivity(i)
+            } else {
+                val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                //Toast.makeText(this, referencia, Toast.LENGTH_SHORT).show()
+              //  aceptarDireccion()
+                ingresarPresupuesto()
+                b.putBoolean("PresupuestoListo", true)
+                intent.putExtras(b)
+                startActivity(intent)
+            }
+
+
         }
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -187,15 +206,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val locationListener: LocationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 val miUbicacion = LatLng(location.getLatitude(), location.getLongitude())
-                latitud = location.latitude
-                longitud = location.longitude
+               // val miUbicacion = LatLng(17.5551109, -99.5042626)
+
                 locationManager.removeUpdates(this)
-                marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title("Mi Ubicacion").snippet("holaaa").icon(
+                marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title(NombreUbi.toString()).icon(
                     BitmapDescriptorFactory.fromResource(
                         R.drawable.miubicacion4
                     )))!!
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))
+                latitud = location.latitude
+                longitud = location.longitude
 
             }
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
@@ -222,6 +243,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         googleMap.setOnMarkerDragListener(this)
 
        // mMap!!.setOnMarkerClickListener(this)
+
     }
 
     private fun getLocalizacion() {
@@ -273,21 +295,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
     override fun onMarkerClick(p0: Marker): Boolean {
         if (p0!!.equals(marcador!!)) {
-            System.out.println("entro")
+          //  System.out.println("entro")
             latitud = p0.position.latitude
             longitud = p0.position.longitude
             //  Toast.makeText(context, "latitud ${latitud.toString()} longitud $longitud", Toast.LENGTH_LONG).show()
 
 
-            val builder = AlertDialog.Builder(this)
+           /* val builder = AlertDialog.Builder(this)
             builder.setMessage("Por favor, confirme su ubicación")
-            builder.setTitle(title)
+            builder.setTitle(NombreUbi.toString())
             builder.setCancelable(false)
             builder.setPositiveButton("Si") { d, which ->
                 //Toast.makeText(this, "elegido", Toast.LENGTH_LONG).show()
                 //TrazarLineas(latLng)
                 dialog.setContentView(R.layout.confirmar_direccion)
-
+                dialog.show()
                 boton_confirmar = dialog.findViewById(R.id.btn_direccion_exrpess)
                 boton_actualizar = dialog.findViewById(R.id.actualizar_btn)
                 boton_actualizar.visibility = View.GONE
@@ -315,16 +337,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         b.putString("Ciudad", ciudad)
                         b.putString("Estado", estado)
                         b.putString("Pais", pais)
-
                         i.putExtras(b)
-
                         startActivity(i)
                     } else {
                         val intent = Intent(applicationContext, SolicitarServicio::class.java)
                            //Toast.makeText(this, referencia, Toast.LENGTH_SHORT).show()
                         aceptarDireccion()
                         ingresarPresupuesto()
-
                         b.putBoolean("PresupuestoListo", true)
                         intent.putExtras(b)
                         startActivity(intent)
@@ -333,14 +352,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
             builder.setNegativeButton("No") { dialog, which -> dialog.cancel() }
             val alertDialog = builder.create()
-            alertDialog.show()
+            alertDialog.show()*/
 
             /*boton_actualizar.setOnClickListener {
 
             }*/
 
 
-            dialog.show()
+           // dialog.show()
         }
 
         return false
@@ -364,7 +383,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             colonia,
             num_ext,
             cp,
-            referencia,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null
@@ -398,25 +416,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMarkerDragEnd(p0: Marker) {
         if (p0.equals(marcador)) {
             // Toast.makeText(context, "finish", Toast.LENGTH_SHORT).show()
+            latitud = p0.position.latitude
+            longitud = p0.position.longitude
         }
     }
 
     override fun onMarkerDragStart(p0: Marker) {
         if (p0.equals(marcador)) {
             //Toast.makeText(context, "start", Toast.LENGTH_SHORT).show()
+            latitud = p0.position.latitude
+            longitud = p0.position.longitude
         }
     }
     override fun onMarkerDrag(p0: Marker) {
         if (p0!!.equals(marcador!!)){
-            val nuevoTitulo  = String.format(
-                Locale.getDefault(),getString(R.string.marker_detail),
-                marcador.position.latitude,
-                marcador.position.longitude)
+           // val nuevoTitulo  = String.format(Locale.getDefault(),getString(R.string.marker_detail), marcador.position.latitude, marcador.position.longitude)
 
-            setTitle(nuevoTitulo)
+          //setTitle(nuevoTitulo)
             latitud = p0.position.latitude
             longitud = p0.position.longitude
-            setLocation(latitud, longitud)
+            //setLocation(latitud, longitud)
         }
     }
 
@@ -438,20 +457,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 num_ext = direccion[0].subThoroughfare
 
                  //txtDireccion.setText(address)
-                 editCiudad.setText(ciudad)
+               //  editCiudad.setText(ciudad)
                  //edit.setText(estado)
               //   txtPais.setText(pais)
-                 calle_edit.setText(calle)
-                 colonia_edit.setText(colonia)
-                 numero_extEdit.setText(num_ext)
-                 edit_cp.setText(cp)
+                 //calle_edit.setText(calle)
+                 //colonia_edit.setText(colonia)
+                 //numero_extEdit.setText(num_ext)
+                 //edit_cp.setText(cp)
                 //texViewDireecion.setText("ciudad $ciudad \n Estado  $estado \n pais $pais \n codigo Postal $codigoPostal \n calle $calle \n colonia $colonia")
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
-
-
-
     }
+
+
 }

@@ -19,6 +19,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
@@ -31,10 +32,20 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.MainActivityControlador
 import com.example.kerklyv5.controlador.Notificacion
 import com.example.kerklyv5.extras.IntroSliderActivity
+import com.example.kerklyv5.interfaces.AceptarPresupuestoNormalInterface
+import com.example.kerklyv5.interfaces.DeviceIDInterfaceBotonSinRegistro
 import com.example.kerklyv5.modelo.Cliente
- import com.google.android.material.textfield.TextInputEditText
+import com.example.kerklyv5.url.Url
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit.Callback
+import retrofit.RestAdapter
+import retrofit.RetrofitError
+import retrofit.client.Response
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 /*
@@ -76,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var epicDialog2: Dialog
     private lateinit var seguir: Button
     private lateinit var buttonclosed: ImageButton
-
+    private lateinit var btn_pruebaSinRegistro: MaterialButton
 
 
 
@@ -122,6 +133,9 @@ class MainActivity : AppCompatActivity() {
 
 
         boton = findViewById(R.id.button)
+        btn_pruebaSinRegistro = findViewById(R.id.btn_pruebaSinRegistro)
+
+        deviceIDBoton()
 
         ivLogo = findViewById(R.id.logokerkly)
         editContra = findViewById(R.id.input_password)
@@ -157,6 +171,51 @@ class MainActivity : AppCompatActivity() {
         //WorkManager.getInstance(this).enqueue(uploadWork)
         //startService(Intent(this,PresupuestoService::class.java))
         //startService(Intent(this, PresupuestoServicio::class.java))
+    }
+
+    fun deviceIDBoton() {
+        var enteroBandera = 3
+        val ROOT_URL = Url().url
+        val adaptar = RestAdapter.Builder()
+            .setEndpoint(ROOT_URL)
+            .build()
+
+        val api = adaptar.create(DeviceIDInterfaceBotonSinRegistro ::class.java)
+
+        api.mensaje(id,
+            object : Callback<Response?> {
+                override fun success(t: Response?, response: Response?) {
+                    var entrada: BufferedReader? =  null
+                    var Respuesta = ""
+                    try {
+                        entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                        Respuesta = entrada.readLine().trim()
+                        Log.d("id", id)
+                        //Toast.makeText(applicationContext, id, Toast.LENGTH_SHORT).show()
+
+                        enteroBandera = Respuesta.toInt()
+                        if ( enteroBandera == 1) {
+                            btn_pruebaSinRegistro.visibility = View.GONE
+                        } else {
+                            btn_pruebaSinRegistro.visibility = View.VISIBLE
+
+                        }
+
+                       // Toast.makeText(applicationContext, enteroBandera.toString(), Toast.LENGTH_SHORT).show()
+
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun failure(error: RetrofitError?) {
+                    print(error.toString())
+                }
+
+            }
+        )
+        Log.d("respuesta", enteroBandera.toString())
+
     }
 
     fun click (view: View) {
@@ -226,7 +285,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun servicioExpress (view: View) {
-        var notificacion = Notificacion(this)
+        //var notificacion = Notificacion(this)
         dialog.setContentView(R.layout.telefono_no_registrado_confirmar)
         dialog.show()
     }
@@ -261,7 +320,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun mostrarSalir(view: View) {
-        var notificacion = Notificacion(this)
+        //var notificacion = Notificacion(this)
         epicDialog2 = Dialog(this)
         epicDialog2.setContentView(R.layout.about2)
         buttonclosed = epicDialog2.findViewById<View>(R.id.buttonclosed) as ImageButton
