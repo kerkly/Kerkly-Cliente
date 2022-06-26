@@ -16,6 +16,7 @@ import com.example.kerklyv5.controlador.AdapterSpinner
 import com.example.kerklyv5.interfaces.ObtenerOficiosInterface
 import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.url.Url
+import com.example.kerklyv5.vista.KerklyListActivity
 import com.example.kerklyv5.vista.MapsActivity
 import com.example.kerklyv5.vista.fragmentos.KerklyFragment
 import com.google.android.material.button.MaterialButton
@@ -27,7 +28,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.ArrayList
+
 
 class HomeFragment : Fragment() {
 
@@ -46,18 +47,17 @@ class HomeFragment : Fragment() {
     private lateinit var telefono: String
     private lateinit var problema: String
     private lateinit var boton_servicioUrgente: MaterialButton
+    var nombreUbi: String? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         /*homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
         val root = inflater.inflate(R.layout.fragment_home, container, false)
+        // Obtienes el Bundle del Intent
 
+       b = Bundle()
+        nombreUbi = arguments?.getString("Nombre")
 
-        b = Bundle()
 
         spinner = root.findViewById(R.id.spinnerNormal)
         textProblem = root.findViewById(R.id.inputProblematica)
@@ -78,26 +78,24 @@ class HomeFragment : Fragment() {
 
             telefono = arguments?.getString("Telefono")!!
 
+
             // Log.d("tel", telefono)
             b.putString("Oficio", oficio)
             b.putString("Telefono", telefono)
-
             problema = textProblem.text.toString()
-
             b.putString("Problema", problema)
 
             if (problema.isEmpty()) {
                 layoutProblem.error = getString(R.string.campo_requerido)
             } else {
                 layoutProblem.error = null
-                /* val f = KerklyFragment()
-                 f.arguments = b
-                 var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
-                     replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()*/
+
                 val i = Intent(context, MapsActivity::class.java)
                 b.putBoolean("Express", true)
+                b.putString("Nombre", nombreUbi.toString())
                 i.putExtras(b)
                 startActivity(i)
+
             }
         }
 
@@ -151,6 +149,7 @@ class HomeFragment : Fragment() {
         telefono = arguments?.getString("Telefono")!!
 
        // Log.d("tel", telefono)
+
         b.putString("Oficio", oficio)
         b.putString("Telefono", telefono)
 
@@ -168,6 +167,7 @@ class HomeFragment : Fragment() {
                 replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()*/
             val i = Intent(context, MapsActivity::class.java)
             b.putBoolean("Express", false)
+            b.putString("Nombre", nombreUbi.toString())
             i.putExtras(b)
             startActivity(i)
             }

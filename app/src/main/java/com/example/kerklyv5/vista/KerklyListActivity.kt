@@ -50,7 +50,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var cp: String
     private lateinit var colonia: String
     private lateinit var num_ext: String
-    private lateinit var referencia: String
+  //  private lateinit var referencia: String
     private lateinit var estado: String
     private lateinit var pais: String
 
@@ -71,7 +71,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         cp = b.getString("Código Postal").toString()
         colonia = b.getString("Colonia").toString()
         num_ext = b.getString("Exterior").toString()
-        referencia = b.getString("Referencia").toString()
+     //   referencia = b.getString("Referencia").toString()
         pais = b.getString("Pais").toString()
 
         recyclerview = findViewById(R.id.recycler_kerkly)
@@ -211,7 +211,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             colonia,
             num_ext,
             cp,
-            referencia,
+        //    referencia,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null

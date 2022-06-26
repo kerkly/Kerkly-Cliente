@@ -211,7 +211,7 @@ class PedirServicioExpress : AppCompatActivity() {
                    // b = Bundle()
                     var n = postList[0].nombre_noR
                     nombre = n
-                    Log.d("nosee", nombre)
+                   // Log.d("nosee", nombre)
                     apellidoP = postList[0].apellidoP_noR
                     apellidoM = postList[0].apellidoM_noR
                     intentos = postList[0].numIntentos

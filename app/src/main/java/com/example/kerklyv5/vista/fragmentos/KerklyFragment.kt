@@ -65,7 +65,6 @@ class KerklyFragment : Fragment() {
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager= LinearLayoutManager(context)
         oficio = arguments?.getString("Oficio").toString()
-
         b = requireArguments()
 
         return v
