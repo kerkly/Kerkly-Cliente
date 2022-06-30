@@ -2,6 +2,7 @@ package com.example.kerklyv5
 
 import android.Manifest
 import android.app.Dialog
+import android.content.DialogInterface
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Nullable
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
@@ -32,6 +35,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+
 import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.VolleyError
@@ -52,7 +56,6 @@ import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -62,6 +65,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 import java.io.*
 import java.util.*
 
@@ -81,13 +87,14 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var dialog: Dialog
     var NombreF: String?=null
 
-
     //subir foto
     //subir foto de perfil
     lateinit var fotoPerfil: ImageView
     var bitmap: Bitmap? = null
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
@@ -117,11 +124,12 @@ class SolicitarServicio : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
-                R.id.nav_ordenesPendientes,
-                R.id.historialFragment,
-                R.id.nav_mensajes
+                //R.id.ordenesPendientesFragment,
+              //  R.id.historialFragment,
+               // R.id.nav_mensajes
             ), drawerLayout
         )
+
 
        // sesion(correo)
 
@@ -131,8 +139,8 @@ class SolicitarServicio : AppCompatActivity() {
             when (it.itemId) {
                 R.id.nav_home -> setFragmentHome(nombre.toString())
                 R.id.nav_notificaciones -> setNoficiaciontes()
-                R.id.nav_ordenesPendientes -> setFragmentOrdenesPendientes()
-                R.id.historialFragment -> setFragmentHistorial()
+                R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
+                R.id.fragment_historial -> setFragmentHistorial()
                 R.id.nav_mensajes -> setMensajesPresupuesto()
                 R.id.nav_cerrarSesion -> cerrarSesion()
             }
@@ -143,9 +151,11 @@ class SolicitarServicio : AppCompatActivity() {
             dialog.setContentView(R.layout.presupuesto_solicitud)
             dialog.show()
         }
+
        getJson()
 
     }
+
 
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -263,7 +273,13 @@ class SolicitarServicio : AppCompatActivity() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            val alert: AlertDialog.Builder = AlertDialog.Builder(this)
+            alert.setTitle(getString(R.string.cerrar_app))
+            alert.setMessage(getString(R.string.mensaje_alertaCerrarApp))
+            alert.setCancelable(false)
+            alert.setPositiveButton(getString(R.string.confirmar_alertCerrarApp)) { dialogo1, id -> finish() }
+            alert.setNegativeButton(getString(R.string.cancelar_alertCerrarApp)) { dialogo1, id -> dialogo1.dismiss() }
+            alert.show()
         }
     }
 
@@ -513,7 +529,7 @@ class SolicitarServicio : AppCompatActivity() {
                 /* Picasso.get().load(file)
                     .resize(50,50)
                     .into(fotoPerfil)*/
-               // Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 2", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 2", Toast.LENGTH_SHORT).show()
 
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
@@ -524,6 +540,27 @@ class SolicitarServicio : AppCompatActivity() {
 
         })
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
