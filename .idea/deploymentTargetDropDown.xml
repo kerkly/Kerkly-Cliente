@@ -9,6 +9,8 @@
             <type value="VIRTUAL_DEVICE_PATH" />
             <value value="C:\Users\josem\.android\avd\Pixel_4_XL_API_30.avd" />
           </Key>
+
+            <value value="C:\Users\josem\.android\avd\Pixel_2_XL_API_30.avd" />
         </deviceKey>
       </Target>
     </targetSelectedWithDropDown>

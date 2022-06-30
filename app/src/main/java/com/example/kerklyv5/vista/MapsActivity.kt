@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -76,7 +77,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var pais: String
     private var band = false
     var NombreUbi: String? = null
-
+    private var locationManager: LocationManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,8 +106,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
-        BotonT = findViewById(R.id.button2)
-        BotonT.setOnClickListener {
+       // BotonT = findViewById(R.id.button2)
+/*        BotonT.setOnClickListener {
             when(tipo) {
                 1 -> Hibrido()
                 2 -> satelite()
@@ -116,7 +117,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
             //Toast.makeText(applicationContext, mapa, Toast.LENGTH_LONG).show()
 
-        }
+        }*/
 
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
 
@@ -156,18 +157,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 b.putBoolean("PresupuestoListo", true)
                 intent.putExtras(b)
                 startActivity(intent)
-          //  }
-
-
-*/
+          //  }*/
+      locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!gpsEnabled) {
+            val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(settingsIntent)
+        }else {
             setLocation(latitud, longitud)
-            if(!band) {
+            if (!band) {
                 val i = Intent(applicationContext, KerklyListActivity::class.java)
                 b.putString("Calle", calle)
                 b.putString("Colonia", colonia)
                 b.putString("Código Postal", cp)
                 b.putString("Exterior", num_ext)
-               // b.putString("Referencia", referencia)
+                // b.putString("Referencia", referencia)
                 b.putDouble("Latitud", latitud)
                 b.putDouble("Longitud", longitud)
                 b.putString("Ciudad", ciudad)
@@ -175,17 +179,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 b.putString("Pais", pais)
                 i.putExtras(b)
                 startActivity(i)
+                finish()
             } else {
                 val intent = Intent(applicationContext, SolicitarServicio::class.java)
                 //Toast.makeText(this, referencia, Toast.LENGTH_SHORT).show()
-              //  aceptarDireccion()
+                //aceptarDireccion()
                 ingresarPresupuesto()
                 b.putBoolean("PresupuestoListo", true)
                 intent.putExtras(b)
                 startActivity(intent)
+                finish()
             }
 
-
+        }
         }
     }
 
@@ -206,7 +212,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val locationListener: LocationListener = object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 val miUbicacion = LatLng(location.getLatitude(), location.getLongitude())
-               // val miUbicacion = LatLng(17.5551109, -99.5042626)
+             //  val miUbicacion = LatLng(17.5551109, -99.5042626)
 
                 locationManager.removeUpdates(this)
                 marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title(NombreUbi.toString()).icon(
@@ -227,11 +233,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 }
             }
             override fun onProviderEnabled(provider: String) {
-                //   Toast.makeText(context, "GPS activado", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(this@MapsActivity, "GPS activado", Toast.LENGTH_SHORT).show()
 
             }
             override fun onProviderDisabled(provider: String) {
-                //  Toast.makeText(context, "GPS Desactivado", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(this@MapsActivity, "GPS Desactivado", Toast.LENGTH_SHORT).show()
+                //val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                //startActivity(settingsIntent)
+              /*  val miUbicacion = LatLng(17.5551109, -99.5042626)
+               // val miUbicacion = LatLng(16.94508, -98.23878833333335)
+                marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title(NombreUbi.toString()).icon(
+                    BitmapDescriptorFactory.fromResource(
+                        R.drawable.miubicacion4
+                    )))!!
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))*/
             }
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
@@ -366,50 +382,52 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     private fun ingresarPresupuesto() {
-        val ROOT_URL = Url().url
-        val adapter = RestAdapter.Builder()
-            .setEndpoint(ROOT_URL)
-            .build()
-        val api = adapter.create(IngresarPresupuestoUrgente::class.java)
-        api.presupuesto_urgente(problema,
-            telefono,
-            oficio,
-            latitud,
-            longitud,
-            ciudad,
-            estado,
-            pais,
-            calle,
-            colonia,
-            num_ext,
-            cp,
-            object : Callback<Response?> {
-                override fun success(t: Response?, response: Response?) {
-                    var salida: BufferedReader? = null
-                    var entrada = ""
-                    try {
-                        salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
-                        entrada = salida.readLine()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+            val ROOT_URL = Url().url
+            val adapter = RestAdapter.Builder()
+                .setEndpoint(ROOT_URL)
+                .build()
+            val api = adapter.create(IngresarPresupuestoUrgente::class.java)
+            api.presupuesto_urgente(problema,
+                telefono,
+                oficio,
+                latitud,
+                longitud,
+                ciudad,
+                estado,
+                pais,
+                calle,
+                colonia,
+                num_ext,
+                cp,
+                object : Callback<Response?> {
+                    override fun success(t: Response?, response: Response?) {
+                        var salida: BufferedReader? = null
+                        var entrada = ""
+                        try {
+                            salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                            entrada = salida.readLine()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+
+                        //Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
+
+                        // Toast.makeText(applicationContext, entrada, Toast.LENGTH_LONG).show()
+
+                        val cadena = "Datos enviados"
+                        if (cadena.equals(entrada)) {
+                            Toast.makeText(applicationContext, "Datos enviados", Toast.LENGTH_LONG)
+                                .show()
+                        }
                     }
 
-                    //Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
-
-                   // Toast.makeText(applicationContext, entrada, Toast.LENGTH_LONG).show()
-
-                    val cadena = "Datos enviados"
-                    if (cadena.equals(entrada)){
-                        Toast.makeText(applicationContext,"Datos enviados", Toast.LENGTH_LONG).show()
+                    override fun failure(error: RetrofitError?) {
+                        println("error$error")
+                        Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
                     }
                 }
+            )
 
-                override fun failure(error: RetrofitError?) {
-                    println("error$error")
-                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
-                }
-            }
-        )
     }
 
 
@@ -441,30 +459,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     fun setLocation(latitud: Double, longitud: Double) {
         if (latitud !== 0.0 && longitud !== 0.0) {
+
             try {
                 val geocoder: Geocoder
                 val direccion: List<Address>
                 geocoder = Geocoder(this, Locale.getDefault())
 
                 direccion = geocoder.getFromLocation(latitud, longitud, 1) // 1 representa la cantidad de resultados a obtener
-                val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                ciudad = direccion[0].locality // ciudad
-                estado = direccion[0].adminArea //estado
-                pais = direccion[0].countryName // pais
-                cp = direccion[0].postalCode //codigo Postal
-                calle = direccion[0].thoroughfare // la calle
-                colonia =  direccion[0].subLocality// colonia
-                num_ext = direccion[0].subThoroughfare
+                //val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                //Toast.makeText(this, "Entroooo ${direccion[0].locality}", Toast.LENGTH_SHORT).show()
+                if (direccion[0].locality == null || direccion[0].subLocality == null || direccion[0].thoroughfare == null){
+                  //  Toast.makeText(this, "Entroooo ${direccion[0].postalCode}", Toast.LENGTH_SHORT).show()
+                    pais = direccion[0].countryName
+                    estado = direccion[0].adminArea
+                    ciudad = "Sin nombre"
+                    colonia = "Sin nombre"
+                    calle = "Sin Nombre"
+                    cp = "NULL"
+                    num_ext = "Sin número"
+                }else{
+                   ciudad = direccion[0].locality // ciudad
+                     estado = direccion[0].adminArea //estado
+               pais = direccion[0].countryName // pais
+               cp = direccion[0].postalCode //codigo Postal
+               calle = direccion[0].thoroughfare // la calle
+               colonia =  direccion[0].subLocality// colonia
+               num_ext = direccion[0].subThoroughfare
+                }
 
-                 //txtDireccion.setText(address)
-               //  editCiudad.setText(ciudad)
-                 //edit.setText(estado)
-              //   txtPais.setText(pais)
-                 //calle_edit.setText(calle)
-                 //colonia_edit.setText(colonia)
-                 //numero_extEdit.setText(num_ext)
-                 //edit_cp.setText(cp)
-                //texViewDireecion.setText("ciudad $ciudad \n Estado  $estado \n pais $pais \n codigo Postal $codigoPostal \n calle $calle \n colonia $colonia")
+
+
             } catch (e: IOException) {
                 e.printStackTrace()
             }
