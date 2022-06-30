@@ -39,6 +39,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
@@ -503,8 +504,7 @@ class SolicitarServicio : AppCompatActivity() {
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                val multi = MultiTransformation<Bitmap>(
-                    RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
+                val multi = MultiTransformation<Bitmap>(RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
 
                 Glide.with(this@SolicitarServicio).load(file)
                     .apply(RequestOptions.bitmapTransform(multi))

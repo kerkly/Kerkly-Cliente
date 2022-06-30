@@ -3,24 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_maps.xml" value="0.25" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_pantalla_inicio.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_pedir_servicio_express.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_solicitar_servicio.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/confirmar_direccion.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/content_solicitar_servicio.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/fragment_home.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/fragment_kerkly.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/fragment_mensajes_presupuesto.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/mensajes_recycler.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/nav_header_solicitar_servicio.xml" value="0.20364583333333333" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/presupuesto_listo.xml" value="0.2" />
-        <entry key="..\:/Users/alfre/OneDrive/Escritorio/kekly orginal/cliente/Kerkly-Cliente/app/src/main/res/layout/presupuesto_solicitud.xml" value="0.2" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly Ciente/Kerkly-Cliente/app/src/main/res/layout/activity_main.xml" value="0.25885416666666666" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly Ciente/Kerkly-Cliente/app/src/main/res/layout/activity_registro.xml" value="0.22685185185185186" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly Ciente/Kerkly-Cliente/app/src/main/res/layout/content_solicitar_servicio.xml" value="0.25885416666666666" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly Ciente/Kerkly-Cliente/app/src/main/res/layout/fragment_mensajes.xml" value="0.22685185185185186" />
-        <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly Ciente/Kerkly-Cliente/app/src/main/res/layout/fragment_mensajes_presupuesto.xml" value="0.22685185185185186" />
+        <entry key="..\:/Users/Luis Luis/Documents/copias kerkly/10 de junio 2022/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_maps.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/Luis Luis/Documents/copias kerkly/10 de junio 2022/cliente/Kerkly-Cliente/app/src/main/res/layout/activity_solicitar_servicio.xml" value="0.1796875" />
+        <entry key="..\:/Users/Luis Luis/Documents/copias kerkly/10 de junio 2022/cliente/Kerkly-Cliente/app/src/main/res/layout/app_bar_solicitar_servicio.xml" value="0.1796875" />
+        <entry key="..\:/Users/Luis Luis/Documents/copias kerkly/10 de junio 2022/cliente/Kerkly-Cliente/app/src/main/res/layout/fragment_home.xml" value="0.1796875" />
+        <entry key="..\:/Users/Luis Luis/Documents/copias kerkly/10 de junio 2022/cliente/Kerkly-Cliente/app/src/main/res/layout/nav_header_solicitar_servicio.xml" value="0.1796875" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly-Cliente/app/src/main/res/layout/about2.xml" value="0.358695652173913" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly-Cliente/app/src/main/res/layout/activity_comprobante_pago_express.xml" value="0.3625" />
         <entry key="..\:/Users/josem/AndroidStudioProjects/Kerkly-Cliente/app/src/main/res/layout/activity_contrato.xml" value="0.3625" />
