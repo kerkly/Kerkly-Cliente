@@ -55,6 +55,7 @@ import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
 import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -540,27 +541,6 @@ class SolicitarServicio : AppCompatActivity() {
 
         })
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
