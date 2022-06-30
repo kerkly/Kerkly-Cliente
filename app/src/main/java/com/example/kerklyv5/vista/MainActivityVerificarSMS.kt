@@ -289,16 +289,18 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                     //Descartar el diálogo de progreso
                    loading.dismiss()
                     //Mostrando el mensaje de la respuesta
-                  //  Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+
                     //ystem.out.println("error aqui 1 $s")
                     if(s.equals("Registrado")){
                         dialog2()
                     }else{
                         Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                    }
+                       /* Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
                         val intent = Intent(this@MainActivityVerificarSMS, Registro::class.java)
                         startActivity(intent)
-                        finish()
-                    }
+                        finish()*/
+
                 }
             },
             object : Response.ErrorListener {
@@ -350,8 +352,13 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                     //Descartar el diálogo de progreso
                     loading.dismiss()
                     //Mostrando el mensaje de la respuesta
-                    Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
-                    System.out.println("error aqui 1 $s")
+                    //Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                    if(s.equals("Registrado")){
+                        dialog2()
+                    }else{
+                        Toast.makeText(this@MainActivityVerificarSMS, s, Toast.LENGTH_LONG).show()
+                    }
+                   // System.out.println("error aqui 1 $s")
                 }
             },
             object : Response.ErrorListener {
