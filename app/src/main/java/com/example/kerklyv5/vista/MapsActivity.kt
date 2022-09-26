@@ -251,6 +251,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
+            //seccion donde se encuentran los mappas
 
         //los marcadores
         // Utils_k.Marcador(mMap, applicationContext, telefono)

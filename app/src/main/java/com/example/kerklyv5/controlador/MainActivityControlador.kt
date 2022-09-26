@@ -2,6 +2,7 @@ package com.example.kerklyv5.controlador
 
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +19,7 @@ import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.MainActivityVerificarSMS
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.GsonBuilder
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
@@ -41,8 +43,13 @@ class MainActivityControlador {
     private var intentos = 1
     private lateinit var tel: String
 
+
     fun verficiarUsuario(usuario: Cliente, contexto: AppCompatActivity) {
         val Url = Url().url
+
+ProgressDialogFragment.showProgressBar(contexto)
+
+
         val adapter = RestAdapter.Builder()
             .setEndpoint(Url)
             .build()
@@ -52,6 +59,11 @@ class MainActivityControlador {
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var entrada: BufferedReader? =  null
+
+
+                    ProgressDialogFragment.hideProgressBar(contexto)
+
+
                     var Respuesta = ""
                     try {
                         entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
@@ -67,7 +79,7 @@ class MainActivityControlador {
                         contexto.startActivity(intent)
                         contexto.finish()
                     }
-                    Toast.makeText(contexto, Respuesta, Toast.LENGTH_SHORT).show()
+                  //  Toast.makeText(contexto, Respuesta, Toast.LENGTH_SHORT).show()
 
                 }
 
