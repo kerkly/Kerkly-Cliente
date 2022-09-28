@@ -544,27 +544,6 @@ class SolicitarServicio : AppCompatActivity() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private fun EnviarFotoPerfil(fotoPerfil: String?, telefonoCliente: String, nombref: String) {
         val ROOT_URL = Url().url
         //Mostrar el diálogo de progreso
