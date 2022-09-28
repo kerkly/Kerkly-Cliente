@@ -40,6 +40,7 @@ class PantallaInicio : AppCompatActivity() {
 
 
          id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
          controlador.verificarSesion(id, this)
 
          ivLogo = findViewById(R.id.img_logo_inicio)
@@ -59,6 +60,7 @@ class PantallaInicio : AppCompatActivity() {
 
             override fun onAnimationEnd(animation: Animation) {
                    controlador.verificarSesion(id, context)
+                System.out.println("id del telefono: $id")
                 /*val i = Intent(applicationContext, MainActivity::class.java)
                 startActivity(i)
                 finish()*/
