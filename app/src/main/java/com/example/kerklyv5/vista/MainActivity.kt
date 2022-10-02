@@ -344,6 +344,7 @@ class MainActivity : AppCompatActivity() {
         requestPermission(this)
     }
     private val sms = 0
+
     private fun requestPermission(contexto: Activity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(contexto,
                 Manifest.permission.RECEIVE_SMS)) {

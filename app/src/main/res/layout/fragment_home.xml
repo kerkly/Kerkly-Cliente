@@ -64,7 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
-                    android:hint="Escribe la problematica "
+                    android:hint="Escribe la problematica... "
                     android:enabled="true"
                     app:boxStrokeColor="@color/white"
                     app:startIconDrawable="@drawable/ic_baseline_edit_24"
@@ -77,6 +77,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
                         android:gravity="start"
+                        android:fontFamily="@font/quicksand_bold"
                         android:inputType="textMultiLine"
 
                         android:overScrollMode="always"
@@ -104,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_gravity="center"
-                    android:text="@string/servicio"
+                    android:text="Elija un Servicio:"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
 

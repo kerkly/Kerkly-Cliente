@@ -84,7 +84,8 @@ ProgressDialogFragment.showProgressBar(contexto)
                 }
 
                 override fun failure(error: RetrofitError) {
-                    Toast.makeText(contexto, "error $error" , Toast.LENGTH_SHORT).show()
+
+                //    Toast.makeText(contexto, "error $error" , Toast.LENGTH_SHORT).show()
                 }
 
             }
