@@ -192,6 +192,7 @@ class MainActivity : AppCompatActivity() {
                     try {
                         entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
                         Respuesta = entrada.readLine().trim()
+                        System.out.println("respuesta de id: $Respuesta")
                         Log.d("id", id)
                         //Toast.makeText(applicationContext, id, Toast.LENGTH_SHORT).show()
 
@@ -309,7 +310,7 @@ class MainActivity : AppCompatActivity() {
             usuario = Cliente(editTelefono.text.toString())
 
             if (usuario.getTelefonoNoR().isEmpty()) {
-                layoutTelefono.error = getString(R.string.campo_requerido)
+                 layoutTelefono.error = getString(R.string.campo_requerido)
             } else {
                 layoutTelefono.error = null
                 if (usuario.getTelefonoNoR().length != 10) {

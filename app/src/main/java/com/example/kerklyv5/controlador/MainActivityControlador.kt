@@ -235,18 +235,20 @@ ProgressDialogFragment.showProgressBar(contexto)
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
 
                         output = reader.readLine()
+                        System.out.println("pantalla inicio $output")
 
 
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
 
-                    if(output == "0") {
+                    if(!output.equals(0)) {
                         val  intent = Intent(contexto, MainActivity::class.java)
                         intent.putExtra("Telefono", output)
                         contexto.startActivity(intent)
-                        contexto.finish()
+                       // contexto.finish()
                     } else {
+                        //System.out.println("entro en linea 238")
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", output)
                         intent.putExtra("PresupuestoListo", false)
