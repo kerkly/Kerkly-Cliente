@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "121612991169-4b7h1tv35rpfsdk5hfgdspvvcf3tcslm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kerkly",
+            "certificate_hash": "c7ebdae34a0c1cf649450d04199675b34ba74f36"
+          }
+        },
+        {
           "client_id": "121612991169-56nnjg6brhko09ho5i5q5m5214a2h4ig.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -147,7 +155,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "121612991169-am8tan2u6th6u1a4qvnlm8iibbsabmt9.apps.googleusercontent.com",
+          "client_id": "121612991169-iosrt79tjhgfm2ffkr99kd98o0r3qjla.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.kerklyv5",

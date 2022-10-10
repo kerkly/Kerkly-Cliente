@@ -75,6 +75,19 @@
                 android:textColor="@color/black" />
 
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/Animacion"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/email">
+
+
+            </com.airbnb.lottie.LottieAnimationView>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -82,29 +95,7 @@
                 android:background="@drawable/btn_redondo3"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    tools:ignore="TouchTargetSizeCheck">
 
-                    <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_vector__3_" />
-
-                    <TextView
-                        android:id="@+id/textView15"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="@string/enviar_codigo"
-                        android:textColor="@color/black"
-                        android:textSize="17sp" />
-                </LinearLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout_codigoSeguridad"

@@ -39,8 +39,8 @@ class RecuperarCuenta : AppCompatActivity() {
     private lateinit var layoutCorreo: TextInputLayout
     private lateinit var session: Session
     private lateinit var context: Context
-    private val correoRem: String = "josem.rl32@gmail.com"
-    private val contraRem: String = "LG-V202V"
+    private val correoRem: String = "kevinhdezvaz@gmail.com"
+    private val contraRem: String = "nbfuibvjxoxekdli"
     private lateinit var correo: String
     private lateinit var barra: ProgressDialog
     private var numero: Int = 0
@@ -97,7 +97,7 @@ class RecuperarCuenta : AppCompatActivity() {
                     }
                 })
 
-                barra = ProgressDialog.show(this, "", "Enviando Correo...", true)
+                barra = ProgressDialog.show(this, "", "Enviando Correo KERKLY...", true)
                 val task = RetreiveFeedTask()
                 task.execute()
                 //sendCorreoCodigo()
@@ -119,9 +119,9 @@ class RecuperarCuenta : AppCompatActivity() {
             val message = MimeMessage(session)
             message.setFrom(InternetAddress(correoRem))
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correo))
-            message.subject = "Asunto"
+            message.subject = "CUENTA KERKLY"
             //message.setContent(" $codigoS", "text/html; charset=utf-8")
-            message.setText(codigoS)
+            message.setText("Tu codigo para restablecer contraseña es: "+codigoS)
 //            Toast.makeText(this, "todo bien", Toast.LENGTH_SHORT).show()
             Transport.send(message)
             //Transport.send(message, correoRem, contraRem)
@@ -178,7 +178,6 @@ class RecuperarCuenta : AppCompatActivity() {
 
         if (band) {
             //controlador.recuperarCuenta(correo, this)
-            Toast.makeText(this,"todo bien", Toast.LENGTH_SHORT).show()
             if (validarCodigo(codigo2,codigoS)) {
                 controlador.recuperarCuenta(correo, this)
             }
