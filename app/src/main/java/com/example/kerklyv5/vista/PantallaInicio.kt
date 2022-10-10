@@ -63,7 +63,9 @@ class PantallaInicio : AppCompatActivity() {
                 System.out.println("id del telefono: $id")
                 /*val i = Intent(applicationContext, MainActivity::class.java)
                 startActivity(i)
+
                 finish()*/
+
             }
 
             override fun onAnimationRepeat(animation: Animation) {

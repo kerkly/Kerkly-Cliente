@@ -9,7 +9,7 @@ import retrofit.client.Response
 
 interface RecuperarCuentaInterface {
     @FormUrlEncoded
-    @POST("/RecuperarCuenta.kt.php")
+    @POST("/RecuperarCuenta.php")
     fun VerficarUsuario(
         @Field("Correo") Correo: String,
         callback: Callback<Response?>

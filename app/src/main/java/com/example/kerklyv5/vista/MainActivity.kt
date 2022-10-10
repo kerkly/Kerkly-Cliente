@@ -244,28 +244,11 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 layoutUsuario.error = null
-
-                //val b = Bundle()
-                // b.putString("Telefono", usuario)
-                // val i = Intent(this, SolicitarServicio::class.java)
-                // i.putExtras(b)
-//validacion correctya pasar al siguiente activity
-
-
-
                 val u = Cliente(editUsuario.text.toString(), editContra.text.toString())
-
                 controlador.verficiarUsuario(u, this)
 
-
-                // ProgressDialogFragment.hideProgressBar()
-
-                //startActivity(i)
             }
         }
-        //  usuario = Cliente(editUsuario.text.toString(), editContra.text.toString())
-        // controlador.verficiarUsuario(usuario, this)
-
     }
 
 
@@ -334,12 +317,7 @@ class MainActivity : AppCompatActivity() {
         epicDialog2 = Dialog(this)
         epicDialog2.setContentView(R.layout.about2)
         buttonclosed = epicDialog2.findViewById<View>(R.id.buttonclosed) as ImageButton
-
-
         buttonclosed.setOnClickListener(View.OnClickListener { epicDialog2.dismiss() })
-
-
-
         epicDialog2.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         epicDialog2.show()
         requestPermission(this)
@@ -406,6 +384,7 @@ class MainActivity : AppCompatActivity() {
         vv_fondo.start()
 
     }
+
 
     
 }

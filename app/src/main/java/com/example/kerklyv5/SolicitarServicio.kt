@@ -366,9 +366,10 @@ class SolicitarServicio : AppCompatActivity() {
                     var output = ""
                     try {
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
-
                         output = reader.readLine()
 
+
+                        Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
 
                     } catch (e: IOException) {
                         e.printStackTrace()
@@ -419,7 +420,7 @@ class SolicitarServicio : AppCompatActivity() {
                         }
 
                         override fun failure(error: RetrofitError?) {
-                            TODO("Not yet implemented")
+
                         }
 
                     })
@@ -567,7 +568,7 @@ class SolicitarServicio : AppCompatActivity() {
                     loading.dismiss()
 
                     //Showing toast
-                    Toast.makeText(this@SolicitarServicio, volleyError.message.toString(), Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@SolicitarServicio, volleyError.message.toString(), Toast.LENGTH_LONG).show()
                     System.out.println("error aqui 2 ${volleyError.message}")
                 }
             }) {

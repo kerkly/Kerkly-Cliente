@@ -66,18 +66,25 @@ class RecuperarCuenta : AppCompatActivity() {
     }
 
     fun enviarEmail() {
+
+
         correo = editCorreo.text.toString()
 
         if (correo.isEmpty()) {
             layoutCorreo.error = getText(R.string.campo_requerido)
-        } else {
-            layoutCorreo.error = null
+        }
+
+        else {
+
+             layoutCorreo.error = null
             if (validarCorreo()) {
                 numero = controlador.valorRandom(100000..1000000)
                 codigoS = numero.toString()
 
                 val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
                 StrictMode.setThreadPolicy(policy)
+
+
 
 
                 var propiedades = Properties()

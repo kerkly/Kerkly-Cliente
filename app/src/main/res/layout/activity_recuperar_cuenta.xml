@@ -12,54 +12,54 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView13"
                 android:layout_width="match_parent"
-                 android:textColor="@color/white"
-                android:layout_gravity="center"
-                android:background="@drawable/btn_redondo"
-                android:padding="10dp"
-                android:layout_margin="20dp"
-                android:gravity="center"
-                android:textSize="25sp"
                 android:layout_height="wrap_content"
-                android:text="@string/recuperar_cuenta" />
+                android:layout_gravity="center"
+                android:layout_margin="20dp"
+                android:background="@drawable/btn_redondo"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/recuperar_cuenta"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/textView14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="10dp"
-                android:textSize="20sp"
-                android:text="@string/introduce_cuenta" />
+                android:text="@string/introduce_cuenta"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_correoRecuperar"
-                android:layout_width="match_parent"
-                android:layout_margin="20dp"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:errorEnabled="true"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_correoRecuperar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/correo_electrónico"
-                    android:inputType="textEmailAddress"
-                    />
+                    android:inputType="textEmailAddress" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -67,13 +67,21 @@
                 android:id="@+id/botonVerificarCorreo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/RecuperarCuenta"
-                android:background="@drawable/fondo_boton"
-                app:backgroundTint="@color/colorBoton"
                 android:layout_gravity="end"
                 android:layout_marginEnd="20dp"
-                android:textColor="@color/black" />
+                android:background="@drawable/fondo_boton"
+                android:text="@string/RecuperarCuenta"
+                android:textColor="@color/black"
+                app:backgroundTint="@color/colorBoton" />
 
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="20dp"
+                android:background="@android:color/black" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/Animacion"
@@ -88,6 +96,7 @@
 
 
             </com.airbnb.lottie.LottieAnimationView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -96,61 +105,60 @@
                 android:orientation="vertical">
 
 
-
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout_codigoSeguridad"
                     android:layout_width="match_parent"
-                    android:layout_margin="10dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/codigoSeguridad_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
                         android:hint="@string/introducir_codigo"
                         android:inputType="number"
-                        />
+                        android:textSize="20sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/textView16"
                     android:layout_width="match_parent"
-                    android:textSize="14sp"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:layout_weight="1"
                     android:layout_margin="10dp"
-                    android:text="@string/texto_codigo_ayuda" />
+                    android:layout_weight="1"
+                    android:text="@string/texto_codigo_ayuda"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
+                android:layout_marginBottom="20dp"
                 android:gravity="end"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/continuar"
-                    android:onClick="enviarCodigo"
                     android:background="@drawable/fondo_boton"
-                    app:backgroundTint="@color/colorBoton"
-                    android:textColor="@color/black" />
+                    android:onClick="enviarCodigo"
+                    android:text="@string/continuar"
+                    android:textColor="@color/black"
+                    app:backgroundTint="@color/colorBoton" />
 
 
                 <com.google.android.material.button.MaterialButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/cancelar"
-                    android:onClick="cancelar"
-                    android:layout_marginEnd="20dp"
                     android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@drawable/fondo_boton"
-                    app:backgroundTint="@color/colorBoton"
-                    android:textColor="@color/black" />
+                    android:onClick="cancelar"
+                    android:text="@string/cancelar"
+                    android:textColor="@color/black"
+                    app:backgroundTint="@color/colorBoton" />
             </LinearLayout>
 
         </LinearLayout>

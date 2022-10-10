@@ -28,7 +28,7 @@ class Correo : AppCompatActivity() {
     private lateinit var correo: String
     private lateinit var contra1: String
     private lateinit var contra2: String
-    private val PASSWORD_PATTERN: String = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,}\$"
+    private val PASSWORD_PATTERN: String = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}\$"
     private lateinit var correo_contenedor: TextInputLayout
     private lateinit var nombre: String
     private lateinit var apellidoP: String
