@@ -81,7 +81,7 @@
     <string name="genero">Género</string>
     <string name="introducir_correo">Introduce tu direeccion de correo electrónico</string>
     <string name="crear_contrasenia">Crea una contraseña</string>
-    <string name="descripcion_contra">Asegúrese de que la contraseña cuente con al menos 8 caracteres e incluir mayúsculas, minúsculas, números y un caractrer especial. </string>
+    <string name="descripcion_contra">Asegúrese de que la contraseña cuente con al menos 6 caracteres e incluir mayúsculas, minúsculas y números.. </string>
     <string name="guardar">Guardar</string>
     <string name="nueva_contra">Elija una nueva contraseña</string>
     <string name="correo_error">Correo inválido</string>

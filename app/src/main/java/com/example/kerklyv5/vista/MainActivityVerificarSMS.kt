@@ -13,6 +13,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -29,6 +30,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.kerklyv5.R
+import com.example.kerklyv5.databinding.ActivityMainVerificarSmsBinding
 import com.example.kerklyv5.express.PedirServicioExpress
 import com.example.kerklyv5.url.Url
 import com.google.android.material.internal.ContextUtils.getActivity
@@ -46,6 +48,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivityVerificarSMS : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainVerificarSmsBinding
     lateinit var auth: FirebaseAuth
     var storedVerificationId: String? = ""
     var TAG2= "MainActivityVerificarSMS"
@@ -57,6 +60,7 @@ class MainActivityVerificarSMS : AppCompatActivity() {
     var claveNoRE = "sinRegistro"
     var claveRe = "registrar"
     var numeroSMS = ""
+    var progresDialog:ProgressDialog?=null
     var f: String? = ""
     private lateinit var dialog: Dialog
 
@@ -99,7 +103,16 @@ class MainActivityVerificarSMS : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_verificar_sms)
+        binding = ActivityMainVerificarSmsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        binding.btnResend.setOnClickListener{
+
+Toast.makeText(this@MainActivityVerificarSMS,numeroSMS,Toast.LENGTH_SHORT).show()
+                resendCode(numeroSMS ,resendToken)
+
+        }
         val intent1 = getIntent()
         clave =  intent1.getStringExtra("clave")!!
         auth = Firebase.auth
@@ -478,6 +491,22 @@ class MainActivityVerificarSMS : AppCompatActivity() {
 
     }
 
+    private fun resendCode(phone: String, token: PhoneAuthProvider.ForceResendingToken){
+
+    progresDialog?.setMessage("Reenviando Codigo...")
+        progresDialog?.show()
+
+        val options = PhoneAuthOptions.newBuilder(auth)
+            .setPhoneNumber(numeroSMS)
+            .setTimeout(60L,TimeUnit.SECONDS)
+            .setActivity(this)
+            .setCallbacks(Callbacks)
+            .setForceResendingToken(token)
+            .build()
+
+        PhoneAuthProvider.verifyPhoneNumber(options)
+
+    }
 
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()

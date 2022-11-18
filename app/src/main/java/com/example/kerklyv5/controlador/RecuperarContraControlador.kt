@@ -16,7 +16,7 @@ import java.io.InputStreamReader
 import java.util.regex.Pattern
 
 class RecuperarContraControlador {
-    private val PASSWORD_PATTERN: String = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,}\$"
+    private val PASSWORD_PATTERN: String = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}\$"
 
     fun validarContra(contra: String): Boolean {
         val pattern = Pattern.compile(PASSWORD_PATTERN)
