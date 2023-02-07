@@ -39,6 +39,7 @@ import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit.Callback
 import retrofit.RestAdapter
@@ -185,6 +186,7 @@ class MainActivity : AppCompatActivity() {
         api.mensaje(id,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
+
                     var entrada: BufferedReader? =  null
                     var Respuesta = ""
                     try {
@@ -242,21 +244,11 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 layoutUsuario.error = null
-
-                //val b = Bundle()
-                // b.putString("Telefono", usuario)
-                // val i = Intent(this, SolicitarServicio::class.java)
-                // i.putExtras(b)
-
-
                 val u = Cliente(editUsuario.text.toString(), editContra.text.toString())
                 controlador.verficiarUsuario(u, this)
-                //startActivity(i)
+
             }
         }
-        //  usuario = Cliente(editUsuario.text.toString(), editContra.text.toString())
-        // controlador.verficiarUsuario(usuario, this)
-
     }
 
 
@@ -325,17 +317,13 @@ class MainActivity : AppCompatActivity() {
         epicDialog2 = Dialog(this)
         epicDialog2.setContentView(R.layout.about2)
         buttonclosed = epicDialog2.findViewById<View>(R.id.buttonclosed) as ImageButton
-
-
         buttonclosed.setOnClickListener(View.OnClickListener { epicDialog2.dismiss() })
-
-
-
         epicDialog2.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         epicDialog2.show()
         requestPermission(this)
     }
     private val sms = 0
+
     private fun requestPermission(contexto: Activity) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(contexto,
                 Manifest.permission.RECEIVE_SMS)) {
@@ -396,6 +384,7 @@ class MainActivity : AppCompatActivity() {
         vv_fondo.start()
 
     }
+
 
     
 }

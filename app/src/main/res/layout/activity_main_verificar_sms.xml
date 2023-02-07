@@ -6,13 +6,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".vista.MainActivityVerificarSMS">
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/Animacion"
+        android:layout_width="250dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="250dp"
+android:layout_gravity="center"
+         app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/send">
+
+    </com.airbnb.lottie.LottieAnimationView>
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutCodigoSMS"
         android:layout_width="match_parent"
         app:errorEnabled="true"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="90dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_marginRight="40dp"
         android:layout_marginLeft="40dp"
@@ -20,18 +31,49 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_VerificarSMS"
+            android:fontFamily="@font/quicksand_bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:hint="codigo SMS"/>
+            android:hint="Ingresa el SMS"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
 
+    <LinearLayout
+         android:layout_width="wrap_content"
+android:weightSum="2"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+android:layout_gravity="center"
+           >
+
+        <TextView
+             android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:text="¿No recibiste el SMS?"
+            android:layout_height="wrap_content"
+
+             android:textSize="15sp" />
+        <TextView
+            android:id="@+id/btnResend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:text="Reenviar"
+            android:layout_weight="1"
+
+
+            />
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/botonSMS"
         android:layout_width="234dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="60dp"
         android:layout_height="52dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="60dp"

@@ -2,6 +2,7 @@ package com.example.kerklyv5.controlador
 
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +19,7 @@ import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.MainActivityVerificarSMS
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.GsonBuilder
+import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
@@ -41,8 +43,13 @@ class MainActivityControlador {
     private var intentos = 1
     private lateinit var tel: String
 
+
     fun verficiarUsuario(usuario: Cliente, contexto: AppCompatActivity) {
         val Url = Url().url
+
+ProgressDialogFragment.showProgressBar(contexto)
+
+
         val adapter = RestAdapter.Builder()
             .setEndpoint(Url)
             .build()
@@ -52,14 +59,24 @@ class MainActivityControlador {
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var entrada: BufferedReader? =  null
+
+
+
+                    ProgressDialogFragment.hideProgressBar(contexto)
+
+
                     var Respuesta = ""
                     try {
                         entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
                         Respuesta = entrada.readLine()
+                        Toast.makeText(contexto,Respuesta,Toast.LENGTH_SHORT).show()
+
+
                     }catch (e: Exception){
                         e.printStackTrace()
                     }
-                    var Res = "Bienvenido";
+
+                  var Res = "Bienvenido";
                     if (Res.equals(Respuesta)){
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", usuario.getUsuario())
@@ -67,12 +84,13 @@ class MainActivityControlador {
                         contexto.startActivity(intent)
                         contexto.finish()
                     }
-                    Toast.makeText(contexto, Respuesta, Toast.LENGTH_SHORT).show()
+                  //  Toast.makeText(contexto, Respuesta, Toast.LENGTH_SHORT).show()
 
                 }
 
                 override fun failure(error: RetrofitError) {
-                    Toast.makeText(contexto, "error $error" , Toast.LENGTH_SHORT).show()
+
+                //    Toast.makeText(contexto, "error $error" , Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -100,7 +118,7 @@ class MainActivityControlador {
                     }
 
                     //  Toast.makeText(this@MainActivity, entrada, Toast.LENGTH_SHORT).show()
-                    var cadena: String = "El número ya existe"
+                    var cadena: String = "EL NUMERO YA EXISTE INTENTE CON OTRO"
                     if (cadena == entrada) {
                         layoutTelefono.error = contexto.getText(R.string.numeroRegistrado_error)
                         return
@@ -131,7 +149,7 @@ class MainActivityControlador {
                                     //en caso de que numero no se encuentre registrado, y sea la primera vez que ingresa, se tendra que verificar su numero
                                      if (entrada == usuario.getTelefonoNoR()) {
                                            layoutTelefono.error = null
-                                           //Toast.makeText(contexto, "todo de maravilla", Toast.LENGTH_SHORT).show()
+
                                           val i = Intent(contexto, MainActivityVerificarSMS::class.java)
                                          b.putString("clave", "sinRegistro")
                                            b.putString("Teléfono No Registrado", usuario.getTelefonoNoR())
@@ -169,7 +187,7 @@ class MainActivityControlador {
                                                 var cadena: String = "Exitoso"
                                                 if (cadena == entrada) {
                                                     layoutTelefono.error = null
-                                                    Toast.makeText(contexto, "Bienvin@ $nom", Toast.LENGTH_SHORT).show()
+                                               //     Toast.makeText(contexto, "Bienvin@ $nom", Toast.LENGTH_SHORT).show()
                                                     val i = Intent(contexto, PedirServicioExpress::class.java)
                                                     b.putString("Teléfono No Registrado", usuario.getTelefonoNoR())
                                                     i.putExtras(b)
@@ -188,7 +206,7 @@ class MainActivityControlador {
                                 }
                             }
                             override fun onFailure(call: Call<List<ModeloIntentos?>?>, t: Throwable) {
-                                Toast.makeText(contexto, "Codigo de respuesta de error: $t", Toast.LENGTH_SHORT).show()
+                             //   Toast.makeText(contexto, "Codigo de respuesta de error: $t", Toast.LENGTH_SHORT).show()
                                 Log.d("error del retrofit", t.toString())
                             }
 
@@ -229,11 +247,12 @@ class MainActivityControlador {
                         e.printStackTrace()
                     }
 
-                    if(!output.equals(0)) {
+                    if(output == "0") {
                         val  intent = Intent(contexto, MainActivity::class.java)
                         intent.putExtra("Telefono", output)
                         contexto.startActivity(intent)
-                       // contexto.finish()
+
+                       contexto.finish()
                     } else {
                         //System.out.println("entro en linea 238")
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
