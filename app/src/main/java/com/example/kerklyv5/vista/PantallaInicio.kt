@@ -60,7 +60,7 @@ class PantallaInicio : AppCompatActivity() {
 
             override fun onAnimationEnd(animation: Animation) {
                    controlador.verificarSesion(id, context)
-                System.out.println("id del telefono: $id")
+                System.out.println("id del telefono1: $id")
                 /*val i = Intent(applicationContext, MainActivity::class.java)
                 startActivity(i)
 

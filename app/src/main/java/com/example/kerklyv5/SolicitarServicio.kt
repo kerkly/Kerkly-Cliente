@@ -427,6 +427,7 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun getJson() {
+        System.out.println("entro en metodo JSON")
         val ROOT_URL = Url().url
 
         val interceptor = HttpLoggingInterceptor()
@@ -451,31 +452,38 @@ class SolicitarServicio : AppCompatActivity() {
 
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
 
-                //carsModels = response.body() as ArrayList<presupuestok>
-            //    Log.d("Lista", postList[0].toString())
-                NombreF = postList[0].Nombre
-                val ap = postList[0].Apellido_Paterno
-                val am = postList[0].Apellido_Materno
-                val foto = postList[0].fotoPerfil
+                if(postList.size == null){
+                    System.out.println("no hay nada")
+                    //carsModels = response.body() as ArrayList<presupuestok>
+                    //    Log.d("Lista", postList[0].toString())
 
-            //    Log.d("nombre", n)
-
-
-                nombre = "$NombreF $ap $am"
-
-                correo = postList[0].Correo
-
-                txt_nombre.text = nombre
-                txt_correo.text = correo
-                if (foto ==null){
-                  //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
-                    //hay que poner una imagen por defecto
                 }else{
-                    cargarImagen(foto)
+                    NombreF = postList[0].Nombre
+                    val ap = postList[0].Apellido_Paterno
+                    val am = postList[0].Apellido_Materno
+                    val foto = postList[0].fotoPerfil
+
+                    //    Log.d("nombre", n)
+
+
+                    nombre = "$NombreF $ap $am"
+
+                    correo = postList[0].Correo
+
+                    txt_nombre.text = nombre
+                    txt_correo.text = correo
+                    if (foto ==null){
+                        Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                        //hay que poner una imagen por defecto
+                    }else{
+                        cargarImagen(foto)
+                    }
+
+                    setFragmentHome(nombre!!)
+                    sesion(correo)
+
                 }
 
-                setFragmentHome(nombre!!)
-                sesion(correo)
 
             }
 

@@ -30,7 +30,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KerklyV5">
-
+        <activity
+            android:name=".MainActivityEnviarUbicacionEnTiempoReal"
+            android:exported="false" />
+        <activity
+            android:name="EnviarUbicacionEnTiempoReal.MainActivityEnviarUbicacionEnTiempoReal"
+            android:exported="false" />
         <activity
             android:name=".vista.MainActivityVerificarSMS"
             android:exported="false" />

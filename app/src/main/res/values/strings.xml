@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Kerkly V5</string>
+    <string name="app_name">Kerkly Cliente</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -92,7 +92,7 @@
     <string name="correo_igual_error">Este correo ya existe</string>
     <string name="telefono_igual_error">Este teléfono ya existe</string>
     <string name="telefonoNoRegistrado_confirmar">Para continuar, confirme su nùmero telefónico</string>
-    <string name="presupuesto">Presupuesto</string>
+    <string name="presupuesto">Servicio Normal</string>
     <string name="mensaje">Mensaje</string>
     <string name="deFrom">De</string>
     <string name="paraTo">Para mí:</string>

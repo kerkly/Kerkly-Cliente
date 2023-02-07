@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.parser.IntegerParser
 import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.express.PedirServicioExpress
 import com.example.kerklyv5.modelo.Cliente
@@ -19,7 +20,6 @@ import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.MainActivityVerificarSMS
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.GsonBuilder
-import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
@@ -46,10 +46,7 @@ class MainActivityControlador {
 
     fun verficiarUsuario(usuario: Cliente, contexto: AppCompatActivity) {
         val Url = Url().url
-
-ProgressDialogFragment.showProgressBar(contexto)
-
-
+//ProgressDialogFragment.showProgressBar(contexto)
         val adapter = RestAdapter.Builder()
             .setEndpoint(Url)
             .build()
@@ -60,10 +57,7 @@ ProgressDialogFragment.showProgressBar(contexto)
                 override fun success(t: Response?, response: Response?) {
                     var entrada: BufferedReader? =  null
 
-
-
-                    ProgressDialogFragment.hideProgressBar(contexto)
-
+                  //  ProgressDialogFragment.hideProgressBar(contexto)
 
                     var Respuesta = ""
                     try {
@@ -83,8 +77,10 @@ ProgressDialogFragment.showProgressBar(contexto)
                         intent.putExtra("PresupuestoListo", false)
                         contexto.startActivity(intent)
                         contexto.finish()
+                    }else{
+                        Toast.makeText(contexto, "$Respuesta", Toast.LENGTH_SHORT).show()
                     }
-                  //  Toast.makeText(contexto, Respuesta, Toast.LENGTH_SHORT).show()
+
 
                 }
 
@@ -230,44 +226,53 @@ ProgressDialogFragment.showProgressBar(contexto)
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(VerificarSesionInterface::class.java)
-        api.sesionAbierta(
-            id,
+        api.sesionAbierta(id,
             object : retrofit.Callback<retrofit.client.Response?> {
-                override fun success(t: retrofit.client.Response?, response2: retrofit.client.Response?) {
+                override fun success(
+                    t: retrofit.client.Response?,
+                    response2: retrofit.client.Response?
+                ) {
                     var reader: BufferedReader? = null
                     var output = ""
                     try {
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
 
                         output = reader.readLine()
-                        System.out.println("pantalla inicio $output")
+                        //  System.out.println("id $id pantalla inicio $output")
 
 
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
+                    System.out.println("entro en veridicar usuario")
+                    if (output != "0") {
+                        // var respuesta: Int =  0;
+                        //respuesta = Integer.parseInt(output)
+                        //System.out.println("telefono obtenido apartir del id " + output)
+                        if (output.equals("0")) {
+                            System.out.println("entro en linea 233")
 
-                    if(output == "0") {
-                        val  intent = Intent(contexto, MainActivity::class.java)
-                        intent.putExtra("Telefono", output)
-                        contexto.startActivity(intent)
+                            val intent = Intent(contexto, MainActivity::class.java)
+                            intent.putExtra("Telefono", output)
+                            contexto.startActivity(intent)
 
-                       contexto.finish()
-                    } else {
-                        //System.out.println("entro en linea 238")
-                        val  intent = Intent(contexto, SolicitarServicio::class.java)
-                        intent.putExtra("Telefono", output)
-                        intent.putExtra("PresupuestoListo", false)
-                        contexto.startActivity(intent)
-                        contexto.finish()
+                            contexto.finish()
+                        } else {
+                            System.out.println("entro en linea $output")
+                            val intent = Intent(contexto, SolicitarServicio::class.java)
+                            intent.putExtra("Telefono", output)
+                            intent.putExtra("PresupuestoListo", false)
+                            contexto.startActivity(intent)
+                            contexto.finish()
+                        }
+
                     }
 
                 }
 
-                override fun failure(error: RetrofitError) {
+                override fun failure(error: RetrofitError?) {
                     println("error $error")
                 }
-
             }
         )
     }

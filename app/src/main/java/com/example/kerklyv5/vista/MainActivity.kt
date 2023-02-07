@@ -29,6 +29,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.kerklyv5.R
+import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.controlador.MainActivityControlador
 import com.example.kerklyv5.controlador.Notificacion
 import com.example.kerklyv5.extras.IntroSliderActivity
@@ -39,7 +40,6 @@ import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.tommasoberlose.progressdialog.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit.Callback
 import retrofit.RestAdapter
@@ -244,8 +244,16 @@ class MainActivity : AppCompatActivity() {
 
             } else {
                 layoutUsuario.error = null
+
+                //val b = Bundle()
+                 //b.putString("Telefono", usuario)
+                 //val i = Intent(this, SolicitarServicio::class.java)
+                //i.putExtras(b)
+
+
                 val u = Cliente(editUsuario.text.toString(), editContra.text.toString())
                 controlador.verficiarUsuario(u, this)
+
 
             }
         }
