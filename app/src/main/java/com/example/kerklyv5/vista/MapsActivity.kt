@@ -67,13 +67,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var numero_extEdit: TextInputEditText
     private lateinit var edit_referecia: TextInputEditText
     private lateinit var lyout_referencia: TextInputLayout
-    private lateinit var ciudad: String
+      var ciudad: String = ""
     private lateinit var calle: String
     private lateinit var cp: String
     private lateinit var colonia: String
     private lateinit var num_ext: String
     private lateinit var referencia: String
-    private lateinit var estado: String
+    private  var estado: String = ""
     private lateinit var pais: String
     private var band = false
     var NombreUbi: String? = null
@@ -182,8 +182,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 finish()
             } else {
                 val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                //Toast.makeText(this, referencia, Toast.LENGTH_SHORT).show()
-                //aceptarDireccion()
+                Toast.makeText(this, "referencia", Toast.LENGTH_SHORT).show()
+                //aceptarDireccion()v
                 ingresarPresupuesto()
                 b.putBoolean("PresupuestoListo", true)
                 intent.putExtras(b)

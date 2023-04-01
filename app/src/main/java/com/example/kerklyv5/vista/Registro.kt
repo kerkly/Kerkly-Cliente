@@ -4,11 +4,13 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.view.View
 import android.widget.ImageView
 import android.widget.Spinner
@@ -19,15 +21,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.R
+import com.example.kerklyv5.modelo.usuarios
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
+import com.firebase.ui.auth.AuthUI.IdpConfig.GoogleBuilder
+import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.lowagie.text.pdf.codec.Base64
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_registro.*
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.OutputStream
+import java.text.DateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 
 /*
@@ -45,11 +57,38 @@ class Registro : AppCompatActivity() {
     private lateinit var layout_Am: TextInputLayout
     private lateinit var layout_telefono: TextInputLayout
 
+    //Contraseña
+    private lateinit var contra1_contendor: TextInputLayout
+    private lateinit var contra2_layot: TextInputLayout
+    private lateinit var editContra1: TextInputEditText
+    private lateinit var editContra2: TextInputEditText
+    private lateinit var contra1: String
+    private lateinit var contra2: String
+    private val PASSWORD_PATTERN: String = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}\$"
+
     //subir foto de perfil
     var iv: ImageView? = null
     var bitmap: Bitmap? = null
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
+
+    var nombre: String = ""
+    var apellidoP: String =""
+    var apellidoM: String = ""
+    var telefono: String = ""
+    var genero: String = ""
+    var id: String =  ""
+    lateinit var bundle: Bundle
+    var correo: String= ""
+
+    //Trabajando con firebase
+    var providers: MutableList<AuthUI.IdpConfig?>? = null
+    private var mAuth: FirebaseAuth? = null
+    private var currentUser: FirebaseUser? = null
+    private val MY_REQUEST_CODE = 200
+    private var name = null
+    private var email = null
+    private var photoUrl = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
@@ -64,11 +103,24 @@ class Registro : AppCompatActivity() {
         layout_Am = findViewById(R.id.layoutAm)
         layout_telefono = findViewById(R.id.layoutTelefono)
 
+        editContra1 = findViewById(R.id.edit_contra1R)
+        editContra2 = findViewById(R.id.edit_contra2R)
+        contra1_contendor = findViewById(R.id.layout_contra1R)
+        contra2_layot = findViewById(R.id.layout_contra2R)
+
         iv = findViewById(R.id.Animacion)
         subirFotoPerfil.setOnClickListener {
             showFileChooser()
 
         }
+
+        id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        bundle = Bundle()
+        providers = Arrays.asList(
+            // EmailBuilder().build(),
+            GoogleBuilder().build())
+        mAuth = FirebaseAuth.getInstance()
     }
 
     private fun showFileChooser() {
@@ -92,9 +144,7 @@ class Registro : AppCompatActivity() {
         }
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ){ isGranted ->
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted ->
 
         if (isGranted){
             pickPhotoFromGallery()
@@ -147,6 +197,19 @@ class Registro : AppCompatActivity() {
             }
 
         }
+
+        if (requestCode == MY_REQUEST_CODE) {
+            val response = IdpResponse.fromResultIntent(data)
+            if (requestCode == RESULT_OK) {
+                val user = FirebaseAuth.getInstance().currentUser
+            //    Toast.makeText(this, "saludos" + user!!.email, Toast.LENGTH_SHORT).show()
+                correo = currentUser!!.getEmail()!!
+                //verficar numero
+
+            }
+
+
+        }
     }
  /*   fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
@@ -155,13 +218,16 @@ class Registro : AppCompatActivity() {
         return Base64.encodeToString(imageBytes, Base64.DEFAULT)
     }*/
 
+
     fun clickContinuarRegistro (view: View) {
         var band = false
-        var nombre: String = editNombre.text.toString()
-        var apellidoP: String = editApellidoP.text.toString()
-        var apellidoM: String = editApellidoM.text.toString()
-        var telefono: String = editTelefono.text.toString()
-        var genero: String = spinner.selectedItem.toString()
+        nombre = editNombre.text.toString()
+        apellidoP = editApellidoP.text.toString()
+        apellidoM = editApellidoM.text.toString()
+        telefono = editTelefono.text.toString()
+        genero = spinner.selectedItem.toString()
+        contra1 = editContra1.text.toString()
+        contra2 = editContra2.text.toString()
 
         if (nombre.isEmpty()) {
             layout_nombre.error = getText(R.string.campo_requerido)
@@ -198,85 +264,132 @@ class Registro : AppCompatActivity() {
 
                 band = true
             } else {
-                    band = false
-                    layout_telefono.error = null
+                band = false
+                layout_telefono.error = null
 
             }
+
+        }
+        if (contra1.isEmpty()) {
+            band = false
+            contra1_contendor.error = getString(R.string.campo_requerido)
+        } else {
+            band = true
+            contra1_contendor.error = null
+        }
+        if (contra2.isEmpty()) {
+            contra2_layot.error = getString(R.string.campo_requerido)
+            band = false
+
+        } else {
+            contra2_layot.error = null
+            band = true
+
         }
 
-        if (!band) {
+        if (contra1 == contra2){
+            if (band== true) {
+                if (validarContra()) {
+                    //Toast.makeText(this, "entro ", Toast.LENGTH_SHORT).show()
+                  //  currentUser = mAuth!!.currentUser
+                    val user = FirebaseAuth.getInstance().currentUser
+                    correo = user!!.email!!
+                    //Toast.makeText(this, "entro : $correo ", Toast.LENGTH_SHORT).show()
 
-            val bundle = Bundle()
+                    // correo = currentUser!!.getEmail()!!
+                    bundle.putString("fotoperfil", filePath.toString())
+                    bundle.putString("clave", "registrar")
+                    bundle.putString("nombre", nombre)
+                    bundle.putString("apellidoP", apellidoP)
+                    bundle.putString("apellidoM", apellidoM)
+                    bundle.putString("telefono", telefono)
+                    bundle.putString("g", genero)
+                    bundle.putString("correo", correo)
+                    bundle.putString("id", id)
+                    bundle.putString("contra1", contra1)
+                   // muestraOpciones()
 
-            bundle.putString("fotoperfil", filePath.toString())
-            bundle.putString("Nombre", nombre)
-            bundle.putString("Apellido Paterno", apellidoP)
-            bundle.putString("Apellido Materno", apellidoM)
-            bundle.putString("Teléfono", telefono)
-            bundle.putString("Género", genero)
+                    val intent = Intent(this, MainActivityVerificarSMS::class.java)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                   finish()
 
-            val intent = Intent(this, Correo::class.java)
-            intent.putExtras(bundle)
-            startActivity(intent)
+
+                }else{
+                    contra1_contendor.error = getString(R.string.contra_invalida)
+                }
+
+            }
+        }else{
+            contra2_layot.error = "Contraseña Incorrecta"
         }
+
+
+
     }
 
-   /* private fun enviarTodoFoto(fotoPerfil: String?, Correo: String, Nombre: String, Apellido_Paterno: String, Apellido_Materno: String, telefonoCliente: String, generoCliente: String, Contrasena: String, fue_NoRegistrado: String, deviceID: String) {
-        val ROOT_URL = Url().url
-        //Mostrar el diálogo de progreso
-        val loading = ProgressDialog.show(this, "Registrando...", "Espere por favor...", false, false)
-        val stringRequest: StringRequest = object : StringRequest(
-            Request.Method.POST, ROOT_URL+"/LoginFoto.php",
-            object : Response.Listener<String?> {
-                override fun onResponse(s: String?) {
-                    //Descartar el diálogo de progreso
-                    loading.dismiss()
-                    //Mostrando el mensaje de la respuesta
-                    Toast.makeText(this@Registro, s, Toast.LENGTH_LONG).show()
-                    System.out.println("error aqui 1 $s")
-                }
-            },
-            object : Response.ErrorListener {
-                override fun onErrorResponse(volleyError: VolleyError) {
-                    //Descartar el diálogo de progreso
-                    loading.dismiss()
-
-                    //Showing toast
-                    Toast.makeText(this@Registro, volleyError.message.toString(), Toast.LENGTH_LONG).show()
-                    System.out.println("error aqui 2 ${volleyError.message}")
-                }
-            }) {
-            @Throws(AuthFailureError::class)
-            override fun getParams(): Map<String, String>? {
-
-                //Creación de parámetros
-                val params: MutableMap<String, String> = Hashtable<String, String>()
-
-                //Agregando de parámetros
-                if (fotoPerfil != null) {
-                    params["fotoPerfil"] = fotoPerfil
-                }
 
 
-                params["Correo"] = Correo
-                params["Nombre"] = Nombre
-                params["Apellido_Paterno"] = Apellido_Paterno
-                params["Apellido_Materno"] = Apellido_Materno
-                params["telefonoCliente"] = telefonoCliente
-                params["generoCliente"] = generoCliente
-                params["Contrasena"] = Contrasena
-                params["fue_NoRegistrado"] = fue_NoRegistrado
-                params["deviceID"] = deviceID
 
-                //Parámetros de retorno
-                return params
-            }
+    fun muestraOpciones() {
+        startActivityForResult(
+            AuthUI.getInstance().createSignInIntentBuilder()
+                .setIsSmartLockEnabled(false)
+                .setAvailableProviders(providers!!)
+                .build(),MY_REQUEST_CODE
+        )
+    }
+
+     private fun validarContra(): Boolean {
+            val pattern = Pattern.compile(PASSWORD_PATTERN)
+            val matcher = pattern.matcher(contra1)
+            return matcher.matches()
         }
 
-        //Creación de una cola de solicitudes
-        val requestQueue = Volley.newRequestQueue(this)
+    override fun onStart() {
+        super.onStart()
+        currentUser = mAuth!!.currentUser
+        val user = FirebaseAuth.getInstance().currentUser
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
 
-        //Agregar solicitud a la cola
-        requestQueue.add(stringRequest)
-    }*/
+        if (networkInfo != null && networkInfo.isConnected) {
+            if (currentUser != null) {
+
+                correo = currentUser!!.email!!
+                val name = currentUser!!.displayName
+                val email = currentUser!!.email
+                val photoUrl = currentUser!!.photoUrl
+                val uid = currentUser!!.uid
+                val foto = photoUrl.toString()
+
+                val database = FirebaseDatabase.getInstance()
+                val databaseReference = database.getReference("UsuariosR").child(telefono)
+                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                //val usuario = usuarios()
+
+                //val u = usuarios(uid, email, name, foto, currentDateTimeString)
+                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(), email.toString(), name.toString(), foto.toString(), currentDateTimeString.toString())) { error, ref -> //txtprueba.setText(uid + "latitud " + latitud + " longitud " + longitud);
+                  //  Toast.makeText(this@Registro, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
+                }
+
+
+            }else{
+                muestraOpciones()
+            }
+
+
+
+        } else {
+            Toast.makeText(this@Registro, "No hay conexion a Internet", Toast.LENGTH_LONG)
+                .show()
+        }
+
+
+
+
+
+    }
+
+
 }

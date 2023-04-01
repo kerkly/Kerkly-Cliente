@@ -70,7 +70,7 @@ class MainActivityControlador {
                         e.printStackTrace()
                     }
 
-                  var Res = "Bienvenido";
+                  var Res = "Bienvenido"
                     if (Res.equals(Respuesta)){
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", usuario.getUsuario())
@@ -244,21 +244,15 @@ class MainActivityControlador {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-                    System.out.println("entro en veridicar usuario")
-                    if (output != "0") {
-                        // var respuesta: Int =  0;
-                        //respuesta = Integer.parseInt(output)
-                        //System.out.println("telefono obtenido apartir del id " + output)
+
                         if (output.equals("0")) {
                             System.out.println("entro en linea 233")
-
                             val intent = Intent(contexto, MainActivity::class.java)
                             intent.putExtra("Telefono", output)
                             contexto.startActivity(intent)
-
                             contexto.finish()
                         } else {
-                            System.out.println("entro en linea $output")
+                            System.out.println("entro en linea 256$output")
                             val intent = Intent(contexto, SolicitarServicio::class.java)
                             intent.putExtra("Telefono", output)
                             intent.putExtra("PresupuestoListo", false)
@@ -266,12 +260,12 @@ class MainActivityControlador {
                             contexto.finish()
                         }
 
-                    }
+
 
                 }
 
                 override fun failure(error: RetrofitError?) {
-                    println("error $error")
+                    println("error268 $error")
                 }
             }
         )

@@ -1,8 +1,8 @@
 package com.example.kerklyv5
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.DialogInterface
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,7 +15,6 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
@@ -43,18 +42,26 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
 import com.example.kerklyv5.interfaces.SesionAbiertaInterface
+import com.example.kerklyv5.modelo.actualizarhora
 import com.example.kerklyv5.modelo.serial.ClienteModelo
+import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
+import com.google.android.gms.tasks.Task
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
@@ -70,6 +77,7 @@ import java.io.BufferedReader
 
 import java.io.InputStreamReader
 import java.io.*
+import java.text.DateFormat
 import java.util.*
 
 
@@ -88,12 +96,22 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var dialog: Dialog
     var NombreF: String?=null
 
+    //Autenticacion para saber la hora activo
+    var providers: MutableList<AuthUI.IdpConfig?>? = null
+    private var mAuth: FirebaseAuth? = null
+    private var currentUser: FirebaseUser? = null
+    private val MY_REQUEST_CODE = 200
+
     //subir foto
     //subir foto de perfil
     lateinit var fotoPerfil: ImageView
     var bitmap: Bitmap? = null
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
+    lateinit var array: ArrayList<String>
+    lateinit var photoUrl: String
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,13 +144,13 @@ class SolicitarServicio : AppCompatActivity() {
             setOf(
                 R.id.nav_home,
                 //R.id.ordenesPendientesFragment,
-              //  R.id.historialFragment,
-               // R.id.nav_mensajes
+                //  R.id.historialFragment,
+                // R.id.nav_mensajes
             ), drawerLayout
         )
 
 
-       // sesion(correo)
+        // sesion(correo)
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -140,9 +158,9 @@ class SolicitarServicio : AppCompatActivity() {
             when (it.itemId) {
                 R.id.nav_home -> setFragmentHome(nombre.toString())
                 R.id.nav_notificaciones -> setNoficiaciontes()
+                R.id.nav_mensajes -> setMensajesPresupuesto()
                 R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
                 R.id.fragment_historial -> setFragmentHistorial()
-                R.id.nav_mensajes -> setMensajesPresupuesto()
                 R.id.nav_cerrarSesion -> cerrarSesion()
             }
             drawerLayout.closeDrawer(GravityCompat.START)
@@ -153,8 +171,38 @@ class SolicitarServicio : AppCompatActivity() {
             dialog.show()
         }
 
-       getJson()
+        getJson()
 
+        //Firebase
+        providers = Arrays.asList(
+            // EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+        mAuth = FirebaseAuth.getInstance()
+/*
+        //Primero Obtendremos la lista de numeros de telefonos
+        val firebaseDatabaseLista: FirebaseDatabase
+        var databaseReferenceLista: Task<DataSnapshot>
+        firebaseDatabaseLista = FirebaseDatabase.getInstance()
+        array = ArrayList<String>()
+
+        databaseReferenceLista = firebaseDatabaseLista.getReference("UsuariosR").child("7471503418")
+            .child("Lista de Usuarios").get().addOnCompleteListener { task ->
+
+                for (snapshot in task.result.children) {
+
+                    //array = arrayListOf(snapshot.key!!)
+                    //  println("claves" + snapshot.key)
+                    // myAdapter.notifyDataSetChanged();
+                    // println(" datos: " + snapshot.value)
+                    println(" tel: " + snapshot.child("telefono").value)
+                    array.add(snapshot.child("telefono").value.toString())
+
+
+                }
+
+
+            }*/
     }
 
 
@@ -201,6 +249,7 @@ class SolicitarServicio : AppCompatActivity() {
         startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
@@ -257,6 +306,20 @@ class SolicitarServicio : AppCompatActivity() {
             } catch (e: IOException) {
                 e.printStackTrace()
             }
+        }
+
+
+        if (requestCode == MY_REQUEST_CODE) {
+            val response = IdpResponse.fromResultIntent(data)
+            if (requestCode == RESULT_OK) {
+                val user = FirebaseAuth.getInstance().currentUser
+                //    Toast.makeText(this, "saludos" + user!!.email, Toast.LENGTH_SHORT).show()
+                //correo = currentUser!!.getEmail()!!
+                //verficar numero
+
+            }
+
+
         }
     }
 
@@ -328,18 +391,24 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun setFragmentMensajes() {
-        val f = ListaChatsFragment()
+        /*val f = ListaChatsFragment()
         // val args = Bundle()
         //args.putString("Tel", telefono)
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
-        }
+        }*/
     }
 
     private fun setMensajesPresupuesto() {
-        val f = MensajesPresupuestoFragment()
+        //val f = MensajesPresupuestoFragment()
+        val f = MensajesFragment()
         f.arguments = b
+       // b!!.putSerializable("arrayUsuarios", array)
+        b!!.putInt("IdContrato", 1)
+        b!!.putString("telefonoCliente", telefono)
+        b!!.putString("urlFotoCliente", photoUrl)
+      //  println("tamaño array ${array.size}")
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
@@ -406,12 +475,14 @@ class SolicitarServicio : AppCompatActivity() {
                                 output = reader.readLine()
 
 
+
                             } catch (e: IOException) {
                                 e.printStackTrace()
                             }
                             Log.e("output", output)
 
                             if (output == "1") {
+                                metodoSalir()
                                 Toast.makeText(applicationContext, "Sesión cerrada", Toast.LENGTH_SHORT).show()
                                 val i = Intent(applicationContext, MainActivity::class.java)
                                 startActivity(i)
@@ -473,7 +544,7 @@ class SolicitarServicio : AppCompatActivity() {
                     txt_nombre.text = nombre
                     txt_correo.text = correo
                     if (foto ==null){
-                        Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                      //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                         //hay que poner una imagen por defecto
                     }else{
                         cargarImagen(foto)
@@ -565,8 +636,8 @@ class SolicitarServicio : AppCompatActivity() {
 
                     loading.dismiss()
                     //Mostrando el mensaje de la respuesta
-                    Toast.makeText(this@SolicitarServicio, s, Toast.LENGTH_LONG).show()
-                    System.out.println("error aqui 1 $s")
+                    //Toast.makeText(this@SolicitarServicio, s, Toast.LENGTH_LONG).show()
+                   // System.out.println("error aqui 1 $s")
 
                 }
             },
@@ -603,5 +674,52 @@ class SolicitarServicio : AppCompatActivity() {
         //Agregar solicitud a la cola
         requestQueue.add(stringRequest)
 
+    }
+
+
+
+    override fun onStart() {
+        super.onStart()
+        currentUser = mAuth!!.currentUser
+        if(currentUser != null){
+           // muestraOpciones()
+            val name = currentUser!!.displayName
+            val email = currentUser!!.email
+             photoUrl = currentUser!!.photoUrl.toString()
+            val uid = currentUser!!.uid
+            val foto = photoUrl.toString()
+            val database = FirebaseDatabase.getInstance()
+            val databaseReference = database.getReference("UsuariosR").child(telefono)
+            val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+            val usuario = usuarios()
+            val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString)
+            databaseReference.child("MisDatos").setValue(u) { error, ref ->
+              //  Toast.makeText(this@SolicitarServicio, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
+            }
+        }else {
+            muestraOpciones()
+        }
+
+
+
+    }
+    fun muestraOpciones() {
+        startActivityForResult(
+            AuthUI.getInstance().createSignInIntentBuilder()
+                .setIsSmartLockEnabled(false)
+                .setAvailableProviders(providers!!)
+                .build(),MY_REQUEST_CODE
+        )
+    }
+
+    fun metodoSalir() {
+        AuthUI.getInstance()
+            .signOut(applicationContext)
+            .addOnCompleteListener { muestraOpciones() }.addOnFailureListener { e ->
+                Toast.makeText(
+                    applicationContext, ""
+                            + e.message, Toast.LENGTH_LONG
+                ).show()
+            }
     }
 }

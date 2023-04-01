@@ -4,6 +4,6 @@ class Url {
 
    //val url: String = "https://www.saua.uagro.mx/cliente"
     //pruebagh
- val url: String = "https://c19b-189-143-80-161.ngrok.io/kerkly/cliente"
+ val url: String = "https://7790-189-143-67-119.ngrok.io/kerkly/cliente"
 
 }

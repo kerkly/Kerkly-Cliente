@@ -109,7 +109,7 @@ class MainActivityVerificarSMS : AppCompatActivity() {
 
         binding.btnResend.setOnClickListener{
 
-Toast.makeText(this@MainActivityVerificarSMS,numeroSMS,Toast.LENGTH_SHORT).show()
+               //Toast.makeText(this@MainActivityVerificarSMS,numeroSMS,Toast.LENGTH_SHORT).show()
                 resendCode(numeroSMS ,resendToken)
 
         }
@@ -440,6 +440,7 @@ Toast.makeText(this@MainActivityVerificarSMS,numeroSMS,Toast.LENGTH_SHORT).show(
             ActivityCompat.requestPermissions(contexto,
                 arrayOf(Manifest.permission.RECEIVE_SMS),
                 sms)
+            finish()
         }
     }
 

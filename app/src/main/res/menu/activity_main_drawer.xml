@@ -17,7 +17,7 @@
         <item
             android:id="@+id/nav_mensajes"
             android:icon="@drawable/ic_bi_chat_left_dots"
-            android:title="@string/mensajes" />
+            android:title="@string/Contactos" />
 
         <item
             android:id="@+id/ordenesPendientesFragment"

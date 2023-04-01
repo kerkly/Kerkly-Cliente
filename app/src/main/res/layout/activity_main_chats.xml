@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivityChats">
+    <LinearLayout
+        android:id="@+id/layout_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/fondo1"
+        >
+
+        <ImageView
+            android:src="@drawable/ic_frame_46"
+            android:id="@+id/image_usuario"
+            android:layout_margin="15dp"
+            android:layout_gravity="center"
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+
+        <TextView
+            android:id="@+id/txt_nombre_kerkly_chats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre del Kerkly"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:layout_margin="12dp"
+            android:textSize="20sp"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="70dp"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_chat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/fondo1"
+        android:layout_marginTop="-60dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editTextChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginVertical="5dp"
+            android:background="@android:drawable/edit_text"
+            android:ems="13"
+            android:hint="@string/mensaje"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            tools:ignore="TouchTargetSizeCheck" />
+
+        <ImageButton
+            android:id="@+id/boton_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorBoton"
+            android:src="@drawable/ic_baseline_send_24"
+            />
+    </LinearLayout>
+
+</LinearLayout>

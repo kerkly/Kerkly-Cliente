@@ -132,6 +132,28 @@
                     android:hint="@string/apellido_matenrno"
                     />
             </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:id="@+id/textView19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/genero"
+                android:fontFamily="@font/quicksand_bold"
+                android:textColor="@color/purple_500"                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/spinnerRecuperarcuenta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/spinner_style"
+                android:entries="@array/generos" />
 
             <TextView
                 android:id="@+id/textView18"
@@ -171,27 +193,54 @@
 
 
             <TextView
-                android:id="@+id/textView19"
+                android:id="@+id/textView21"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="10dp"
-                android:text="@string/genero"
-                android:fontFamily="@font/quicksand_bold"
-                android:textColor="@color/purple_500"                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_margin="20dp"
+                android:text="@string/crear_contrasenia" />
 
-            <Spinner
-                android:id="@+id/spinnerRecuperarcuenta"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_contra1R"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
+                android:layout_marginTop="0dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/spinner_style"
-                android:entries="@array/generos" />
+                app:endIconMode="password_toggle"
+                app:errorEnabled="true"
+                android:layout_marginBottom="15dp"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_contra1R"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:hint="@string/contrasenia"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_contra2R"
+                android:layout_width="match_parent"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="20dp"
+                app:errorEnabled="true"
+                android:layout_marginEnd="20dp"
+                app:endIconMode="password_toggle"
+                android:layout_marginBottom="15dp"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_contra2R"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:hint="@string/contrasenia"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
 
             <com.google.android.material.button.MaterialButton

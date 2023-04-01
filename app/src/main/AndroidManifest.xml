@@ -31,11 +31,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KerklyV5">
         <activity
-            android:name=".MainActivityEnviarUbicacionEnTiempoReal"
+            android:name=".MainActivityChats"
             android:exported="false" />
         <activity
-            android:name="EnviarUbicacionEnTiempoReal.MainActivityEnviarUbicacionEnTiempoReal"
-            android:exported="false" />
+            android:name=".MainActivityChast"
+            android:exported="false"
+            android:label="@string/title_activity_main_chast"
+            android:theme="@style/Theme.KerklyV5.NoActionBar" />
         <activity
             android:name=".vista.MainActivityVerificarSMS"
             android:exported="false" />

@@ -14,7 +14,6 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.modelo.Mensaje
 
 class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
-
     private var lista = ArrayList<Mensaje>()
     var context = c
 
@@ -24,14 +23,13 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
 
         val txt_fecha = view.findViewById<TextView>(R.id.txt_fechaMensaje_chat)
 
-        var layout = view.findViewById<LinearLayout>(R.id.layout_mensaje_card)
+        var layoutmensaje = view.findViewById<LinearLayout>(R.id.layout_mensaje_card)
+        var layoutHora = view.findViewById<LinearLayout>(R.id.layout_hora_card)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_view_mensaje, parent, false)
-
-
         return ViewHolder(view)
     }
 
@@ -41,20 +39,24 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
 
         var tipo_usuario = lista[position].tipo_usuario.trim()
 
-        if (tipo_usuario == "Ker") {
+        if (tipo_usuario == "cliente") {
 
-            holder.layout.style {
+            holder.layoutmensaje.style {
                 this.backgroundRes(R.drawable.burbuja_chat_der)
                 this.layoutGravity(Gravity.END)
+            }
+            holder.layoutHora.style{
+                this.layoutGravity(Gravity.END)
+
             }
 
             if (position > 0) {
                 if (tipo_usuario == lista[position-1].tipo_usuario.trim()) {
-                    holder.layout.style {
+                    holder.layoutmensaje.style {
                         this.layoutMarginTopDp(5)
                     }
                 } else {
-                    holder.layout.style {
+                    holder.layoutmensaje.style {
                         this.layoutMarginTopDp(20)
                     }
                 }
@@ -62,18 +64,21 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
 
         } else if (tipo_usuario == "Kerkly") {
 
-            holder.layout.style {
+            holder.layoutmensaje.style {
                 this.backgroundRes(R.drawable.burbuja_chat)
+                this.layoutGravity(Gravity.START)
+            }
+            holder.layoutHora.style{
                 this.layoutGravity(Gravity.START)
             }
 
             if (position > 0) {
                 if (tipo_usuario == lista[position-1].tipo_usuario.trim()) {
-                    holder.layout.style {
+                    holder.layoutmensaje.style {
                         this.layoutMarginTopDp(5)
                     }
                 } else {
-                    holder.layout.style {
+                    holder.layoutmensaje.style {
                         this.layoutMarginTopDp(20)
                     }
                 }
