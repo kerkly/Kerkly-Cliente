@@ -31,11 +31,9 @@ class CalcularTiempoDistancia (var mContext: Context) : AsyncTask<String?, Void?
         if (aDouble != null) {
             geo1.setDouble(aDouble)
             progressDialog!!.dismiss()
-        } else Toast.makeText(
-            mContext,
-            "Error",
-            Toast.LENGTH_SHORT
-        ).show()
+        } else
+            Toast.makeText(mContext, "Error", Toast.LENGTH_SHORT).show()
+        progressDialog!!.dismiss()
     }
 
     override fun doInBackground(vararg params: String?): String? {
@@ -64,11 +62,14 @@ class CalcularTiempoDistancia (var mContext: Context) : AsyncTask<String?, Void?
                 return object_duration.getString("value") + "," + object_distance.getString("value")
             }
         } catch (e: MalformedURLException) {
-            Log.d("error", "error1")
+            Log.d("error 65:", "$e")
+            progressDialog!!.dismiss()
         } catch (e: IOException) {
-            Log.d("error", "error2")
+            Log.d("error 68:", "$e")
+            progressDialog!!.dismiss()
         } catch (e: JSONException) {
-            Log.d("error", "error3")
+            Log.d("error: 71:", "$e")
+            progressDialog!!.dismiss()
         }
         return null
     }

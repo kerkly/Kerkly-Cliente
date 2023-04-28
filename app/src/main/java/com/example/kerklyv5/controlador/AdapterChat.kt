@@ -57,8 +57,7 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
                     }
                 } else {
                     holder.layoutmensaje.style {
-                        this.layoutMarginTopDp(20)
-                    }
+                        this.layoutMarginTopDp(20)                    }
                 }
             }
 

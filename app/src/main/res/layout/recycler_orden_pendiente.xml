@@ -30,6 +30,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <TextView
+                    android:id="@+id/oficio_txt_correokerkly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    tools:text="correo" />
+                <TextView
+                    android:id="@+id/oficio_txt_NombreKerkly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    tools:text="nombre kerkly" />
 
                 <TextView
                     android:id="@+id/oficio_txt_orden"
@@ -37,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
                     android:layout_marginEnd="15dp"
-                    tools:text="Servicio musico" />
+                    tools:text="Servicio" />
 
                 <TextView
                     android:id="@+id/folio_txt_orden"

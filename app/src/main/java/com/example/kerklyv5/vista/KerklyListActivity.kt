@@ -11,11 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.controlador.AdapterKerkly
+import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
 import com.example.kerklyv5.interfaces.IngresarPresupuestoClienteInterface
 import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
 import com.example.kerklyv5.modelo.serial.Kerkly
+import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.notificaciones.llamarTopico
+import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
 import com.example.kerklyv5.url.Url
+import com.google.firebase.database.*
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -54,11 +59,15 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var estado: String
     private lateinit var pais: String
 
+    private lateinit var nombreCliente: String
+    private  val setProgress = setProgressDialog()
+    private val obtenerToken = obtenerKerklys_y_tokens()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kerkly_list)
-
+        setProgress.setProgressDialog(this)
         b = intent.extras!!
 
         context = this
@@ -73,6 +82,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         num_ext = b.getString("Exterior").toString()
      //   referencia = b.getString("Referencia").toString()
         pais = b.getString("Pais").toString()
+        nombreCliente = b.getString("nombreCliente")!!
 
         recyclerview = findViewById(R.id.recycler_kerkly)
         recyclerview.setHasFixedSize(true)
@@ -82,10 +92,10 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
-        getOficios()
+        getKerklysCercanos()
     }
 
-    private fun getOficios () {
+    private fun getKerklysCercanos () {
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
             .setLenient()
@@ -105,24 +115,20 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
         call?.enqueue(object : retrofit2.Callback<List<Kerkly?>?> {
 
-            override fun onResponse(
-                call: Call<List<Kerkly?>?>,
-                response: retrofit2.Response<List<Kerkly?>?>
-            ) {
-                postlist = response.body()
-                        as ArrayList<Kerkly>
+            override fun onResponse(call: Call<List<Kerkly?>?>, response: retrofit2.Response<List<Kerkly?>?>) {
 
+                postlist = response.body() as ArrayList<Kerkly>
                 var size = 0
 
                 if (postlist!!.size > 0) {
-                    if (postlist!!.size >= 5) {
-                        size = 5
-                    } else {
-                        size = postlist!!.size
-                    }
+                   // if (postlist!!.size >= 4) {
+                     //   size = 4
+                    //} else {
+                      //  size = postlist!!.size
+                    //}
 
 
-                    for (i in 0 until size) {
+                    for (i in 0 until postlist!!.size) {
                         var latitudFinal = postlist!![i].latitud
                         var longitudFinal = postlist!![i].longitud
 
@@ -134,17 +140,16 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                 adapter = AdapterKerkly(postlist!!)
 
                 adapter.setOnClickListener {
-                    Log.d("curp", "Hora: " + postlist!![recyclerview.getChildAdapterPosition(it)].minutos)
+                   // Log.d("curp", "Hora: " + postlist!![recyclerview.getChildAdapterPosition(it)].minutos)
 
                     curp = postlist!![recyclerview.getChildAdapterPosition(it)].Curp
 
-                    intent = Intent(applicationContext, SolicitarServicio::class.java)
+                    //primero Mandamos la solicitud a un kerkly
+                    val telefoK =  postlist!![recyclerview.getChildAdapterPosition(it)].Telefonok
+                    System.out.println("el telefo del kerkly $telefoK")
+                    setProgress.setProgressDialog(this@KerklyListActivity)
+                    obtenerToken.obtenerTokenKerkly(telefoK, problema, nombreCliente, this@KerklyListActivity)
                     ingresarPresupuesto()
-
-                    b.putBoolean("PresupuestoListo", true)
-                    intent.putExtras(b)
-                    startActivity(intent)
-
                 }
 
             }
@@ -157,6 +162,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         })
     }
 
+
     override fun setDouble(min: String?) {
         val res = min!!.split(",").toTypedArray()
         val min = res[0].toDouble() / 60
@@ -165,6 +171,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         i2 = i2!! +1
 
         val e = i2!!-1
+        System.out.println("valor de e : $e")
 
 
         postlist!![e].hora = (min / 60).toInt()
@@ -190,6 +197,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         }
 
         recyclerview.adapter = adapter
+        setProgress.dialog.dismiss()
     }
 
     private fun ingresarPresupuesto() {
@@ -223,11 +231,16 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                         e.printStackTrace()
                     }
 
-                    Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
+                   // Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
 
                     val cadena = "Datos enviados"
                     if (cadena.equals(entrada)){
-                        Toast.makeText(applicationContext,"Datos enviados", Toast.LENGTH_LONG).show()
+                        setProgress.dialog.dismiss()
+                        intent = Intent(applicationContext, SolicitarServicio::class.java)
+                        b.putBoolean("PresupuestoListo", true)
+                        intent.putExtras(b)
+                        startActivity(intent)
+                        Toast.makeText(applicationContext,"Solicitud en proceso", Toast.LENGTH_LONG).show()
                     }
                 }
 

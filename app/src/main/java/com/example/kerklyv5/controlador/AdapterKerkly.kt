@@ -31,7 +31,7 @@ class AdapterKerkly(val datset: ArrayList<Kerkly>):
         val am = datset[position].Apellido_Materno
         val nombre = "$n $ap $am"
 
-        viewHolder.txtNombre.text = nombre
+        viewHolder.txtNombre.text = "$nombre"
         //var h = datset[position].hora
        // var m = datset[position].minutos
 
@@ -39,15 +39,15 @@ class AdapterKerkly(val datset: ArrayList<Kerkly>):
         var m = ""
 
         if (datset[position].hora  < 10) {
-            h = "0${datset[position].hora}"
+            h = "a 0${datset[position].hora} horas con"
         } else {
-            h = "${datset[position].hora}"
+            h = "a ${datset[position].hora} horas con"
         }
 
         if (datset[position].minutos  < 10) {
-            m = "0${datset[position].minutos}"
+            m = "0${datset[position].minutos} minutos"
         } else {
-            m = "${datset[position].minutos}"
+            m = "${datset[position].minutos} minutos"
         }
         viewHolder.txt_tiempo.text = "$h:$m"
 

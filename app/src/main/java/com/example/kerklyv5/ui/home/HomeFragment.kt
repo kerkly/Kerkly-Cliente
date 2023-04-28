@@ -12,11 +12,16 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kerklyv5.R
+import com.example.kerklyv5.controlador.AdapterKerkly
 import com.example.kerklyv5.controlador.AdapterSpinner
+import com.example.kerklyv5.controlador.setProgressDialog
+import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
+import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
 import com.example.kerklyv5.interfaces.ObtenerOficiosInterface
+import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.modelo.serial.Oficio
+import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
 import com.example.kerklyv5.url.Url
-import com.example.kerklyv5.vista.KerklyListActivity
 import com.example.kerklyv5.vista.MapsActivity
 import com.example.kerklyv5.vista.fragmentos.KerklyFragment
 import com.google.android.material.button.MaterialButton
@@ -39,7 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var layoutProblem: TextInputLayout
     private lateinit var oficio: String
     private var latitud: Double = 0.0
-    private var altitud: Double = 0.0
+    private var longitud: Double = 0.0
     private lateinit var botonDireccion: MaterialButton
     private lateinit var botonPresupuesto: MaterialButton
     private lateinit var imageboton: ImageButton
@@ -47,16 +52,18 @@ class HomeFragment : Fragment() {
     private lateinit var telefono: String
     private lateinit var problema: String
     private lateinit var boton_servicioUrgente: MaterialButton
-    var nombreUbi: String? = null
+    val setprogress = setProgressDialog()
+    private lateinit var nombreCliente: String
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         /*homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         // Obtienes el Bundle del Intent
-
+        //setprogress.setProgressDialog(requireContext())
        b = Bundle()
-        nombreUbi = arguments?.getString("Nombre")
+
 
 
         spinner = root.findViewById(R.id.spinnerNormal)
@@ -70,16 +77,16 @@ class HomeFragment : Fragment() {
         getOficios()
 
         botonPresupuesto.setOnClickListener {
+            nombreCliente = arguments?.getString("Nombre")!!
             seleccionarKerkly()
         }
 
+        //click servicio Urgente
         boton_servicioUrgente.setOnClickListener {
             oficio = spinner.selectedItem.toString()
-
             telefono = arguments?.getString("Telefono")!!
-
-
             // Log.d("tel", telefono)
+            nombreCliente = arguments?.getString("Nombre")!!
             b.putString("Oficio", oficio)
             b.putString("Telefono", telefono)
             problema = textProblem.text.toString()
@@ -92,10 +99,9 @@ class HomeFragment : Fragment() {
 
                 val i = Intent(context, MapsActivity::class.java)
                 b.putBoolean("Express", true)
-                b.putString("Nombre", nombreUbi.toString())
+                b.putString("Nombre", nombreCliente.toString())
                 i.putExtras(b)
                 startActivity(i)
-
             }
         }
 
@@ -131,13 +137,14 @@ class HomeFragment : Fragment() {
 
                 val aa = AdapterSpinner(requireActivity(), postList)
                 spinner.adapter = aa
+                //setprogress.dialog.dismiss()
 
             }
 
             override fun onFailure(call: Call<List<Oficio?>?>, t: Throwable) {
 
                 Log.d("error del retrofit", t.toString())
-                Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
+               // Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
             }
 
         })
@@ -167,9 +174,11 @@ class HomeFragment : Fragment() {
                 replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()*/
             val i = Intent(context, MapsActivity::class.java)
             b.putBoolean("Express", false)
-            b.putString("Nombre", nombreUbi.toString())
+            b.putString("Nombre", nombreCliente.toString())
             i.putExtras(b)
             startActivity(i)
             }
         }
-    }
+
+
+}

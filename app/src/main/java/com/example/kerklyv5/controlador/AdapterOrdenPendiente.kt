@@ -26,6 +26,10 @@ class AdapterOrdenPendiente(val datset: ArrayList<OrdenPendiente>):
 
         val txtFecha: TextView = view.findViewById(R.id.fecha_txt_orden)
 
+        val txtnombrek: TextView = view.findViewById(R.id.oficio_txt_NombreKerkly)
+
+        val txtcorreok: TextView = view.findViewById(R.id.oficio_txt_correokerkly)
+
         init {}
 
 
@@ -37,6 +41,9 @@ class AdapterOrdenPendiente(val datset: ArrayList<OrdenPendiente>):
         viewHolder.txtFecha.text = datset[position].Fecha_Inicio
         viewHolder.txt_folio.text = "Folio No. ${datset[position].idContrato}"
         viewHolder.txt_oficio.text = "Servicio ${datset[position].nombreO}"
+        viewHolder.txtcorreok.text = "${datset[position].correo_electronico}"
+        viewHolder.txtnombrek.text = "${datset[position].NombreK}"
+
     }
 
     // Create new views (invoked by the layout manager)

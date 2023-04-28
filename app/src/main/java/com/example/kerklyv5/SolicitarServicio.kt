@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -15,11 +16,8 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Base64
 import android.util.Log
-import android.view.Menu
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
@@ -43,25 +41,26 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.request.RequestOptions
+import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
 import com.example.kerklyv5.interfaces.SesionAbiertaInterface
-import com.example.kerklyv5.modelo.actualizarhora
 import com.example.kerklyv5.modelo.serial.ClienteModelo
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
-import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
@@ -93,7 +92,7 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var id: String
     private lateinit var drawerLayout: DrawerLayout
     private var presupuestoListo = false
-    private lateinit var dialog: Dialog
+    private lateinit var dialog2: Dialog
     var NombreF: String?=null
 
     //Autenticacion para saber la hora activo
@@ -109,8 +108,10 @@ class SolicitarServicio : AppCompatActivity() {
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
     lateinit var array: ArrayList<String>
-    lateinit var photoUrl: String
-
+     var photoUrl: String? = null
+    private lateinit var token: String
+    private lateinit var nombreCompletoCliente: String
+    val setProgressDialog = setProgressDialog()
 
 
 
@@ -118,9 +119,10 @@ class SolicitarServicio : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        dialog = Dialog(this)
+        setProgressDialog()
+        dialog2 = Dialog(this)
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
-
+        //setProgressDialog.setProgressDialog(this)
         b = intent.extras!!
         telefono = b!!.getString("Telefono")!!
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -143,9 +145,9 @@ class SolicitarServicio : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
-                //R.id.ordenesPendientesFragment,
-                //  R.id.historialFragment,
-                // R.id.nav_mensajes
+                R.id.ordenesPendientesFragment,
+               // R.id.historialFragment,
+                R.id.nav_mensajes
             ), drawerLayout
         )
 
@@ -158,7 +160,7 @@ class SolicitarServicio : AppCompatActivity() {
             when (it.itemId) {
                 R.id.nav_home -> setFragmentHome(nombre.toString())
                 R.id.nav_notificaciones -> setNoficiaciontes()
-                R.id.nav_mensajes -> setMensajesPresupuesto()
+                R.id.nav_mensajes -> setContactosPresupuesto()
                 R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
                 R.id.fragment_historial -> setFragmentHistorial()
                 R.id.nav_cerrarSesion -> cerrarSesion()
@@ -167,8 +169,8 @@ class SolicitarServicio : AppCompatActivity() {
             true
         }
         if (presupuestoListo) {
-            dialog.setContentView(R.layout.presupuesto_solicitud)
-            dialog.show()
+            dialog2.setContentView(R.layout.presupuesto_solicitud)
+            dialog2.show()
         }
 
         getJson()
@@ -330,7 +332,13 @@ class SolicitarServicio : AppCompatActivity() {
         return Base64.encodeToString(imageBytes, Base64.DEFAULT)
     }
     fun cerrarVentana(v: View) {
-        dialog.dismiss()
+        dialog2.dismiss()
+        /*
+        val llamarTopico = llamarTopico()
+        val token
+        val mensaje
+        val titulo
+        llamarTopico.llamartopico(this, "","","")*/
     }
 
     override fun onBackPressed() {
@@ -361,20 +369,20 @@ class SolicitarServicio : AppCompatActivity() {
     private fun setFragmentHome(nombre: String) {
         val f = HomeFragment()
         b!!.putString("Nombre", nombre.toString())
-
        // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+
         }
     }
 
     private fun setFragmentOrdenesPendientes() {
         val f = OrdenesPendientesFragment()
-        // val args = Bundle()
-        //args.putString("Tel", telefono)
-        b!!.putString("Nombre", nombre.toString())
-        f.arguments = b
+         val args = Bundle()
+        args.putString("Telefono", telefono)
+        args!!.putString("nombreCompletoCliente", nombreCompletoCliente)
+        f.arguments = args
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
@@ -400,14 +408,15 @@ class SolicitarServicio : AppCompatActivity() {
         }*/
     }
 
-    private fun setMensajesPresupuesto() {
+    private fun setContactosPresupuesto() {
         //val f = MensajesPresupuestoFragment()
-        val f = MensajesFragment()
+        val f = ContactosFragment()
         f.arguments = b
        // b!!.putSerializable("arrayUsuarios", array)
         b!!.putInt("IdContrato", 1)
         b!!.putString("telefonoCliente", telefono)
         b!!.putString("urlFotoCliente", photoUrl)
+        b!!.putString("nombreCompletoCliente", nombreCompletoCliente)
       //  println("tamaño array ${array.size}")
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
@@ -438,7 +447,7 @@ class SolicitarServicio : AppCompatActivity() {
                         output = reader.readLine()
 
 
-                        Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
+                       // Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
 
                     } catch (e: IOException) {
                         e.printStackTrace()
@@ -540,18 +549,27 @@ class SolicitarServicio : AppCompatActivity() {
                     nombre = "$NombreF $ap $am"
 
                     correo = postList[0].Correo
-
+                    nombreCompletoCliente = nombre as String
                     txt_nombre.text = nombre
                     txt_correo.text = correo
                     if (foto ==null){
                       //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                         //hay que poner una imagen por defecto
+                        if (photoUrl == null){
+
+                        }else{
+                            val foto2 = photoUrl
+                            cargarImagen(foto2!!)
+                        }
+
                     }else{
                         cargarImagen(foto)
                     }
 
                     setFragmentHome(nombre!!)
                     sesion(correo)
+                    //setProgressDialog.dialog.dismiss()
+
 
                 }
 
@@ -615,7 +633,7 @@ class SolicitarServicio : AppCompatActivity() {
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 System.out.println("Respuesta error 3 "+ e.toString())
-                Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
             }
 
 
@@ -682,22 +700,32 @@ class SolicitarServicio : AppCompatActivity() {
         super.onStart()
         currentUser = mAuth!!.currentUser
         if(currentUser != null){
-           // muestraOpciones()
-            val name = currentUser!!.displayName
-            val email = currentUser!!.email
-             photoUrl = currentUser!!.photoUrl.toString()
-            val uid = currentUser!!.uid
-            val foto = photoUrl.toString()
-            val database = FirebaseDatabase.getInstance()
-            val databaseReference = database.getReference("UsuariosR").child(telefono)
-            val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-            val usuario = usuarios()
-            val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString)
-            databaseReference.child("MisDatos").setValue(u) { error, ref ->
-              //  Toast.makeText(this@SolicitarServicio, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
-            }
+
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+                token = task.result
+                // muestraOpciones()
+                val name = currentUser!!.displayName
+                val email = currentUser!!.email
+                photoUrl = currentUser!!.photoUrl.toString()
+                val uid = currentUser!!.uid
+                val foto = photoUrl.toString()
+                val database = FirebaseDatabase.getInstance()
+                val databaseReference = database.getReference("UsuariosR").child(telefono)
+                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                val usuario = usuarios()
+                val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
+                databaseReference.child("MisDatos").setValue(u) { error, ref ->
+                      //Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
+                }
+            })
+
         }else {
             muestraOpciones()
+
         }
 
 
@@ -722,4 +750,6 @@ class SolicitarServicio : AppCompatActivity() {
                 ).show()
             }
     }
+
+
 }

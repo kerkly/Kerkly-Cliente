@@ -1,5 +1,6 @@
 package com.example.kerklyv5.vista.fragmentos
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -11,6 +12,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kerklyv5.MainActivityAceptarServicio
+import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
 import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
@@ -45,6 +48,7 @@ class OrdenesPendientesFragment : Fragment() {
     private lateinit var b: Bundle
     private lateinit var img: ImageView
     private lateinit var txt: TextView
+    private lateinit var nombreCompletoCliente: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +76,7 @@ class OrdenesPendientesFragment : Fragment() {
 
         telefono = b.getString("Telefono").toString()
         Log.d("telefono", telefono)
+        nombreCompletoCliente = b.getString("nombreCompletoCliente")!!
         getOrdenes()
 
         return v
@@ -104,8 +109,10 @@ class OrdenesPendientesFragment : Fragment() {
                 val postList: ArrayList<OrdenPendiente> = response.body()
                         as ArrayList<OrdenPendiente>
 
+                Log.d("lista", postList.toString())
                 if (postList.size == 0) {
                     recyclerview.visibility = View.GONE
+                    Log.d("estoyyyyy aqui", "holaaaa")
                 } else {
                     img.visibility = View.GONE
                     txt.visibility = View.GONE
@@ -119,18 +126,29 @@ class OrdenesPendientesFragment : Fragment() {
                         val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
 
                         val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
+                        val nombreCliente = nombreCompletoCliente
 
-                        b = Bundle()
-                        b.putString("Nombre_Kerkly", nombre_kerkly)
-                        b.putString("Ap_Kerkly", ap_kerkly)
-                        b.putString("Nombre_completo_Kerkly", nomre_completo_kerkly)
-                        b.putInt("IdContrato", id)
 
-                        val f = MensajesFragment()
+
+                        val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
+                        intent.putExtra("Nombre_Kerkly", nombre_kerkly)
+                        intent.putExtra("Ap_Kerkly", ap_kerkly)
+                        intent.putExtra("Nombre_completo_Kerkly", nomre_completo_kerkly)
+                        intent.putExtra("IdContrato", id)
+                        intent.putExtra("telefonoCliente", telefono)
+                        intent.putExtra("nombreCompletoCliente",nombreCliente)
+
+                        startActivity(intent)
+
+                     /*   val intent = Intent(requireContext(), MainActivityChats::class.java)
+                        intent.putExtras(b)
+                        startActivity(intent)*/
+
+                       /* val f = ContactosFragment()
                         f.arguments = b
                         var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
                             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
-                        }
+                        }*/
 
                     }
 
@@ -151,7 +169,7 @@ class OrdenesPendientesFragment : Fragment() {
 
    // private fun setChats(n: String, ap: String, nCompleto: String, id: Int) {
     private fun setChats(b_: Bundle) {
-       val f = MensajesFragment()
+       val f = ContactosFragment()
        f.arguments = b_
        /* f.arguments?.putInt("IdContrato", id)
         f.arguments?.putString("Nombre Kerkly", n)

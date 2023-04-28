@@ -11,8 +11,6 @@ interface AceptarPresupuestoInterface {
     fun Aceptar(
         @Field("idPresupuestoNoRegistrado")  idPresupuestoNoRegistrado: String,
         @Field("aceptoCliente") aceptoCliente: String,
-        @Field("numIntentos") numIntentos: Int,
-        @Field("telefono_NoR") telefono_NoR: String,
         callback: Callback<Response?>
     )
 }

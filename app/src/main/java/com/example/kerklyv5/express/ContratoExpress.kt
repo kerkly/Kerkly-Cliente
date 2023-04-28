@@ -132,7 +132,7 @@ class ContratoExpress : AppCompatActivity() {
             txt_intentos.visibility = View.GONE
             aceptarNormal()
         } else {
-            acpetarP()
+            //acpetarP()
             actualizarMensaje()
         }
 
@@ -226,37 +226,37 @@ class ContratoExpress : AppCompatActivity() {
         return "$dia de $mes del $anio"
     }
 
-    private fun acpetarP (){
-        val ROOT_URL = Url().url
-
-        val adaptar = RestAdapter.Builder()
-            .setEndpoint(ROOT_URL)
-            .build()
-        val api: AceptarPresupuestoInterface = adaptar.create(AceptarPresupuestoInterface ::class.java)
-        api.Aceptar(folio.toString(),
-            "1",
-            intentos,
-            telefono,
-            object : Callback<Response?> {
-                override fun success(t: Response?, response: Response?) {
-                    var entrada: BufferedReader? =  null
-                    var Respuesta = ""
-                    try {
-                        entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
-                        Respuesta = entrada.readLine()
-                    }catch (e: Exception){
-                        e.printStackTrace()
-                    }
-                    Toast.makeText(applicationContext, Respuesta, Toast.LENGTH_SHORT).show()
-                }
-
-                override fun failure(error: RetrofitError?) {
-                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_SHORT).show()
-                }
-
-            })
-
-    }
+//    private fun acpetarP (){
+//        val ROOT_URL = Url().url
+//
+//        val adaptar = RestAdapter.Builder()
+//            .setEndpoint(ROOT_URL)
+//            .build()
+//        val api: AceptarPresupuestoInterface = adaptar.create(AceptarPresupuestoInterface ::class.java)
+//        api.Aceptar(folio.toString(),
+//            "1",
+//            intentos,
+//            telefono,
+//            object : Callback<Response?> {
+//                override fun success(t: Response?, response: Response?) {
+//                    var entrada: BufferedReader? =  null
+//                    var Respuesta = ""
+//                    try {
+//                        entrada = BufferedReader(InputStreamReader(t?.body?.`in`()))
+//                        Respuesta = entrada.readLine()
+//                    }catch (e: Exception){
+//                        e.printStackTrace()
+//                    }
+//                    Toast.makeText(applicationContext, Respuesta, Toast.LENGTH_SHORT).show()
+//                }
+//
+//                override fun failure(error: RetrofitError?) {
+//                    Toast.makeText(applicationContext, "error $error", Toast.LENGTH_SHORT).show()
+//                }
+//
+//            })
+//
+//    }
 
     fun descargar(view: View) {
         dialog.dismiss()

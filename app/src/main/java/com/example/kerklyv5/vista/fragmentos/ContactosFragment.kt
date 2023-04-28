@@ -6,13 +6,12 @@ import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
+import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.modelo.adapterUsuarios
 import com.example.kerklyv5.modelo.usuarios
 import com.google.firebase.database.*
@@ -22,7 +21,7 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 
-class MensajesFragment : Fragment() {
+class ContactosFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
@@ -33,6 +32,7 @@ class MensajesFragment : Fragment() {
     private var nombre: String? = null
     private lateinit var array: ArrayList<String>
     private lateinit var arrayListdatos: ArrayList<usuarios>
+    private lateinit var token: String
 
 
     private var b: Bundle? = null
@@ -44,6 +44,7 @@ class MensajesFragment : Fragment() {
     var cont: Int =0
     lateinit var  telefonoCliente: String
     lateinit var fotourl: String
+    val setprogressDialog = setProgressDialog()
 
 
 
@@ -59,10 +60,11 @@ class MensajesFragment : Fragment() {
         // Inflate the layout for this fragment
         val v =  inflater.inflate(R.layout.fragment_mensajes, container, false)
         reciclerView = v.findViewById(R.id.recycler_Usuarios)
-
+        //setprogressDialog.setProgressDialog(requireContext())
         b = requireArguments()
          telefonoCliente = b!!.getString("telefonoCliente")!!
-        fotourl = b!!.getString("urlFotoCliente")!!
+        //fotourl = b!!.getString("urlFotoCliente")!!
+//        nombreCompletoCliente = b!!.getString("nombreCompletoCliente")!!
 
         arrayListdatos = ArrayList()
         Miadapter = adapterUsuarios(requireContext())
@@ -136,10 +138,11 @@ class MensajesFragment : Fragment() {
 
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-              println("aqui 139 " + snapshot.value)
-                println(" datos101: " + snapshot.getValue())
+              //println("aqui 139 " + snapshot.value)
+                //println(" datos101: " + snapshot.getValue())
                 val u2 = snapshot.getValue(usuarios::class.java)
                 Miadapter.agregarUsuario(u2!!)
+
 
                 val mGestureDetector = GestureDetector(requireContext(), object : SimpleOnGestureListener() {
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -158,16 +161,22 @@ class MensajesFragment : Fragment() {
                                 val nombre = Miadapter.lista[position].nombre
                                 val telefono = Miadapter.lista[position].telefono
                                 val urlfoto = Miadapter.lista[position].foto
-                                //Toast.makeText(requireContext(),"$telefono",Toast.LENGTH_SHORT).show()
+                                 token =Miadapter.lista[position].token
+
                                 val intent = Intent(requireContext(), MainActivityChats::class.java)
+
                                 b!!.putString("nombreCompletoK", nombre)
                                 b!!.putString("correoK", correo)
                                 b!!.putString("telefonok",telefono)
                                 b!!.putString("telefonoCliente", telefonoCliente)
-                                //pendiente
+
+                                b!!.putString("tokenKerkly", token)
+                                b!!.putString("nombreCompletoCliente", nombre)
+                              //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()
                                 b!!.putString("urlFotoKerkly",urlfoto)
                                 intent.putExtras(b!!)
                                 startActivity(intent)
+
                                 return true
                             }
                         } catch (e: Exception) {
@@ -184,7 +193,7 @@ class MensajesFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                System.out.println("Firebase: $error")
             }
 
 

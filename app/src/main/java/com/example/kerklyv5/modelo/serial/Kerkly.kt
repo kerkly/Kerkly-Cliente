@@ -20,6 +20,14 @@ class Kerkly {
     @Expose
     var Apellido_Materno: String = ""
 
+    @SerializedName("Telefono")
+    @Expose
+    var Telefonok: String = ""
+
+    @SerializedName("correo_electronico")
+    @Expose
+    var correo_electronico: String = ""
+
     @SerializedName("latitud")
     @Expose
     var latitud: Double = 0.0

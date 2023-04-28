@@ -9,7 +9,7 @@ class OrdenPendiente {
     @Expose
     var nombreO: String = ""
 
-    @SerializedName("idContrato")
+    @SerializedName("idPresupuesto")
     @Expose
     var idContrato: Int = 1
 
@@ -40,4 +40,8 @@ class OrdenPendiente {
     @SerializedName("Apellido_Materno")
     @Expose
     var Apellido_MaternoK: String = ""
+
+    @SerializedName("correo_electronico")
+    @Expose
+    var correo_electronico: String = ""
 }

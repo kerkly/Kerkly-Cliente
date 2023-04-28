@@ -17,6 +17,10 @@
         android:maxSdkVersion="18" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -31,13 +35,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KerklyV5">
         <activity
+            android:name=".MainActivityAceptarServicio"
+            android:exported="false" />
+
+        <service
+            android:name=".notificaciones.FirebaseNoti"
+            android:directBootAware="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity
             android:name=".MainActivityChats"
             android:exported="false" />
-        <activity
-            android:name=".MainActivityChast"
-            android:exported="false"
-            android:label="@string/title_activity_main_chast"
-            android:theme="@style/Theme.KerklyV5.NoActionBar" />
         <activity
             android:name=".vista.MainActivityVerificarSMS"
             android:exported="false" />

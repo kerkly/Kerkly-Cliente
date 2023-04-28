@@ -102,7 +102,7 @@
     <string name="mensaje_informacion"> Su solicitud es importante para nosotros, en cuanto un Kerkly esté
         disponible lo contactaremos.</string>
     <string name="gracias_comprension">¡Gracias por su compresión!</string>
-    <string name="mensaje_informacion2"> Su solicitud de presupuesto se esta procesando, en cuanto este lista
+    <string name="mensaje_informacion2"> Su solicitud se esta procesando, en cuanto este lista
         se le notificará.</string>
     <string name="presupuesto_listo">Su presupuesto esta listo, puede visualizarlo en el siguiente archivo PDF.
     </string>
