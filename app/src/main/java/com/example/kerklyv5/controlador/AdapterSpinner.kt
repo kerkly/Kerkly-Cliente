@@ -24,6 +24,7 @@ class AdapterSpinner(c:Context, l: List<Oficio>): BaseAdapter() {
 
     override fun getItemId(position: Int): Long {
         return 0
+
     }
 
     @SuppressLint("ViewHolder", "InflateParams")

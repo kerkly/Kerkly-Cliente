@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
         //setprogress.setProgressDialog(requireContext())
        b = Bundle()
 
-
+        getOficios()
 
         spinner = root.findViewById(R.id.spinnerNormal)
         textProblem = root.findViewById(R.id.inputProblematica)
@@ -73,8 +73,6 @@ class HomeFragment : Fragment() {
         botonPresupuesto = root.findViewById(R.id.button_presupuesto)
         boton_servicioUrgente = root.findViewById(R.id.boton_servicio_urgente)
         //imageboton = root.findViewById(R.id.kerkly_boton)
-
-        getOficios()
 
         botonPresupuesto.setOnClickListener {
             nombreCliente = arguments?.getString("Nombre")!!
@@ -136,6 +134,7 @@ class HomeFragment : Fragment() {
                         as ArrayList<Oficio>
 
                 val aa = AdapterSpinner(requireActivity(), postList)
+                println("------------->" + aa)
                 spinner.adapter = aa
                 //setprogress.dialog.dismiss()
 

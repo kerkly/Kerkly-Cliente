@@ -30,7 +30,7 @@ class CalcularTiempoDistancia (var mContext: Context) : AsyncTask<String?, Void?
         super.onPostExecute(aDouble)
         if (aDouble != null) {
             geo1.setDouble(aDouble)
-            progressDialog!!.dismiss()
+            //progressDialog!!.dismiss()
         } else
             Toast.makeText(mContext, "Error", Toast.LENGTH_SHORT).show()
         progressDialog!!.dismiss()
