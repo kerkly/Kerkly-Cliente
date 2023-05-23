@@ -27,6 +27,7 @@ interface direccionCoordenadasInterface {
         @Field("nombre_noR") nombre_NoR: String,
         @Field("apellidoP_noR") apellidoP_noR: String,
         @Field("apellidoM_noR") apellidoM_noR: String,
+        @Field("numIntentos") numIntentos: String,
 
         callback: Callback<Response?>
     )

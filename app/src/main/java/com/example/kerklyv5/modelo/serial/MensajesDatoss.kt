@@ -12,42 +12,6 @@ class MensajesDatoss {
     @Expose
     var fechaPresupuesto: String = ""
 
-    @SerializedName("Nombre")
-    @Expose
-    var Nombre: String = ""
-
-    @SerializedName("Apellido_Paterno")
-    @Expose
-    var Apellido_Paterno: String = ""
-
-    @SerializedName("Apellido_Materno")
-    @Expose
-    var Apellido_Materno: String = ""
-
-    @SerializedName("Telefono")
-    @Expose
-    var Telefono: String = ""
-
-    @SerializedName("Calle")
-    @Expose
-    var Calle: String = ""
-
-    @SerializedName("Colonia")
-    @Expose
-    var Colonia: String = ""
-
-    @SerializedName("No_Exterior")
-    @Expose
-    var No_Exterior: Int = 0
-
-    @SerializedName("Referencia")
-    @Expose
-    var Referencia: String = ""
-
-    @SerializedName("Codigo_Postal")
-    @Expose
-    var Codigo_Postal: String = ""
-
     @SerializedName("problema")
     @Expose
     var problema: String = ""
@@ -56,13 +20,9 @@ class MensajesDatoss {
     @Expose
     var PagoTotal: Double = 0.0
 
-    @SerializedName("cuerpo_mensaje")
+    @SerializedName("nombreO")
     @Expose
-    var cuerpo_mensaje = ""
-
-    @SerializedName("estaPagado")
-    @Expose
-    var estaPagado = ""
+    var nombreO = ""
 
     @SerializedName("nombre_noR")
     @Expose
@@ -76,7 +36,4 @@ class MensajesDatoss {
     @Expose
     var apellidoM_noR = ""
 
-    @SerializedName("nombreO")
-    @Expose
-    var nombreO = ""
 }

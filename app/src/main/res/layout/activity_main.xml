@@ -139,7 +139,7 @@
         android:layout_alignParentBottom="true"
         android:height="30dp"
         android:backgroundTint="@color/colorBoton"
-        android:onClick="mostrarSalir"
+        android:onClick="PruebaSinRegistro"
         android:text="@string/pruebaSinRegistro"
         android:textAlignment="textEnd"
         android:textColor="@color/black"
@@ -149,8 +149,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-
 
 
 </RelativeLayout>

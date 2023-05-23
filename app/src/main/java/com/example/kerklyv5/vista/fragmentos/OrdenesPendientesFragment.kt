@@ -124,31 +124,26 @@ class OrdenesPendientesFragment : Fragment() {
                         val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
                         val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
                         val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
+                        val telefonoKerkly = postList[recyclerview.getChildAdapterPosition(it)].Telefono
 
                         val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
                         val nombreCliente = nombreCompletoCliente
 
 
+                        //Metodo Para Descargar PDF, ver el Presupuesto
+                        
 
-                        val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
+                      /*  val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
                         intent.putExtra("Nombre_Kerkly", nombre_kerkly)
                         intent.putExtra("Ap_Kerkly", ap_kerkly)
                         intent.putExtra("Nombre_completo_Kerkly", nomre_completo_kerkly)
                         intent.putExtra("IdContrato", id)
                         intent.putExtra("telefonoCliente", telefono)
                         intent.putExtra("nombreCompletoCliente",nombreCliente)
+                        intent.putExtra("telefonokerkly", telefonoKerkly)
 
-                        startActivity(intent)
-
-                     /*   val intent = Intent(requireContext(), MainActivityChats::class.java)
-                        intent.putExtras(b)
                         startActivity(intent)*/
 
-                       /* val f = ContactosFragment()
-                        f.arguments = b
-                        var fm = requireActivity().supportFragmentManager.beginTransaction().apply {
-                            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
-                        }*/
 
                     }
 

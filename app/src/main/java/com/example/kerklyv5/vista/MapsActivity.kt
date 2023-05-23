@@ -80,7 +80,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var band = false
     private lateinit var nombreCliente: String
     private var locationManager: LocationManager? = null
-    val setProgress = setProgressDialog()
+   // val setProgress = setProgressDialog()
 
     var postlist: java.util.ArrayList<Kerkly>? =null
     lateinit var context: Context
@@ -96,7 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         b = intent.extras!!
-        setProgress.setProgressDialog(this)
+       // setProgress.setProgressDialog(this)
        // dialog = Dialog(this)
         context = this
         arrayListTiempo = ArrayList<modelokerklyCercanos>()
@@ -117,7 +117,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         // val bandK = b.getBoolean("Ker")
 
-        getLocalizacion()
+            getLocalizacion()
+
 
         telefono = b.get("Telefono").toString()
         oficio = b.getString("Oficio").toString()
@@ -149,7 +150,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         if (!gpsEnabled) {
             val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(settingsIntent)
+            //setProgress.dialog.dismiss()
+            getLocalizacion()
         }else {
+
             setLocation(latitud, longitud)
             if (!band) {
                 val i = Intent(applicationContext, KerklyListActivity::class.java)
@@ -171,9 +175,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             } else {
                 setLocation(latitud, longitud)
                 //Obetener los kerlys cercanos
-                recorrerLista()
-                ingresarPresupuesto()
-
+                if (latitud == 0.0 || longitud == 0.0){
+                    Toast.makeText(this, "Por favor Actualice su Ubicacion",Toast.LENGTH_SHORT).show()
+                }else {
+                    recorrerLista()
+                }
                 // System.out.println("el token del kerkly " + u2!!.token[i])
                 // llamartopico.llamartopico(context, token, "(Servicio Normal) $problema", "Usuario Nuevo-> $nombreCliente")
 
@@ -199,7 +205,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         if (!gpsEnabled) {
             val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(settingsIntent)
-
+            //setProgress.dialog.dismiss()
         }else {
             // mMap.isMyLocationEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = true
@@ -224,7 +230,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))
                     latitud = location.latitude
                     longitud = location.longitude
-                    setProgress.dialog.dismiss()
+                   // setProgress.dialog.dismiss()
                     getKerklys()
 
                 }
@@ -245,10 +251,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
                 override fun onProviderEnabled(provider: String) {
                     Toast.makeText(this@MapsActivity, "GPS activado", Toast.LENGTH_SHORT).show()
-
+                   // setProgress.dialog.dismiss()
                 }
 
                 override fun onProviderDisabled(provider: String) {
+                   // setProgress.dialog.dismiss()
                     Toast.makeText(this@MapsActivity, "GPS Desactivado", Toast.LENGTH_SHORT).show()
                     locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
                     val gpsEnabled =
@@ -370,15 +377,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
                         // Toast.makeText(applicationContext, entrada, Toast.LENGTH_LONG).show()
 
-                        val cadena = "Datos enviados"
+                        val cadena = "1"
                         if (cadena.equals(entrada)) {
-                          //  Toast.makeText(applicationContext, "Peticion enviada, por favor espere un momento.....", Toast.LENGTH_LONG) .show()
+                            Toast.makeText(applicationContext, "Peticion enviada, por favor espere un momento.....", Toast.LENGTH_LONG) .show()
                             val intent = Intent(applicationContext, SolicitarServicio::class.java)
                             b.putBoolean("PresupuestoListo", true)
                             intent.putExtras(b)
                             startActivity(intent)
                             finish()
 
+                        }else{
+                            Toast.makeText(applicationContext, "Peticion no  enviada, $entrada-->", Toast.LENGTH_LONG) .show()
                         }
                     }
 
@@ -497,7 +506,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         System.out.println("latitutinicial: $latitud longitudinicial $longitud latitudFinal $latitudFinal longitudFinal $longitudFinal")
 
                     }
-                    setProgress.dialog.dismiss()
+                   // setProgress.dialog.dismiss()
                 }
 
             }
@@ -536,67 +545,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     fun recorrerLista (){
-        for(i in 0 until postlist!!.size){
-            System.out.println(postlist!![i].Telefonok)
-            System.out.println("hora " + postlist!!.get(i).hora + ":" + postlist!!.get(i).minutos)
+        if(postlist!!.size == 0){
+            print("____> vacio")
+        }else{
+            for(i in 0 until postlist!!.size){
+                System.out.println(postlist!![i].Telefonok)
+                System.out.println("hora " + postlist!!.get(i).hora + ":" + postlist!!.get(i).minutos)
 
-            //obtenerTokenKerkly(postlist!![i].Telefonok!!)
-            firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-            databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(postlist!![i].Telefonok).child("MisDatos")
-            databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    //System.out.println("---->${snapshot.value}")
-                    if (snapshot.value != null){
-                        System.out.println("---->${snapshot.value}")
-                        val u2 = snapshot.getValue(usuarios::class.java)
-                         if (u2 != null) {
-                           arraylistUsuarios.add(u2)
-                           if (arraylistUsuarios.size != null){
-                               System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
-                               for (i in 0 until arraylistUsuarios.size) {
-                                   System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
-                                   val llamarTopico = llamarTopico()
-                                       llamarTopico.llamartopico(this@MapsActivity, arraylistUsuarios[i].token, "(Servicio Urgente) $problema", "Usuario Nuevo-> $nombreCliente")
-                               }
-                           }else{
-                               System.out.println("-------------> Sin token")
-                           }
-                       }
+                //obtenerTokenKerkly(postlist!![i].Telefonok!!)
+                firebaseDatabaseUsu = FirebaseDatabase.getInstance()
+                databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(postlist!![i].Telefonok).child("MisDatos")
+                databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        //System.out.println("---->${snapshot.value}")
+                        if (snapshot.value != null){
+                            System.out.println("---->${snapshot.value}")
+                            val u2 = snapshot.getValue(usuarios::class.java)
+                            if (u2 != null) {
+                                arraylistUsuarios.add(u2)
+                                if (arraylistUsuarios.size != null){
+                                    System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
+                                    for (i in 0 until arraylistUsuarios.size) {
+                                        System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
+                                        ingresarPresupuesto()
+                                        val llamarTopico = llamarTopico()
+                                        llamarTopico.llamartopico(this@MapsActivity, arraylistUsuarios[i].token, "(Servicio Urgente) $problema", "Usuario Nuevo-> $nombreCliente")
+                                    }
+                                }else{
+                                    System.out.println("-------------> Sin token")
+                                }
+                            }
+                        }else{
+                            System.out.println("-------------> Sin datos")
+                            ingresarPresupuesto()
+                        }
 
-                    }else{
-                        System.out.println("-------------> Sin datos")
+
                     }
 
+                    override fun onCancelled(error: DatabaseError) {
+                        System.out.println("Firebase: $error")
+                    }
 
-                }
+                })
 
-                override fun onCancelled(error: DatabaseError) {
-                    System.out.println("Firebase: $error")
-                }
-
-            })
-
-        } //setProgress.dialog.dismiss()
-    }
-
-    fun obtenerTokenKerkly(telefoK: String){
-        val llamartopico = llamarTopico()
-        firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(telefoK).child("MisDatos")
-        databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val u2 = snapshot.getValue(usuarios::class.java)
-                arraylistUsuarios.add(u2!!)
-                System.out.println("kerkly Agregado ${arraylistUsuarios.get(0).token}")
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                System.out.println("Firebase: $error")
-            }
-
-        })
+            } //setProgress.dialog.dismiss()
+        }
 
     }
+
 
 }

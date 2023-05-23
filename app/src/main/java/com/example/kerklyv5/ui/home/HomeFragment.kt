@@ -1,6 +1,9 @@
 package com.example.kerklyv5.ui.home
 
+import android.content.Context
+import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +13,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterKerkly
@@ -55,13 +59,14 @@ class HomeFragment : Fragment() {
     val setprogress = setProgressDialog()
     private lateinit var nombreCliente: String
 
+    private var locationManager: LocationManager? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         /*homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         // Obtienes el Bundle del Intent
-        //setprogress.setProgressDialog(requireContext())
+        setprogress.setProgressDialog(requireContext())
        b = Bundle()
 
         getOficios()
@@ -83,7 +88,7 @@ class HomeFragment : Fragment() {
         boton_servicioUrgente.setOnClickListener {
             oficio = spinner.selectedItem.toString()
             telefono = arguments?.getString("Telefono")!!
-            // Log.d("tel", telefono)
+            System.out.println("-------------> oficiooo $oficio")
             nombreCliente = arguments?.getString("Nombre")!!
             b.putString("Oficio", oficio)
             b.putString("Telefono", telefono)
@@ -136,7 +141,7 @@ class HomeFragment : Fragment() {
                 val aa = AdapterSpinner(requireActivity(), postList)
                 println("------------->" + aa)
                 spinner.adapter = aa
-                //setprogress.dialog.dismiss()
+                setprogress.dialog.dismiss()
 
             }
 

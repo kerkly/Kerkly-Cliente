@@ -146,47 +146,27 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button7Express"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
                     android:background="@drawable/fondo_boton"
-                    android:baselineAligned="false"
-                    android:drawablePadding="15dp"
-                    android:onClick="direccionExpress"
-                    android:padding="6dp"
-                    android:text="@string/direccion"
                     android:backgroundTint="@color/colorBoton"
-                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:onClick="direccionExpress"
+                    android:text="Enviar Solicitud"
                     android:textColor="@color/black"
                     app:icon="@drawable/ic_baseline_location_on_24"
-                    app:iconTint="@color/black"
-                    tools:ignore="OnClick,TouchTargetSizeCheck" />
+                    app:iconTint="@color/black" />
 
                 <Space
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button8Express"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/fondo_boton"
-                    android:onClick="pagoExpress"
-                    android:text="@string/presupuesto"
-                    android:textColor="@color/black"
-                    app:backgroundTint="@color/colorBoton"
-                    app:icon="@drawable/ic_vector__4_"
-                    app:iconTint="@color/black"
-                    tools:ignore="OnClick,TouchTargetSizeCheck" />
             </LinearLayout>
 
         </LinearLayout>

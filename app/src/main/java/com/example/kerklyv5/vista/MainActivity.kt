@@ -95,23 +95,15 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         controlador = MainActivityControlador()
-
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-
       // controlador.verificarSesion(id, this)
-
-
         //fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
             vv_fondo = findViewById<VideoView>(R.id.vv_fondo)
-
-
-//fondo de video
+        //fondo de video
         val uri = Uri.parse("android.resource://"
                 +packageName
                 +"/"
@@ -127,23 +119,15 @@ class MainActivity : AppCompatActivity() {
                 mMediaPlayer.setVolume(0F, 0F);
             }
         }
-
-
-
         editUsuario = findViewById(R.id.input_user)
-
-
         boton = findViewById(R.id.button)
         btn_pruebaSinRegistro = findViewById(R.id.btn_pruebaSinRegistro)
-
         deviceIDBoton()
-
         ivLogo = findViewById(R.id.logokerkly)
         editContra = findViewById(R.id.input_password)
         layoutUsuario = findViewById(R.id.textnputUser)
         layoutContra = findViewById(R.id.textnputPassword)
         dialog = Dialog(this)
-
 
         //animaciones
         animation = AnimationUtils.loadAnimation(this, R.anim.advanced_inicio)
@@ -158,13 +142,11 @@ class MainActivity : AppCompatActivity() {
         animation4 = AnimationUtils.loadAnimation(this, R.anim.from_right_0)
         boton.startAnimation(animation4)
 
-
-//si es la primera vez que se inicia la app, se envia al IntroSlider
-     //si no, se mantiene en la ventana actual
+        //si es la primera vez que se inicia la app, se envia al IntroSlider
+        //si no, se mantiene en la ventana actual
         if(isFirstTime()){
             startActivity(Intent(this@MainActivity, IntroSliderActivity::class.java))
             finish();
-        }else{
         }
 
         //  val constraints = Constraints.Builder().setRequiresCharging(true).build()
@@ -180,9 +162,7 @@ class MainActivity : AppCompatActivity() {
         val adaptar = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
             .build()
-
         val api = adaptar.create(DeviceIDInterfaceBotonSinRegistro ::class.java)
-
         api.mensaje(id,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
@@ -269,7 +249,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPostExecute(result: String?) {
-            barra.dismiss()
+           // barra.dismiss()
         }
 
     }
@@ -294,7 +274,6 @@ class MainActivity : AppCompatActivity() {
 
     //modificar este metodo par que solo ingrese el numero
     fun aceptarNoRegistrado (view: View) {
-
         editTelefono = epicDialog2.findViewById(R.id.edit_telefonoNoRegistrado)
         layoutTelefono = epicDialog2.findViewById(R.id.layoutTelefonoNoRegistrado)
 
@@ -309,7 +288,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     layoutTelefono.error = null
                     if (!(usuario.getTelefonoNoR().isEmpty())) {
-                        barra = ProgressDialog.show(this, "", "Ingresando...")
+                       // barra = ProgressDialog.show(this, "", "Ingresando...")
                        // Toast.makeText(this, "entro", Toast.LENGTH_SHORT).show()
                         val task = RetreiveFeedTask()
                         task.execute()
@@ -320,12 +299,15 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun mostrarSalir(view: View) {
+    fun PruebaSinRegistro(view: View) {
         //var notificacion = Notificacion(this)
         epicDialog2 = Dialog(this)
         epicDialog2.setContentView(R.layout.about2)
         buttonclosed = epicDialog2.findViewById<View>(R.id.buttonclosed) as ImageButton
-        buttonclosed.setOnClickListener(View.OnClickListener { epicDialog2.dismiss() })
+        buttonclosed.setOnClickListener(View.OnClickListener {
+            epicDialog2.dismiss()
+
+        })
         epicDialog2.getWindow()?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         epicDialog2.show()
         requestPermission(this)
@@ -333,8 +315,11 @@ class MainActivity : AppCompatActivity() {
     private val sms = 0
 
     private fun requestPermission(contexto: Activity) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(contexto,
-                Manifest.permission.RECEIVE_SMS)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                contexto,
+                Manifest.permission.RECEIVE_SMS
+            )
+        ) {
             //El usuario ya ha rechazado el permiso anteriormente, debemos informarle que vaya a ajustes.
 
             AlertDialog.Builder(contexto)
@@ -351,12 +336,13 @@ class MainActivity : AppCompatActivity() {
                 .show()
         } else {
             //El usuario nunca ha aceptado ni rechazado, así que le pedimos que acepte el permiso.
-            ActivityCompat.requestPermissions(contexto,
+            ActivityCompat.requestPermissions(
+                contexto,
                 arrayOf(Manifest.permission.RECEIVE_SMS),
-                sms)
+                sms
+            )
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -365,7 +351,6 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     }
-
     private fun isFirstTime(): Boolean {
         val preferences = getPreferences(MODE_PRIVATE)
         val ranBefore = preferences.getBoolean("RanBefore", false)
@@ -377,22 +362,14 @@ class MainActivity : AppCompatActivity() {
         }
         return !ranBefore
     }
-
-
     override fun onPause() {
         super.onPause()
         mCurrentVideoPosition = mMediaPlayer.currentPosition
         vv_fondo.pause()
     }
-
-
-
     override fun onResume() {
         super.onResume()
         vv_fondo.start()
 
     }
-
-
-    
 }

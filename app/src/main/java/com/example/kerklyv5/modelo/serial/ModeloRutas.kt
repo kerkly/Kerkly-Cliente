@@ -8,6 +8,10 @@ class ModeloRutas {
     @Expose
     var Curp: String = ""
 
+    @SerializedName("Telefono")
+    @Expose
+    var Telefono: String = ""
+
     @SerializedName("latitud")
 
     @Expose
@@ -16,4 +20,13 @@ class ModeloRutas {
     @SerializedName("longitud")
     @Expose
     var longitud = 0.0
+
+    @SerializedName("Ciudad")
+    @Expose
+    var Ciudad: String = ""
+
+    var hora: Int = 0
+    var minutos: Int = 0
+    var horaMin: Int = 0
+
 }

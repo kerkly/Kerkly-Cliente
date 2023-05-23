@@ -113,51 +113,24 @@ class MensajesActivity : AppCompatActivity() {
                         val nombre = postList[recyclerview.getChildAdapterPosition(it)].nombre_noR
                         val ap = postList[recyclerview.getChildAdapterPosition(it)].apellidoP_noR
                         val am = postList[recyclerview.getChildAdapterPosition(it)].apellidoM_noR
-                        val telefonoT = postList[recyclerview.getChildAdapterPosition(it)].Telefono
-                        val calle = postList[recyclerview.getChildAdapterPosition(it)].Calle
-                        val colonia = postList[recyclerview.getChildAdapterPosition(it)].Colonia
                         val fecha = postList[recyclerview.getChildAdapterPosition(it)].fechaPresupuesto
-                        val num_ext = postList[recyclerview.getChildAdapterPosition(it)].No_Exterior
                         val problema = postList[recyclerview.getChildAdapterPosition(it)].problema
                         val folio = postList[recyclerview.getChildAdapterPosition(it)].idPresupuestoNoRegistrado
                         val pago = postList[recyclerview.getChildAdapterPosition(it)].PagoTotal
-                        val mensaje = postList[recyclerview.getChildAdapterPosition(it)].cuerpo_mensaje
-                        var pagado = postList[recyclerview.getChildAdapterPosition(it)].estaPagado
                         val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
-                        val referencia = postList[recyclerview.getChildAdapterPosition(it)].Referencia
-                        val cp = postList[recyclerview.getChildAdapterPosition(it)].Codigo_Postal
-                        val nombreT = postList[recyclerview.getChildAdapterPosition(it)].Nombre
-                        val apT = postList[recyclerview.getChildAdapterPosition(it)].Apellido_Paterno
-                        val amT = postList[recyclerview.getChildAdapterPosition(it)].Apellido_Materno
 
                         val n = "$nombre $ap $am"
-                        val n2 = "$nombreT $apT $amT"
-
-                        pagado = pagado.trim()
 
                         val i = Intent(applicationContext, MensajesExpress::class.java)
 
                         b.putString("Nombre", n)
                         b.putString("Telefono", telefono)
-                        b.putString("Calle", calle)
-                        b.putString("Colonia", colonia)
                         b.putString("Fecha", fecha)
-                        b.putInt("Numero exterior", num_ext)
                         b.putString("Problema", problema)
                         b.putInt("Folio", folio)
                         b.putDouble("Pago total", pago)
                         b.putString("Oficio", oficio)
-                        b.putString("Referencia", referencia)
-                        b.putString("CP", cp)
-                        b.putString("NombreT", n2)
-                        b.putString("Pagado", pagado)
-
-                        if (pagado == "1") {
-                            b.putString("Mensaje", mensaje)
-                        }
-
                         i.putExtras(b)
-
                         startActivity(i)
                     }
 

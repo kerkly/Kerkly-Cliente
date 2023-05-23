@@ -26,10 +26,12 @@ interface EntrarSinRegistroInterface {
 
 
     @FormUrlEncoded
-    @POST("/IncrementarIntentos.php")
-    fun IncrementarNumIntentos(
+    @POST("/InsertarNombreClienteNR.php")
+    fun insertarNombreNR(
         @Field("telefono_NoR") telefono_NoR: String,
-        @Field("numIntentos") numIntentos: Int,
+        @Field("nombre_noR") nombre_noR: String,
+        @Field("apellidoP_noR") apellidoP_noR: String,
+        @Field("apellidoM_noR") apellidoM_noR: String,
         callback: Callback<Response?>
     )
 }

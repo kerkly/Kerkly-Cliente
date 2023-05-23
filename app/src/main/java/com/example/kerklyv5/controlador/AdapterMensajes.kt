@@ -26,6 +26,8 @@ class AdapterMensajes(val datset: ArrayList<MensajesDatoss>):
 
         val image: ImageView = view.findViewById(R.id.ivimage)
 
+        val txtproblema: TextView = view.findViewById(R.id.txtProblema)
+        val txtNombreOficio: TextView = view.findViewById(R.id.txtNombreOficio)
 
     }
 
@@ -33,12 +35,14 @@ class AdapterMensajes(val datset: ArrayList<MensajesDatoss>):
     override fun onBindViewHolder(viewHolder: AdapterMensajes.ViewHolder, position: Int) {
         viewHolder.txtFolio.text = datset[position].idPresupuestoNoRegistrado.toString()
         viewHolder.txtFecha.text = datset[position].fechaPresupuesto.toString()
-        if (datset[position].estaPagado == "1") {
+        viewHolder.txtproblema.text = datset[position].problema
+        viewHolder.txtNombreOficio.text = datset[position].nombreO
+        /*if (datset[position].estaPagado == "1") {
             viewHolder.image.setImageResource(R.drawable.ic_clarity_email_outline_alerted)
         } else {
             viewHolder.image.setImageResource(R.drawable.ic_clarity_email_outline_badged)
 
-        }
+        }*/
     }
 
     // Create new views (invoked by the layout manager)

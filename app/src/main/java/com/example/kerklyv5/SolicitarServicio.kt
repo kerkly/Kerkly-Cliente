@@ -124,7 +124,8 @@ class SolicitarServicio : AppCompatActivity() {
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
         //setProgressDialog.setProgressDialog(this)
         b = intent.extras!!
-        telefono = b!!.getString("Telefono")!!
+        telefono = b!!.getString("Telefono").toString()
+        println("--------------> $telefono")
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         presupuestoListo = b!!.getBoolean("PresupuestoListo")
 
@@ -299,7 +300,7 @@ class SolicitarServicio : AppCompatActivity() {
                     roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
                     EnviarFotoPerfil(imagen, telefono, NombreF.toString())
                     fotoPerfil.setImageDrawable(roundedDrawable)
-                    System.out.println("AQui la imagen" +filePath.toString())
+                   // System.out.println("AQui la imagen" +filePath.toString())
 
 
 
@@ -369,6 +370,7 @@ class SolicitarServicio : AppCompatActivity() {
     private fun setFragmentHome(nombre: String) {
         val f = HomeFragment()
         b!!.putString("Nombre", nombre.toString())
+        b!!.putString("Telefono", telefono)
        // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
@@ -417,7 +419,7 @@ class SolicitarServicio : AppCompatActivity() {
         b!!.putString("telefonoCliente", telefono)
         b!!.putString("urlFotoCliente", photoUrl)
         b!!.putString("nombreCompletoCliente", nombreCompletoCliente)
-      //  println("tamaño array ${array.size}")
+       println("tamaño array $telefono")
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
@@ -426,9 +428,6 @@ class SolicitarServicio : AppCompatActivity() {
     private fun setNoficiaciontes() {
 
     }
-
-
-
     private fun sesion(correo: String) {
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
@@ -445,16 +444,11 @@ class SolicitarServicio : AppCompatActivity() {
                     try {
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
                         output = reader.readLine()
-
-
                        // Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
-
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-
                 }
-
                 override fun failure(error: RetrofitError) {
                     println("error $error")
                 }
@@ -472,19 +466,12 @@ class SolicitarServicio : AppCompatActivity() {
         val api = adapter.create(CerrarSesionInterface::class.java)
         api.cerrar(correo,
                     object: retrofit.Callback<retrofit.client.Response?> {
-                        override fun success(
-                            t: retrofit.client.Response?,
-                            response: retrofit.client.Response?
-                        ) {
+                        override fun success(t: retrofit.client.Response?, response: retrofit.client.Response?) {
                             var reader: BufferedReader? = null
                             var output = ""
                             try {
                                 reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
-
                                 output = reader.readLine()
-
-
-
                             } catch (e: IOException) {
                                 e.printStackTrace()
                             }
@@ -529,9 +516,7 @@ class SolicitarServicio : AppCompatActivity() {
                 call: Call<List<ClienteModelo?>?>,
                 response: Response<List<ClienteModelo?>?>
             ) {
-
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
-
                 if(postList.size == null){
                     System.out.println("no hay nada")
                     //carsModels = response.body() as ArrayList<presupuestok>
@@ -700,6 +685,10 @@ class SolicitarServicio : AppCompatActivity() {
         super.onStart()
         currentUser = mAuth!!.currentUser
         if(currentUser != null){
+            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
+            firebaseMessaging.addOnCompleteListener {
+                //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+            }
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -719,7 +708,7 @@ class SolicitarServicio : AppCompatActivity() {
                 val usuario = usuarios()
                 val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
                 databaseReference.child("MisDatos").setValue(u) { error, ref ->
-                      //Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
+                     // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
                 }
             })
 
@@ -743,12 +732,14 @@ class SolicitarServicio : AppCompatActivity() {
     fun metodoSalir() {
         AuthUI.getInstance()
             .signOut(applicationContext)
-            .addOnCompleteListener { muestraOpciones() }.addOnFailureListener { e ->
+            .addOnCompleteListener {// muestraOpciones()
+                }.addOnFailureListener { e ->
                 Toast.makeText(
                     applicationContext, ""
                             + e.message, Toast.LENGTH_LONG
                 ).show()
             }
+        finish()
     }
 
 

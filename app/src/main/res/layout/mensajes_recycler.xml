@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,8 +19,8 @@
             android:id="@+id/ivimage"
             android:layout_marginEnd="10dp"
             android:layout_gravity="center"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
+            android:layout_width="34dp"
+            android:layout_height="34dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="15dp"
+                android:textSize="15dp"
                 tools:text="15200"/>
 
             <TextView
@@ -40,10 +42,56 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
+                android:textSize="15dp"
                 android:text="10/09/2021  03:26 p.m."/>
 
         </LinearLayout>
+
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Problema: "
+            android:textSize="15dp"
+            />
+        <TextView
+            android:id="@+id/txtProblema"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="aqui el problema"
+            android:textSize="15dp"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Servicio: "
+            android:textSize="15dp"
+            />
+        <TextView
+            android:id="@+id/txtNombreOficio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="mecanico"
+            android:textSize="15dp"
+            />
+    </LinearLayout>
+
+
 
     <TextView
         android:layout_width="match_parent"

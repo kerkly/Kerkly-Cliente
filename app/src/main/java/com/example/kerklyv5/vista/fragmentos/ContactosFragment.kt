@@ -63,6 +63,7 @@ class ContactosFragment : Fragment() {
         //setprogressDialog.setProgressDialog(requireContext())
         b = requireArguments()
          telefonoCliente = b!!.getString("telefonoCliente")!!
+        println("contactos----> $telefonoCliente")
         //fotourl = b!!.getString("urlFotoCliente")!!
 //        nombreCompletoCliente = b!!.getString("nombreCompletoCliente")!!
 
@@ -131,17 +132,22 @@ class ContactosFragment : Fragment() {
     }
 
     private fun mostrarUsuarios (snapshot: DataSnapshot){
-        println(" tel: " + snapshot.child("telefono").value)
-        array = arrayListOf(snapshot.child("telefono").value.toString())
+        println(" tel: " + snapshot.value)
+        array = arrayListOf(snapshot.value.toString())
         firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(snapshot.child("telefono").value.toString()).child("MisDatos")
+        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(snapshot.value.toString()).child("MisDatos")
 
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
               //println("aqui 139 " + snapshot.value)
                 //println(" datos101: " + snapshot.getValue())
                 val u2 = snapshot.getValue(usuarios::class.java)
-                Miadapter.agregarUsuario(u2!!)
+                if (u2 ==null){
+                    Toast.makeText(requireContext(), "No Tienes Ningun Cotacto", Toast.LENGTH_SHORT).show()
+                }else{
+                    Miadapter.agregarUsuario(u2!!)
+                }
+
 
 
                 val mGestureDetector = GestureDetector(requireContext(), object : SimpleOnGestureListener() {

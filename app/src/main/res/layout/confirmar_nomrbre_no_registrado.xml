@@ -93,6 +93,7 @@
             android:layout_gravity=""
             android:background="@drawable/fondo_boton"
             android:text="@string/cancelar"
+            android:onClick="cancelar"
             android:textColor="@color/black"
             app:backgroundTint="@color/colorBoton"
             app:layout_constraintEnd_toEndOf="parent"

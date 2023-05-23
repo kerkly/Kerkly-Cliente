@@ -110,7 +110,7 @@
     <string name="nuevoPresupuesto">Nuevo presupuesto</string>
     <string name="home">Volver al inicio</string>
     <string name="ordenes_pendientes">Órdenes pendientes</string>
-    <string name="mensajes">Mensajes</string>
+    <string name="mensajes">Mis Solicitudes</string>
     <string name="historial">Historial</string>
     <string name="confirmarDireccion">Confirme su dirección</string>
     <string name="ciudad">Ciudad</string>

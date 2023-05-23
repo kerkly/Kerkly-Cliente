@@ -7,7 +7,6 @@ import retrofit.http.FormUrlEncoded
 import retrofit.http.POST
 
 interface IngresarPresupuestoUrgente {
-
     @FormUrlEncoded
     @POST("/IngresarPresupuestoUrgente.php")
     fun presupuesto_urgente(

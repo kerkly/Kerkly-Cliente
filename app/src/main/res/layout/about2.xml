@@ -101,7 +101,7 @@ android:orientation="vertical"
 
 
             <Button
-                android:id="@+id/botonvamo"
+                android:id="@+id/botonAceptarNumeroNR"
                 android:layout_width="234dp"
                 android:layout_marginTop="30dp"
                 android:layout_height="52dp"
@@ -110,7 +110,7 @@ android:orientation="vertical"
                 android:background="@drawable/btn_redondo"
                 android:backgroundTint="#009688"
                 android:text="Aceptar"
-android:onClick="aceptarNoRegistrado"
+                android:onClick="aceptarNoRegistrado"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
                 />

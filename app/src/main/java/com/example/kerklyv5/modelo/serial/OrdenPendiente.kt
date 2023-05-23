@@ -44,4 +44,8 @@ class OrdenPendiente {
     @SerializedName("correo_electronico")
     @Expose
     var correo_electronico: String = ""
+
+    @SerializedName("Telefono")
+    @Expose
+    var Telefono: String = ""
 }
