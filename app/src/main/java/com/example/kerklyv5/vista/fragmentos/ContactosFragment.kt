@@ -1,6 +1,7 @@
 package com.example.kerklyv5.vista.fragmentos
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
@@ -150,11 +151,15 @@ class ContactosFragment : Fragment() {
 
 
 
-                val mGestureDetector = GestureDetector(requireContext(), object : SimpleOnGestureListener() {
-                    override fun onSingleTapUp(e: MotionEvent): Boolean {
-                        return true
-                    }
-                })
+                val mGestureDetector = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
+                    GestureDetector(requireContext(), object : SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
+                } else {
+                    TODO("VERSION.SDK_INT < CUPCAKE")
+                }
                 reciclerView.addOnItemTouchListener(object : OnItemTouchListener {
                     override fun onRequestDisallowInterceptTouchEvent(b: Boolean) {}
                     override fun onInterceptTouchEvent(

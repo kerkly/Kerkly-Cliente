@@ -56,17 +56,17 @@ class HomeFragment : Fragment() {
     private lateinit var telefono: String
     private lateinit var problema: String
     private lateinit var boton_servicioUrgente: MaterialButton
-    val setprogress = setProgressDialog()
+   // val setprogress = setProgressDialog()
     private lateinit var nombreCliente: String
 
-    private var locationManager: LocationManager? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         /*homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         // Obtienes el Bundle del Intent
-        setprogress.setProgressDialog(requireContext())
+        //setprogress.setProgressDialog(requireContext())
        b = Bundle()
 
         getOficios()
@@ -141,12 +141,12 @@ class HomeFragment : Fragment() {
                 val aa = AdapterSpinner(requireActivity(), postList)
                 println("------------->" + aa)
                 spinner.adapter = aa
-                setprogress.dialog.dismiss()
+                //setprogress.dialog.dismiss()
 
             }
 
             override fun onFailure(call: Call<List<Oficio?>?>, t: Throwable) {
-
+//                setprogress.dialog.dismiss()
                 Log.d("error del retrofit", t.toString())
                // Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
             }

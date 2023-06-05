@@ -483,8 +483,8 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     fun aceptarNoR(view: View) {
         nombre = editNombre.text.toString()
         apellidoP = editAp.text.toString()
-        apellidoM =  editAM.text.toString()
-            if (nombre.isEmpty()) {
+        apellidoM =  editAM.text.toString().trim()
+            if (nombre.isEmpty()){
                 layoutNombre.error = getString(R.string.campo_requerido)
             } else {
                 layoutNombre.error = null
@@ -501,7 +501,6 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             } else {
                 layoutAM.error = null
             }
-
             if (!nombre.isEmpty() && !apellidoP.isEmpty() && !apellidoM.isEmpty()) {
                 nombre = editNombre.text.toString()
                 apellidoP = editAp.text.toString()
@@ -548,9 +547,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     fun direccionExpress(view: View) {
         problematica = editProblematica.text.toString()
         servicio = spinner.selectedItem.toString()
-
         var band = false
-
         if (problematica.isEmpty()) {
             band = false
             layoutProblematica.error = getText(R.string.campo_requerido)

@@ -8,7 +8,7 @@ import retrofit2.http.*
 
 interface MensajesInterface {
     @FormUrlEncoded
-    @GET("PresupuestoRecibido.php")
+    @GET("SolicitudesClienteNR.php")
     open fun EnviarT(@Query("telefono_NoR") telefono_NoR: String):
             Call<List<MensajesDatoss?>?>?
 }

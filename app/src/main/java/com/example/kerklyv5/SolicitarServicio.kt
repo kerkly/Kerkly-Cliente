@@ -111,7 +111,7 @@ class SolicitarServicio : AppCompatActivity() {
      var photoUrl: String? = null
     private lateinit var token: String
     private lateinit var nombreCompletoCliente: String
-    val setProgressDialog = setProgressDialog()
+   // val setProgressDialog = setProgressDialog()
 
 
 
@@ -119,7 +119,6 @@ class SolicitarServicio : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setProgressDialog()
         dialog2 = Dialog(this)
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
         //setProgressDialog.setProgressDialog(this)
@@ -494,6 +493,7 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun getJson() {
+      //  setProgressDialog.setProgressDialog(this)
         System.out.println("entro en metodo JSON")
         val ROOT_URL = Url().url
 
@@ -519,6 +519,7 @@ class SolicitarServicio : AppCompatActivity() {
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
                 if(postList.size == null){
                     System.out.println("no hay nada")
+                   // setProgressDialog.dialog.dismiss()
                     //carsModels = response.body() as ArrayList<presupuestok>
                     //    Log.d("Lista", postList[0].toString())
 
@@ -541,19 +542,22 @@ class SolicitarServicio : AppCompatActivity() {
                       //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                         //hay que poner una imagen por defecto
                         if (photoUrl == null){
-
+                           // setProgressDialog.dialog.dismiss()
                         }else{
                             val foto2 = photoUrl
                             cargarImagen(foto2!!)
+                           // setProgressDialog.dialog.dismiss()
+
                         }
 
                     }else{
                         cargarImagen(foto)
+                       // setProgressDialog.dialog.dismiss()
                     }
 
                     setFragmentHome(nombre!!)
                     sesion(correo)
-                    //setProgressDialog.dialog.dismiss()
+
 
 
                 }
@@ -567,6 +571,8 @@ class SolicitarServicio : AppCompatActivity() {
                     "Codigo de respuesta de error: $t",
                     Toast.LENGTH_SHORT
                 ).show();
+
+                //setProgressDialog.dialog.dismiss()
             }
 
         })
@@ -609,7 +615,7 @@ class SolicitarServicio : AppCompatActivity() {
                 Glide.with(this@SolicitarServicio).load(file)
                     .apply(RequestOptions.bitmapTransform(multi))
                     .into(fotoPerfil)
-
+               //setProgressDialog.dialog.dismiss()
                 /* Picasso.get().load(file)
                     .resize(50,50)
                     .into(fotoPerfil)*/
@@ -618,6 +624,7 @@ class SolicitarServicio : AppCompatActivity() {
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 System.out.println("Respuesta error 3 "+ e.toString())
+               // setProgressDialog.dialog.dismiss()
                 //Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
             }
 
@@ -709,11 +716,13 @@ class SolicitarServicio : AppCompatActivity() {
                 val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
                 databaseReference.child("MisDatos").setValue(u) { error, ref ->
                      // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
+                  //  setProgressDialog.dialog.dismiss()
                 }
             })
 
         }else {
             muestraOpciones()
+           // setProgressDialog.dialog.dismiss()
 
         }
 
