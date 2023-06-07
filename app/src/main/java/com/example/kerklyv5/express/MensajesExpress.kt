@@ -19,6 +19,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -37,19 +38,25 @@ class MensajesExpress : AppCompatActivity() {
     private var total = 0.0
     private lateinit var boton: MaterialButton
     private var problema = "Mi problema"
-    private var cliente = "José Luis López Durán"
+    private var cliente = ""
     private var direccion = "Mi direccion"
-    private var telefono = "7474747474"
-    private var correo = "josem_rl@hotmail.com"
+    private var telefono = ""
+
     private var folio = 0
     private lateinit var pdf_img: ImageView
     private lateinit var imgP: ImageView
     private var header: ArrayList<String> = ArrayList<String>()
-    private lateinit var database: DatabaseReference
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var firebaseDatabase: FirebaseDatabase
     var lista: MutableList<MutableList<String>>? = null
     private lateinit var b: Bundle
-    private lateinit var pagado: String
+    private lateinit var pagoTotal: String
     private lateinit var mensaje_txt: TextView
+    private lateinit var tipoUsuario: String
+    private lateinit var telefonoKerkly: String
+    private lateinit var nombreCompletoKerkly: String
+    private lateinit var direccionKerkly: String
+    private lateinit var correoKerkly: String
 
 
 
@@ -58,14 +65,7 @@ class MensajesExpress : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mensajes_express)
 
-        database = Firebase.database.reference
-
-        pdf_img = findViewById(R.id.pdf_img)
-        pdf_img.setOnClickListener {
-            pdf()
-        }
-
-
+        firebaseDatabase = FirebaseDatabase.getInstance()
         txt_dest = findViewById(R.id.txt_destinatario)
         txt_remi = findViewById(R.id.txt_remitente)
         txt_fecha = findViewById(R.id.txt_fechaMensaje)
@@ -74,71 +74,82 @@ class MensajesExpress : AppCompatActivity() {
         dialog = Dialog(this)
 
         b = intent.extras!!
+        pdf_img = findViewById(R.id.pdf_img)
+        tipoUsuario = b.getString("tipoServicio").toString()
+        if (tipoUsuario =="NoRegistrado"){
+            nombreCompletoKerkly = b.getString("nombreCompletoKerkly").toString()
+            telefonoKerkly = b.getString("telefonoKerkly").toString()
+            pagoTotal = b.getString("Pago total").toString()
+            val nombre = b.get("NombreClienteNR").toString()
+            txt_remi.text = "Para: $nombre"
+            txt_fecha.text = b.get("Fecha").toString()
 
-        pagado = b.getString("Pagado").toString()
-        Toast.makeText(this, pagado, Toast.LENGTH_SHORT).show()
+            txt_dest.text = "De: $nombreCompletoKerkly"
+            folio = b.getInt("Folio")
+            cliente = nombre
 
-        if (pagado == "1") {
-            pdf_img.visibility = View.GONE
-            val mensaje = b.get("Mensaje") as String
-            mensaje_txt.text = mensaje
+            problema = b.getString("Problema").toString()
+
+            var calle = b.getString("Calle")
+            val num = b.getInt("Numero exterior")
+            var colonia = b.getString("Colonia")
+            var ref = b.getString("Referencia")
+            var cp = b.getString("CP")
+
+            var ext = ""
+
+            if (num == 0) {
+                ext = "S/N"
+            } else {
+                ext = num.toString()
+            }
+            if (calle == null){
+                calle = "S/N"
+            }
+
+            if (colonia == null){
+                colonia = "S/N"
+            }
+            if (cp ==null){
+                cp = "S/N"
+            }
+            if (ref ==null){
+                ref = "S/N"
+            }
+            direccionKerkly = b.getString("direccionKerly").toString()
+            correoKerkly = b.getString("correoKerly").toString()
+            direccion = "$calle $colonia $ext $cp $ref"
+            telefono = b.getString("Telefono").toString()
+            total = b.getDouble("Pago total")
+            header.add("Item")
+            header.add("Concepto")
+            header.add("Pago")
+            println("foliooo ---> " +  "$calle $colonia $ext $cp $ref")
+            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
+            databaseReference.addValueEventListener(postListener)
         }
-
-        val nombre = b.get("Nombre").toString()
-        txt_remi.text = "Para: $nombre"
-        txt_fecha.text = b.get("Fecha").toString()
-
-
-        val nT = b.getString("NombreT")
-
-        txt_dest.text = "De: $nT"
-
-        folio = b.getInt("Folio")
-        cliente = nombre
-
-        problema = b.getString("Problema").toString()
-
-        val calle = b.getString("Calle")
-        val num = b.getInt("Numero exterior")
-        val colonia = b.getString("Colonia")
-        val ref = b.getString("Referencia")
-        val cp = b.getString("CP")
-
-        var ext = ""
-
-        if (num == 0) {
-            ext = "S/N"
-        } else {
-            ext = num.toString()
+        pdf_img.setOnClickListener {
+            val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+            b.putBoolean("Express", true)
+            intent.putExtras(b)
+            startActivity(intent)
         }
-
-        direccion = "$calle $colonia $ext $cp $ref"
-
-        telefono = b.getString("Telefono").toString()
-
-        total = b.getDouble("Pago total")
-
-
-        header.add("Item")
-        header.add("Concepto")
-        header.add("Pago")
-
-        database.addValueEventListener(postListener)
-
 
     }
 
     val postListener = object:ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            var coleccion = snapshot.child("Presupuesto $folio").value as MutableList<*>
-            val c = coleccion[1] as HashMap<*,*>
+            System.out.println(snapshot.value)
+          // var coleccion = snapshot.child("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal $folio").value as MutableList<*>
+            var sn = snapshot.value as MutableList<*>
+            val c = sn[1] as HashMap<*,*>
             var l1 = ArrayList<ArrayList<String>>()
             lista = l1.toMutableList()
             lista!!.clear()
 
 
-            for(i in 1 until coleccion.size) {
-                var dicc = coleccion[i] as HashMap<*,*>
+            for(i in 1 until sn.size) {
+                var dicc = sn[i] as HashMap<*,*>
                 var l: ArrayList<String>? = ArrayList<String>()
                 var l2 = l!!.toMutableList()
                 l.add(i.toString())
@@ -148,6 +159,7 @@ class MensajesExpress : AppCompatActivity() {
 
             }
             Log.d("coleccion", lista.toString())
+            pdf()
         }
 
         override fun onCancelled(error: DatabaseError) {
@@ -162,11 +174,8 @@ class MensajesExpress : AppCompatActivity() {
     }
 
     fun aceptar(view: View) {
-       // acpetarP()
-        val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
-        b.putBoolean("Express", true)
-        intent.putExtras(b)
-        startActivity(intent)
+        generarPDF()
+
     }
 
 
@@ -174,21 +183,22 @@ class MensajesExpress : AppCompatActivity() {
         dialog.dismiss()
     }
 
-    fun generarPDF(view: View) {
+    fun generarPDF() {
         imgP = dialog.findViewById(R.id.imageViePdf)
-        val p = Pdf(cliente, direccion)
+        val p = Pdf(cliente, direccion, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly)
         p.telefono = telefono
         p.cabecera = header
-        p.correo = correo
+       // p.correo = correo
         p.problema = problema
+        p.direccion = direccion
         p.folio = folio
         p.total = total
         p.total = total
         p.lista = lista
         p.generarPdf()
 
-        Toast.makeText(this, "Se creo tu archivo pdf", Toast.LENGTH_SHORT).show()
-
+        Toast.makeText(this, "Se descargo el archivo pdf", Toast.LENGTH_SHORT).show()
+        dialog.dismiss()
     }
 
 }

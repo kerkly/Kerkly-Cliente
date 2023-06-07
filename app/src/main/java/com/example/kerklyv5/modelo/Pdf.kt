@@ -15,20 +15,22 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Pdf (nombreC: String, direccionC: String) {
+class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, TipodeUsuario: String, nombreKerkly: String) {
 
     var nombre = nombreC
     var direccion = direccionC
     lateinit var telefono: String
-    var correo = ""
     lateinit var problema: String
-    var folio = 0
+    var folio = folio
     var total = 0.0
-    private val NOMBRE_DIRECTORIO = "MiPdf3"
-    private val NOMBRE_DOCUMENTO = "prueba3.pdf"
+    private val NOMBRE_DIRECTORIO = "Presupuestos Recibidos"
+    private val NOMBRE_DOCUMENTO = "$nombreC $folio.pdf"
     private val ETIQUETA_ERROR = "ERROR"
     var cabecera = ArrayList<String>()
     var lista: MutableList<MutableList<String>>? = null
+    var correo = correo
+    var TipodeUsuario = TipodeUsuario
+    var nombreKerly = nombreKerkly
 
 
     fun getRuta(): File? {
@@ -61,6 +63,7 @@ class Pdf (nombreC: String, direccionC: String) {
         if (ruta != null) fichero = File(ruta, nombreFichero)
         return fichero
     }
+
 
     fun generarPdf() {
 
@@ -131,16 +134,8 @@ class Pdf (nombreC: String, direccionC: String) {
             // documento.add(Paragraph("Titulo personalizado", font))
             f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
             var f2 = FontFactory.getFont(FontFactory.HELVETICA)
-            var ph2 = Phrase("Empresa Kerkly", f2)
+            var ph2 = Phrase("$nombreKerly", f2)
             var ph1 = Phrase("De: ", f1)
-            p = Paragraph(ph1)
-            p.add(ph2)
-            documento.add(p)
-
-            f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
-            f2 = FontFactory.getFont(FontFactory.HELVETICA)
-            ph2 = Phrase(nombre, f2)
-            ph1 = Phrase("Para: ", f1)
             p = Paragraph(ph1)
             p.add(ph2)
             documento.add(p)
@@ -161,18 +156,31 @@ class Pdf (nombreC: String, direccionC: String) {
             p.add(ph2)
             documento.add(p)
 
+            if (TipodeUsuario =="ServicioNR"){
+
+            }else{
+                f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
+                f2 = FontFactory.getFont(FontFactory.HELVETICA)
+                ph2 = Phrase(correo, f2)
+                ph1 = Phrase("Correo: ", f1)
+                p = Paragraph(ph1)
+                p.add(ph2)
+                documento.add(p)
+
+            }
+
             f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
             f2 = FontFactory.getFont(FontFactory.HELVETICA)
-            ph2 = Phrase(correo, f2)
-            ph1 = Phrase("Correo: ", f1)
+            ph2 = Phrase(nombre, f2)
+            ph1 = Phrase("Para: ", f1)
             p = Paragraph(ph1)
             p.add(ph2)
             documento.add(p)
 
+
             f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
             p = Paragraph(problema, f1)
             p.alignment = Paragraph.ALIGN_CENTER
-
             documento.add(p)
 
 
@@ -294,14 +302,16 @@ class Pdf (nombreC: String, direccionC: String) {
             )*/
         } catch (e: DocumentException) {
             Log.e(ETIQUETA_ERROR, e.message!!)
+            println("aquiii_>")
         } catch (e: IOException) {
             e.message?.let { Log.e(ETIQUETA_ERROR, it) }
+            println("aquiii 308")
         } finally {
             // Cerramos el documento.
+            println("aquiii 311")
             documento.close()
         }
     }
-
 
 }
 

@@ -168,7 +168,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
 
     fun generarPDF(view: View) {
         imgP = dialog.findViewById(R.id.imageViePdf)
-        val p = Pdf(cliente, direccion)
+        val p = Pdf(cliente, direccion, 11, "","","")
         p.telefono = telefono
         p.cabecera = header
         p.correo = correo

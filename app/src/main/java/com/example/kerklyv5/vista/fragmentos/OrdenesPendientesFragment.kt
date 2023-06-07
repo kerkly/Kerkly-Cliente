@@ -17,15 +17,21 @@ import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
 import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
+import com.example.kerklyv5.modelo.Pdf
 import com.example.kerklyv5.modelo.serial.OrdenPendiente
 import com.example.kerklyv5.url.Url
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.ArrayList
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -49,6 +55,10 @@ class OrdenesPendientesFragment : Fragment() {
     private lateinit var img: ImageView
     private lateinit var txt: TextView
     private lateinit var nombreCompletoCliente: String
+    private  var header: ArrayList<String> = ArrayList<String>()
+
+    private lateinit var firebaseDatabase: FirebaseDatabase
+    private lateinit var dabaseReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +88,8 @@ class OrdenesPendientesFragment : Fragment() {
         Log.d("telefono", telefono)
         nombreCompletoCliente = b.getString("nombreCompletoCliente")!!
         getOrdenes()
+
+        firebaseDatabase = FirebaseDatabase.getInstance()
 
         return v
     }
@@ -131,8 +143,11 @@ class OrdenesPendientesFragment : Fragment() {
 
 
                         //Metodo Para Descargar PDF, ver el Presupuesto
-                        
-
+                        obtenerPresupuestoFirebase(id, telefonoKerkly)
+                       // val pdf = Pdf("luis","cgfhg", 10)
+                       // pdf.telefono = telefono
+                       // pdf.cabecera = header
+                       // val lista = tabla
                       /*  val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
                         intent.putExtra("Nombre_Kerkly", nombre_kerkly)
                         intent.putExtra("Ap_Kerkly", ap_kerkly)
@@ -162,7 +177,37 @@ class OrdenesPendientesFragment : Fragment() {
         })
     }
 
-   // private fun setChats(n: String, ap: String, nCompleto: String, id: Int) {
+    private fun obtenerPresupuestoFirebase(id: Int, telefonoKerkly: String) {
+        dabaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuesto Normal"
+        ).child("Presupuesto Normal $id")
+
+        dabaseReference.addChildEventListener(object : ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+               val m= snapshot.getValue()
+                println(m)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+    }
+
+    // private fun setChats(n: String, ap: String, nCompleto: String, id: Int) {
     private fun setChats(b_: Bundle) {
        val f = ContactosFragment()
        f.arguments = b_

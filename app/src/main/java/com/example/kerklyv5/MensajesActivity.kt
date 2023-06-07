@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kerklyv5.controlador.AdapterMensajes
 import com.example.kerklyv5.express.MensajesExpress
+//import com.example.kerklyv5.express.MensajesExpress
 import com.example.kerklyv5.modelo.serial.MensajesDatoss
 import com.example.kerklyv5.interfaces.MensajesInterface
 import com.example.kerklyv5.url.Url
@@ -40,13 +41,13 @@ class MensajesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mensajes)
-
         b = intent.extras!!
-
         telefono = b.get("Teléfono No Registrado").toString()
 
         img = findViewById(R.id.img_mensaes_express)
         txt = findViewById(R.id.txt_mensajes_express)
+
+
 
         recyclerview = findViewById(R.id.recycler_mensajes)
         recyclerview.setOnClickListener {
@@ -118,20 +119,44 @@ class MensajesActivity : AppCompatActivity() {
                         val folio = postList[recyclerview.getChildAdapterPosition(it)].idPresupuestoNoRegistrado
                         val pago = postList[recyclerview.getChildAdapterPosition(it)].PagoTotal
                         val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
+                        val telefonoKerkly = postList[recyclerview.getChildAdapterPosition(it)].Telefono
+                        val nombreKerkly = postList[recyclerview.getChildAdapterPosition(it)].Nombre
+                        val apeP =  postList[recyclerview.getChildAdapterPosition(it)].Apellido_Paterno
+                        val apeM =  postList[recyclerview.getChildAdapterPosition(it)].Apellido_Materno
+                        val pais =  postList[recyclerview.getChildAdapterPosition(it)].Pais
+                        val ciudad =  postList[recyclerview.getChildAdapterPosition(it)].Ciudad
+                        val Colonia =  postList[recyclerview.getChildAdapterPosition(it)].Colonia
+                        val calle =  postList[recyclerview.getChildAdapterPosition(it)].Calle
+                        val correoKerly =  postList[recyclerview.getChildAdapterPosition(it)].correo_electronico
 
-                        val n = "$nombre $ap $am"
+                        val direccionKerly = "$pais $ciudad $Colonia $calle"
 
-                        val i = Intent(applicationContext, MensajesExpress::class.java)
+                        val nombreCompletoKerkly = "$nombreKerkly $apeP $apeM"
 
-                        b.putString("Nombre", n)
-                        b.putString("Telefono", telefono)
-                        b.putString("Fecha", fecha)
-                        b.putString("Problema", problema)
-                        b.putInt("Folio", folio)
-                        b.putDouble("Pago total", pago)
-                        b.putString("Oficio", oficio)
-                        i.putExtras(b)
-                        startActivity(i)
+                        val nombreCompletoClienteNR = "$nombre $ap $am"
+
+                        if (pago.equals("0")){
+                            Toast.makeText(this@MensajesActivity, "Por favor espere, Seguimos buscando el kerkly mas cercano", Toast.LENGTH_SHORT).show()
+                        }else {
+
+                            val i = Intent(applicationContext, MensajesExpress::class.java)
+
+                            b.putString("NombreClienteNR", nombreCompletoClienteNR)
+                            b.putString("tipoServicio", "NoRegistrado")
+                            b.putString("Telefono", telefono)
+                            b.putString("Fecha", fecha)
+                            b.putString("Problema", problema)
+                            b.putInt("Folio", folio)
+                            b.putDouble("Pago total", pago)
+                            b.putString("Oficio", oficio)
+                            b.putString("telefonoKerkly", telefonoKerkly)
+                            b.putString("nombreCompletoKerkly", nombreCompletoKerkly)
+                            b.putString("direccionKerly", direccionKerly)
+                            b.putString("correoKerly", correoKerly)
+                            i.putExtras(b)
+                            startActivity(i)
+
+                        }
                     }
 
                     recyclerview.adapter = MiAdapter

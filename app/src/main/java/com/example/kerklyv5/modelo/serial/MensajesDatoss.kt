@@ -36,4 +36,41 @@ class MensajesDatoss {
     @Expose
     var apellidoM_noR = ""
 
+    @SerializedName("Telefono")
+    @Expose
+    var Telefono = ""
+
+    @SerializedName("Nombre")
+    @Expose
+    var Nombre = ""
+
+    @SerializedName("Apellido_Paterno")
+    @Expose
+    var Apellido_Paterno = ""
+
+    @SerializedName("Apellido_Materno")
+    @Expose
+    var Apellido_Materno = ""
+
+    @SerializedName("correo_electronico")
+    @Expose
+    var correo_electronico = ""
+
+    @SerializedName("Pais")
+    @Expose
+    var Pais = ""
+
+    @SerializedName("Ciudad")
+    @Expose
+    var Ciudad = ""
+
+    @SerializedName("Colonia")
+    @Expose
+    var Colonia = ""
+
+    @SerializedName("Calle")
+    @Expose
+    var Calle = ""
+
+
 }
