@@ -31,11 +31,11 @@ class FirebaseNoti: FirebaseMessagingService() {
             val titulo: String = message.getData().get("titulo")!!
             val detalle: String = message.getData().get("detalle")!!
             // val foto: String = message.getData().get("foto")!!
-            CraerNotificacion(titulo, detalle)
+            TraerNotificacion(titulo, detalle)
         }
     }
 
-    private fun CraerNotificacion(titulo: String, detalle: String) {
+    private fun TraerNotificacion(titulo: String, detalle: String) {
         val id = "mensajeCliente"
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val builder = NotificationCompat.Builder(this, id)
@@ -71,7 +71,7 @@ class FirebaseNoti: FirebaseMessagingService() {
 
         val nf = Intent(applicationContext, PantallaInicio::class.java)
         val pendingIntent : PendingIntent = PendingIntent.getActivity(applicationContext, 0, nf, flags)
-        nf.putExtra("color", "rojo")
+        nf.putExtra("notificacion", "chat")
         nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         return PendingIntent.getActivity(this, 0, nf, flags)
 

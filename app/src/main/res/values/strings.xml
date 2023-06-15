@@ -127,8 +127,10 @@
     <string name="titulo_notificacionPresupuesto">Presupuesto</string>
     <string name="cuerpo_notificacionPresupuesto">Se ha enviado con éxito el presupuesto al Kerkly</string>
     <string name="buenas_tardes_cliente">Estimado cliente, reciba un cordial saludo.</string>
-    <string name="cuerpo_mensaje_presupuesto">En el siguiente archivo PDF puede visualizar el presupuesto, si usted
-    está de acuerdo con el presupuesto mostrado, puede aceptarlo para proceder con el servicio técnico.</string>
+    <string name="cuerpo_mensaje_presupuesto">En el siguiente archivo PDF puede visualizar el presupuesto, si usted está de acuerdo con el presupuesto mostrado, puede aceptarlo para proceder con el servicio técnico.
+
+        Diríjase a su adminitrador de archivos, posteriormente a la carpeta de descargas, abra la carpeta con el nombre de (Presupuestos Recebidos) y por ultimo ubique el PDF, tendra su nombre y el numero de Folio
+    </string>
     <string name="confirmar_nombreNoR">Para continuar con el servicio solicitado,
     confirme sus datos.</string>
     <string name="forma_pago">Forma de pago</string>
@@ -193,5 +195,6 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
     <string name="Contactos">Contactos</string>
-
+    <string name="Continuar">Continuar</string>
+    <string name="btn_masOficios">Otros oficios</string>
 </resources>

@@ -7,28 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.example.kerklyv5.express.FormaPagoExrpess
+import androidx.core.view.isInvisible
+import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.R
-import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
 import com.example.kerklyv5.modelo.Pdf
-import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import retrofit.Callback
-import retrofit.RestAdapter
-import retrofit.RetrofitError
-import java.io.BufferedReader
-import retrofit.client.Response
-import java.io.InputStreamReader
 
 class MensajesExpress : AppCompatActivity() {
     private lateinit var txt_dest: TextView
@@ -37,13 +29,12 @@ class MensajesExpress : AppCompatActivity() {
     private lateinit var dialog: Dialog
     private var total = 0.0
     private lateinit var boton: MaterialButton
-    private var problema = "Mi problema"
+    private var problema = ""
     private var cliente = ""
-    private var direccion = "Mi direccion"
     private var telefono = ""
 
     private var folio = 0
-    private lateinit var pdf_img: ImageView
+    private lateinit var btnContinuar: Button
     private lateinit var imgP: ImageView
     private var header: ArrayList<String> = ArrayList<String>()
     private lateinit var databaseReference: DatabaseReference
@@ -57,6 +48,8 @@ class MensajesExpress : AppCompatActivity() {
     private lateinit var nombreCompletoKerkly: String
     private lateinit var direccionKerkly: String
     private lateinit var correoKerkly: String
+    lateinit var txtPruebaSinR: TextView
+
 
 
 
@@ -70,16 +63,22 @@ class MensajesExpress : AppCompatActivity() {
         txt_remi = findViewById(R.id.txt_remitente)
         txt_fecha = findViewById(R.id.txt_fechaMensaje)
         mensaje_txt = findViewById(R.id.txt_cuerpoMensaje)
+        txtPruebaSinR = findViewById(R.id.txtPruebaSinR)
 
         dialog = Dialog(this)
 
         b = intent.extras!!
-        pdf_img = findViewById(R.id.pdf_img)
+        btnContinuar = findViewById(R.id.BtnSiguiente)
         tipoUsuario = b.getString("tipoServicio").toString()
+        nombreCompletoKerkly = b.getString("nombreCompletoKerkly").toString()
+        telefonoKerkly = b.getString("telefonoKerkly").toString()
+        direccionKerkly = b.getString("direccionKerkly").toString()
+        correoKerkly = b.getString("correoKerkly").toString()
+        telefono = b.getString("Telefono").toString()
+        problema = b.getString("Problema").toString()
+
+        pagoTotal = b.getString("Pago total").toString()
         if (tipoUsuario =="NoRegistrado"){
-            nombreCompletoKerkly = b.getString("nombreCompletoKerkly").toString()
-            telefonoKerkly = b.getString("telefonoKerkly").toString()
-            pagoTotal = b.getString("Pago total").toString()
             val nombre = b.get("NombreClienteNR").toString()
             txt_remi.text = "Para: $nombre"
             txt_fecha.text = b.get("Fecha").toString()
@@ -89,7 +88,6 @@ class MensajesExpress : AppCompatActivity() {
             cliente = nombre
 
             problema = b.getString("Problema").toString()
-
             var calle = b.getString("Calle")
             val num = b.getInt("Numero exterior")
             var colonia = b.getString("Colonia")
@@ -116,10 +114,7 @@ class MensajesExpress : AppCompatActivity() {
             if (ref ==null){
                 ref = "S/N"
             }
-            direccionKerkly = b.getString("direccionKerly").toString()
-            correoKerkly = b.getString("correoKerly").toString()
-            direccion = "$calle $colonia $ext $cp $ref"
-            telefono = b.getString("Telefono").toString()
+
             total = b.getDouble("Pago total")
             header.add("Item")
             header.add("Concepto")
@@ -128,11 +123,47 @@ class MensajesExpress : AppCompatActivity() {
             databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
             databaseReference.addValueEventListener(postListener)
         }
-        pdf_img.setOnClickListener {
-            val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
-            b.putBoolean("Express", true)
-            intent.putExtras(b)
-            startActivity(intent)
+
+        if (tipoUsuario == "Registrado"){
+            txtPruebaSinR.isInvisible = true
+            val nombre = b.get("NombreCliente").toString()
+            txt_remi.text = "Para: $nombre"
+            txt_fecha.text = b.get("Fecha").toString()
+            txt_dest.text = "De: $nombreCompletoKerkly"
+            folio = b.getInt("Folio")
+            cliente = nombre
+
+            total = b.getDouble("Pago total")
+            header.add("Item")
+            header.add("Concepto")
+            header.add("Pago")
+            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal $folio")
+            databaseReference.addValueEventListener(postListener)
+
+        }
+        btnContinuar.setOnClickListener {
+            if (tipoUsuario =="NoRegistrado"){
+                finish()
+                val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+                b.putBoolean("Express", true)
+                intent.putExtras(b)
+                startActivity(intent)
+            }
+            if (tipoUsuario == "Registrado"){
+                finish()
+                val intent = Intent(this, MainActivityAceptarServicio::class.java)
+                //intent.putExtra("Ap_Kerkly", ap_kerkly)
+                intent.putExtra("Nombre_completo_Kerkly", nombreCompletoKerkly)
+                intent.putExtra("IdContrato", folio)
+                intent.putExtra("telefonoCliente", telefono)
+                intent.putExtra("nombreCompletoCliente",cliente)
+                intent.putExtra("telefonokerkly", telefonoKerkly)
+                intent.putExtra("tipoServicio", tipoUsuario)
+                intent.putExtra("problema", problema)
+                startActivity(intent)
+            }
+
+
         }
 
     }
@@ -185,14 +216,13 @@ class MensajesExpress : AppCompatActivity() {
 
     fun generarPDF() {
         imgP = dialog.findViewById(R.id.imageViePdf)
-        val p = Pdf(cliente, direccion, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly)
-        p.telefono = telefono
+        val p = Pdf(cliente, direccionKerkly, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly)
+        p.telefono = telefonoKerkly
         p.cabecera = header
        // p.correo = correo
         p.problema = problema
-        p.direccion = direccion
+        p.direccion = direccionKerkly
         p.folio = folio
-        p.total = total
         p.total = total
         p.lista = lista
         p.generarPdf()

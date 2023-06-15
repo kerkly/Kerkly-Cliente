@@ -207,6 +207,24 @@ class SolicitarServicio : AppCompatActivity() {
             }*/
     }
 
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            //finish()
+            setFragmentHome(nombre.toString())
+            /* val alert: AlertDialog.Builder = AlertDialog.Builder(this)
+             alert.setTitle(getString(R.string.cerrar_app))
+             alert.setMessage(getString(R.string.mensaje_alertaCerrarApp))
+             alert.setCancelable(false)
+             alert.setPositiveButton(getString(R.string.confirmar_alertCerrarApp)) {
+                     dialogo1, id -> finish() }
+             alert.setNegativeButton(getString(R.string.cancelar_alertCerrarApp)) { dialogo1, id -> dialogo1.dismiss() }
+             alert.show()*/
+        }
+    }
+
+
 
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -341,19 +359,7 @@ class SolicitarServicio : AppCompatActivity() {
         llamarTopico.llamartopico(this, "","","")*/
     }
 
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            val alert: AlertDialog.Builder = AlertDialog.Builder(this)
-            alert.setTitle(getString(R.string.cerrar_app))
-            alert.setMessage(getString(R.string.mensaje_alertaCerrarApp))
-            alert.setCancelable(false)
-            alert.setPositiveButton(getString(R.string.confirmar_alertCerrarApp)) { dialogo1, id -> finish() }
-            alert.setNegativeButton(getString(R.string.cancelar_alertCerrarApp)) { dialogo1, id -> dialogo1.dismiss() }
-            alert.show()
-        }
-    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -370,6 +376,7 @@ class SolicitarServicio : AppCompatActivity() {
         val f = HomeFragment()
         b!!.putString("Nombre", nombre.toString())
         b!!.putString("Telefono", telefono)
+        b!!.putString("correoCliente", correo)
        // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {

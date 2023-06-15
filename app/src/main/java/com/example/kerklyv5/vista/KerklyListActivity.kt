@@ -62,6 +62,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var nombreCliente: String
     private  val setProgress = setProgressDialog()
     private val obtenerToken = obtenerKerklys_y_tokens()
+    lateinit var correoCliente:String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +84,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
      //   referencia = b.getString("Referencia").toString()
         pais = b.getString("Pais").toString()
         nombreCliente = b.getString("nombreCliente")!!
+        correoCliente =  b.getString("correoCliente")!!
 
         recyclerview = findViewById(R.id.recycler_kerkly)
         recyclerview.setHasFixedSize(true)
@@ -149,7 +151,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     System.out.println("el telefo del kerkly $telefoK")
                     setProgress.setProgressDialog(this@KerklyListActivity)
                     obtenerToken.obtenerTokenKerkly(telefoK, problema, nombreCliente, this@KerklyListActivity)
-                    ingresarPresupuesto()
+                    enviarSolicitud()
                 }
 
             }
@@ -200,7 +202,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         setProgress.dialog.dismiss()
     }
 
-    private fun ingresarPresupuesto() {
+    private fun enviarSolicitud() {
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
@@ -219,6 +221,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             colonia,
             num_ext,
             cp,
+            correoCliente,
         //    referencia,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
@@ -230,9 +233,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-
                    // Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
-
                     val cadena = "Datos enviados"
                     if (cadena.equals(entrada)){
                         setProgress.dialog.dismiss()
@@ -241,6 +242,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                         intent.putExtras(b)
                         startActivity(intent)
                         Toast.makeText(applicationContext,"Solicitud en proceso", Toast.LENGTH_LONG).show()
+                    }else{
+                        setProgress.dialog.dismiss()
+                        Toast.makeText(applicationContext,"$entrada", Toast.LENGTH_LONG).show()
                     }
                 }
 

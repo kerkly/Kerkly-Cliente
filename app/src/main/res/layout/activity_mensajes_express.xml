@@ -108,20 +108,20 @@
                     android:gravity="start|top"
                     tools:ignore="TouchTargetSizeCheck" />
 
-                <ImageView
-                    android:id="@+id/pdf_img"
+                <Button
+                    android:id="@+id/BtnSiguiente"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="15dp"
-                    android:src="@mipmap/ic_pdf_foreground"
+                    android:text="@string/Continuar"
                     />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
     <TextView
-        android:id="@+id/textView28"
+        android:id="@+id/txtPruebaSinR"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/pruebaSinRegistro"

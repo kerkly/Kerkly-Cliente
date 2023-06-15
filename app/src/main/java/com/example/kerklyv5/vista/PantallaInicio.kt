@@ -10,6 +10,7 @@ import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.MainActivityControlador
@@ -21,6 +22,8 @@ class PantallaInicio : AppCompatActivity() {
     private lateinit var ivLogo: ImageView
     private lateinit var id: String
     private lateinit var controlador: MainActivityControlador
+    private lateinit var noti:String
+    private lateinit var b: Bundle
 
 
     @SuppressLint("HardwareIds")
@@ -31,7 +34,11 @@ class PantallaInicio : AppCompatActivity() {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_pantalla_inicio)
-
+//        b = intent.extras!!
+//        noti = b.getString("notificacion").toString()
+//        if (noti == "chat"){
+//            Toast.makeText(this, "esto es una notificacion", Toast.LENGTH_SHORT).show()
+//        }
 
        var context = this
 

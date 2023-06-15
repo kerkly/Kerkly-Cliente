@@ -48,4 +48,36 @@ class OrdenPendiente {
     @SerializedName("Telefono")
     @Expose
     var Telefono: String = ""
+
+    @SerializedName("pago_total")
+    @Expose
+    var pago_total: Double = 0.0
+
+    @SerializedName("Pais")
+    @Expose
+    var Pais: String =  ""
+
+    @SerializedName("Ciudad")
+    @Expose
+    var Ciudad: String =  ""
+
+    @SerializedName("Colonia")
+    @Expose
+    var Colonia: String =  ""
+
+    @SerializedName("Calle")
+    @Expose
+    var Calle: String =  ""
+
+    @SerializedName("problema")
+    @Expose
+    var problema: String =  ""
+
+    @SerializedName("fechaP")
+    @Expose
+    var fechaP: String =  ""
+
+    @SerializedName("aceptoCliente")
+    @Expose
+    var aceptoCliente: String =  ""
 }

@@ -90,6 +90,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var token: String
     lateinit var arrayListTiempo: ArrayList<modelokerklyCercanos>
     lateinit var arraylistUsuarios: ArrayList<usuarios>
+    lateinit var correoCliente:String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,10 +137,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //Toast.makeText(applicationContext, mapa, Toast.LENGTH_LONG).show()
 
         }*/
-
-
-
-
         BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
 
         BotonEnviarU.setOnClickListener {
@@ -157,6 +154,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             setLocation(latitud, longitud)
             if (!band) {
                 val i = Intent(applicationContext, KerklyListActivity::class.java)
+                correoCliente =  b.get("correoCliente").toString()
+                b.putString("correoCliente",correoCliente)
                 b.putString("Calle", calle)
                     b.putString("Colonia", colonia)
                     b.putString("Código Postal", cp)

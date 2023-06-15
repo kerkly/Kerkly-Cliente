@@ -11,7 +11,7 @@ interface AceptarPresupuestoNormalInterface {
     @FormUrlEncoded
     @POST("/Aceptar_presupuesto_normal.php")
     fun Aceptar(
-        @Field("idPresupuesto")  idPresupuesto: String,
+        @Field("idPresupuesto") idPresupuesto: String,
         @Field("aceptoCliente") aceptoCliente: String,
         callback: Callback<Response?>
     )

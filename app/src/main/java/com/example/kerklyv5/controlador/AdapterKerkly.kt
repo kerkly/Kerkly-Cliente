@@ -16,7 +16,6 @@ class AdapterKerkly(val datset: ArrayList<Kerkly>):
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val txtNombre: TextView = view.findViewById(R.id.nombre_kekrly_txt)
-
         val txt_tiempo: TextView = view.findViewById(R.id.tiempo_kerkly)
 
         init {}

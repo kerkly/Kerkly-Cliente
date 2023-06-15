@@ -480,10 +480,11 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         }
     }*/
 
+    @SuppressLint("SuspiciousIndentation")
     fun aceptarNoR(view: View) {
         nombre = editNombre.text.toString()
         apellidoP = editAp.text.toString()
-        apellidoM =  editAM.text.toString().trim()
+        apellidoM =  editAM.text.toString()
             if (nombre.isEmpty()){
                 layoutNombre.error = getString(R.string.campo_requerido)
             } else {

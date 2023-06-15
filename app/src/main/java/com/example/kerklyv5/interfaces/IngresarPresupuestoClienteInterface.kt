@@ -24,7 +24,7 @@ interface IngresarPresupuestoClienteInterface {
         @Field("Colonia") Colonia: String,
         @Field("No_Exterior") No_Exterior: String,
         @Field("Codigo_Postal") Codigo_Postal: String,
-      //  @Field("Referencia") Referencia: String,
+        @Field("correoCliente") correoCliente: String,
         callback: Callback<Response?>
     )
 

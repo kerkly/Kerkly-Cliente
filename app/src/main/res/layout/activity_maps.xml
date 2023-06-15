@@ -30,7 +30,7 @@
                 android:id="@+id/buttonEnviarUbicacion"
                 android:layout_width="260dp"
                 android:layout_height="wrap_content"
-                android:text="siguiente"
+                android:text="Confirmar Ubicación"
                 android:layout_gravity="center"
                 android:background="@drawable/fondo_boton"
                 android:textColor="@color/black"

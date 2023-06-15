@@ -16,6 +16,8 @@ import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
+import com.example.kerklyv5.express.FormaPagoExrpess
+import com.example.kerklyv5.express.MensajesExpress
 import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
 import com.example.kerklyv5.modelo.Pdf
 import com.example.kerklyv5.modelo.serial.OrdenPendiente
@@ -124,47 +126,76 @@ class OrdenesPendientesFragment : Fragment() {
                 Log.d("lista", postList.toString())
                 if (postList.size == 0) {
                     recyclerview.visibility = View.GONE
-                    Log.d("estoyyyyy aqui", "holaaaa")
+
                 } else {
                     img.visibility = View.GONE
                     txt.visibility = View.GONE
-
+                    Log.d("estoyyyyy aqui", "holaaaa")
                     adapter = AdapterOrdenPendiente(postList)
 
                     adapter.setOnClickListener {
 
                         val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
                         val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
+                        val ap_kerkly_M = postList[recyclerview.getChildAdapterPosition(it)].Apellido_MaternoK.trim()
                         val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
+                        val problema = postList[recyclerview.getChildAdapterPosition(it)].problema
+                        val fecha = postList[recyclerview.getChildAdapterPosition(it)].fechaP
+                        val aceptoCliente = postList[recyclerview.getChildAdapterPosition(it)].aceptoCliente
+
                         val telefonoKerkly = postList[recyclerview.getChildAdapterPosition(it)].Telefono
+                        val correoKerkly = postList[recyclerview.getChildAdapterPosition(it)].correo_electronico
 
-                        val nomre_completo_kerkly = "$nombre_kerkly $ap_kerkly"
+                        val pais = postList[recyclerview.getChildAdapterPosition(it)].Pais
+                        val ciudad = postList[recyclerview.getChildAdapterPosition(it)].Ciudad
+                        val calle = postList[recyclerview.getChildAdapterPosition(it)].Colonia
+                        val colonia = postList[recyclerview.getChildAdapterPosition(it)].Calle
+
+                        val nombre_completo_kerkly = "$nombre_kerkly $ap_kerkly $ap_kerkly_M"
+                        val direccionKerkly = "$pais $ciudad $colonia $calle"
                         val nombreCliente = nombreCompletoCliente
+                        var pagoTotal = postList[recyclerview.getChildAdapterPosition(it)].pago_total
+                        var oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
 
-
-                        //Metodo Para Descargar PDF, ver el Presupuesto
-                        obtenerPresupuestoFirebase(id, telefonoKerkly)
-                       // val pdf = Pdf("luis","cgfhg", 10)
-                       // pdf.telefono = telefono
-                       // pdf.cabecera = header
-                       // val lista = tabla
-                      /*  val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
-                        intent.putExtra("Nombre_Kerkly", nombre_kerkly)
-                        intent.putExtra("Ap_Kerkly", ap_kerkly)
-                        intent.putExtra("Nombre_completo_Kerkly", nomre_completo_kerkly)
-                        intent.putExtra("IdContrato", id)
-                        intent.putExtra("telefonoCliente", telefono)
-                        intent.putExtra("nombreCompletoCliente",nombreCliente)
-                        intent.putExtra("telefonokerkly", telefonoKerkly)
-
-                        startActivity(intent)*/
-
-
+                        if (pagoTotal == 0.0){
+                            Toast.makeText(requireContext(), "Por favor espere, le notificaremos en un momento", Toast.LENGTH_SHORT).show()
+                           /* val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
+                              intent.putExtra("Nombre_Kerkly", nombre_kerkly)
+                              intent.putExtra("Ap_Kerkly", ap_kerkly)
+                              intent.putExtra("Nombre_completo_Kerkly", nomre_completo_kerkly)
+                              intent.putExtra("IdContrato", id)
+                              intent.putExtra("telefonoCliente", telefono)
+                              intent.putExtra("nombreCompletoCliente",nombreCliente)
+                              intent.putExtra("telefonokerkly", telefonoKerkly)
+                              startActivity(intent)*/
+                        }else{
+                            //Toast.makeText(requireContext(), "ya hay presupuesto", Toast.LENGTH_SHORT).show()
+                            if (aceptoCliente == "1"){
+                                //Toast.makeText(requireContext(), "este presuepuesto ya sido aceptado", Toast.LENGTH_SHORT).show()
+                                val intent  = Intent(requireContext(), FormaPagoExrpess::class.java)
+                                b.putBoolean("Normal", true)
+                                intent.putExtras(b)
+                                startActivity(intent)
+                            }else {
+                                val i = Intent(requireContext(), MensajesExpress::class.java)
+                                b.putString("NombreCliente", nombreCliente)
+                                b.putString("tipoServicio", "Registrado")
+                                b.putString("Telefono", telefono)
+                                b.putString("Fecha", fecha)
+                                b.putString("Problema", problema)
+                                b.putInt("Folio", id)
+                                b.putDouble("Pago total", pagoTotal)
+                                b.putString("Oficio", oficio)
+                                b.putString("telefonoKerkly", telefonoKerkly)
+                                b.putString("nombreCompletoKerkly", nombre_completo_kerkly)
+                                b.putString("direccionKerkly", direccionKerkly)
+                                b.putString("correoKerkly", correoKerkly)
+                                i.putExtras(b)
+                                startActivity(i)
+                            }
+                        }
                     }
-
                     recyclerview.adapter = adapter
-
-
                 }
             }
 

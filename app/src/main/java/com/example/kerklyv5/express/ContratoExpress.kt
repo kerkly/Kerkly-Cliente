@@ -7,14 +7,12 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
-import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
 import com.example.kerklyv5.interfaces.AceptarPresupuestoNormalInterface
 import com.example.kerklyv5.interfaces.ActualizarMensajeInterface
 import com.example.kerklyv5.url.Url

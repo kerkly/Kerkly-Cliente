@@ -19,7 +19,7 @@ class obtenerKerklys_y_tokens {
                 val u2 = snapshot.getValue(usuarios::class.java)
                  token = u2!!.token
                 System.out.println("el token del kerkly " + token)
-                llamartopico.llamartopico(context, token, "(Servicio Normal) $problema", "Usuario Nuevo-> $nombreCliente")
+                llamartopico.llamartopico(context, token, "(Servicio Normal) $problema", "Usuario--> $nombreCliente")
             }
 
             override fun onCancelled(error: DatabaseError) {

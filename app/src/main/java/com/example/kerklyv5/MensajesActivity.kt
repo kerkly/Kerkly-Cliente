@@ -127,16 +127,16 @@ class MensajesActivity : AppCompatActivity() {
                         val ciudad =  postList[recyclerview.getChildAdapterPosition(it)].Ciudad
                         val Colonia =  postList[recyclerview.getChildAdapterPosition(it)].Colonia
                         val calle =  postList[recyclerview.getChildAdapterPosition(it)].Calle
-                        val correoKerly =  postList[recyclerview.getChildAdapterPosition(it)].correo_electronico
+                        val correokerkly =  postList[recyclerview.getChildAdapterPosition(it)].correo_electronico
 
-                        val direccionKerly = "$pais $ciudad $Colonia $calle"
+                        val direccionKerkly = "$pais $ciudad $Colonia $calle"
 
                         val nombreCompletoKerkly = "$nombreKerkly $apeP $apeM"
 
                         val nombreCompletoClienteNR = "$nombre $ap $am"
-
-                        if (pago.equals("0")){
-                            Toast.makeText(this@MensajesActivity, "Por favor espere, Seguimos buscando el kerkly mas cercano", Toast.LENGTH_SHORT).show()
+                        println("pagoo $pago")
+                        if (pago == 0.0){
+                            Toast.makeText(this@MensajesActivity, "Por favor espere, Seguimos buscando el kerkly mas cercano, vuelva intentar en unos minutos", Toast.LENGTH_SHORT).show()
                         }else {
 
                             val i = Intent(applicationContext, MensajesExpress::class.java)
@@ -151,8 +151,8 @@ class MensajesActivity : AppCompatActivity() {
                             b.putString("Oficio", oficio)
                             b.putString("telefonoKerkly", telefonoKerkly)
                             b.putString("nombreCompletoKerkly", nombreCompletoKerkly)
-                            b.putString("direccionKerly", direccionKerly)
-                            b.putString("correoKerly", correoKerly)
+                            b.putString("direccionKerkly", direccionKerkly)
+                            b.putString("correoKerkly", correokerkly)
                             i.putExtras(b)
                             startActivity(i)
 
