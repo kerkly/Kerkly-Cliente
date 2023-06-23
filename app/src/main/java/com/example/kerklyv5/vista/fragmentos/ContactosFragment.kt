@@ -149,8 +149,6 @@ class ContactosFragment : Fragment() {
                     Miadapter.agregarUsuario(u2!!)
                 }
 
-
-
                 val mGestureDetector = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
                     GestureDetector(requireContext(), object : SimpleOnGestureListener() {
                         override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -180,7 +178,6 @@ class ContactosFragment : Fragment() {
                                 b!!.putString("correoK", correo)
                                 b!!.putString("telefonok",telefono)
                                 b!!.putString("telefonoCliente", telefonoCliente)
-
                                 b!!.putString("tokenKerkly", token)
                                 b!!.putString("nombreCompletoCliente", nombre)
                               //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()

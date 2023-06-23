@@ -16,6 +16,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.controlador.AdapterChat
 import com.example.kerklyv5.modelo.Mensaje
+import com.example.kerklyv5.modelo.MensajeCopia
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
@@ -33,6 +34,8 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var databaseReferenceCliente: DatabaseReference
     private lateinit var databaseReferenceKerkly: DatabaseReference
+    private lateinit var databaseReferenceMensajeCliente: DatabaseReference
+    private lateinit var databaseReferenceMensajekerkly: DatabaseReference
     private lateinit var txt_nombreKerkly: TextView
     private lateinit var b: Bundle
     private lateinit var imageViewPerfil: ImageView
@@ -45,6 +48,9 @@ class MainActivityChats : AppCompatActivity() {
    private lateinit var tokenKerkly : String
    private lateinit var nombreCompletoCliente: String
    val llamartopico = llamarTopico()
+    private lateinit var telefonoCliente: String
+    private lateinit var childEventListener: ChildEventListener
+    private lateinit var childEventListener2: ChildEventListener
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +69,7 @@ class MainActivityChats : AppCompatActivity() {
         nombreCompletoCliente = b.getString("nombreCompletoCliente")!!
         val correoKerkly = b.getString("correoK")
          telefonoKerkly = b.getString("telefonok").toString()
-        val telefonoCliente = b!!.getString("telefonoCliente")
+         telefonoCliente = b!!.getString("telefonoCliente").toString()
         val url = b!!.getString("urlFotoKerkly")
         tokenKerkly = b!!.getString("tokenKerkly").toString()
 
@@ -112,24 +118,30 @@ class MainActivityChats : AppCompatActivity() {
           }else{
 
            //adapter.addMensaje(Mensaje(editText.text.toString(), "00:00"))
-           databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime()))
-           databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime()))
+           databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),""))
+           databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),""))
          llamartopico.llamartopico(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente)
            editText.setText("")
-
 
           }
 
         }
-        databaseReferenceCliente.addChildEventListener(object : ChildEventListener {
+     childEventListener =  databaseReferenceCliente.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val m = snapshot.getValue(Mensaje::class.java)
                // notificacionMensajeEntrantes(m!!.mensaje)
+               // Toast.makeText(applicationContext, "mensaje nuevo" , Toast.LENGTH_SHORT).show()
                 adapter.addMensaje(m!!)
+                if (m!!.tipo_usuario == "Kerkly"){
+                    mensajeVistoCliente(snapshot.key!!)
+                }
 
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                val m = snapshot.getValue(Mensaje::class.java)
+                adapter.addMensajeClear()
+                adapter.addMensaje(m!!)
+                adapter.notifyDataSetChanged()
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 adapter.notifyDataSetChanged()
@@ -142,12 +154,56 @@ class MainActivityChats : AppCompatActivity() {
             }
 
         })
+
+       childEventListener2 = databaseReferenceKerkly.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val m = snapshot.getValue(MensajeCopia::class.java)
+                    // notificacionMensajeEntrantes(m!!.mensaje)
+                    if (m!!.tipo_usuario == "Kerkly"){
+                        mensajeVistoKerkly(snapshot.key!!)
+                    }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
         imageButtonSeleccionarFoto.setOnClickListener {
             SeleccionarFoto()
 
         }
 
     }
+
+    private fun mensajeVistoKerkly(key: String) {
+        firebaseDatabase = FirebaseDatabase.getInstance()
+        databaseReferenceMensajekerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats")
+            .child("$telefonoKerkly"+"_"+"$telefonoCliente").child(key)
+        val map = mapOf("mensajeLeido" to "Visto")
+        databaseReferenceMensajekerkly.updateChildren(map)
+    }
+
+    private fun mensajeVistoCliente(key: String) {
+        firebaseDatabase = FirebaseDatabase.getInstance()
+        databaseReferenceMensajeCliente = firebaseDatabase.getReference("UsuariosR").child(telefonoCliente.toString()).child("chats")
+            .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(key)
+        val map = mapOf("mensajeLeido" to "Visto")
+        databaseReferenceMensajeCliente.updateChildren(map)
+    }
+
     private fun setScrollBar() {
         recyclerView.scrollToPosition(adapter.itemCount-1)
     }
@@ -171,6 +227,18 @@ class MainActivityChats : AppCompatActivity() {
             val selectedImageUri = data!!.data
             println("url foto " + selectedImageUri.toString())
             // Hacer algo con la URI de la imagen seleccionada, como cargarla en Firebase Storage
+        }
+    }
+
+    override fun onBackPressed() {
+        finish()
+        if (childEventListener == null || childEventListener2 == null) {
+           // Toast.makeText(applicationContext, "null el childEventListener", Toast.LENGTH_SHORT) .show()
+        } else {
+            //Toast.makeText(applicationContext, "childEventListener detnido ", Toast.LENGTH_SHORT) .show()
+            databaseReferenceCliente.removeEventListener(childEventListener!!);
+            databaseReferenceKerkly.removeEventListener(childEventListener2!!);
+
         }
     }
 

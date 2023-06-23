@@ -219,7 +219,7 @@ class MensajesExpress : AppCompatActivity() {
         val p = Pdf(cliente, direccionKerkly, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly)
         p.telefono = telefonoKerkly
         p.cabecera = header
-       // p.correo = correo
+        p.correo = correoKerkly
         p.problema = problema
         p.direccion = direccionKerkly
         p.folio = folio

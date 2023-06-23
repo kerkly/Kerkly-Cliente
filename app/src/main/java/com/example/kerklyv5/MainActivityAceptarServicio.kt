@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
+import com.example.kerklyv5.express.FormaPagoExrpess
 import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
 import com.example.kerklyv5.interfaces.AceptarPresupuestoNormalInterface
 import com.example.kerklyv5.notificaciones.llamarTopico
@@ -49,8 +50,13 @@ class MainActivityAceptarServicio : AppCompatActivity() {
             if (tipoServicio == "Registrado"){
                 AceptarServicioNormal(folio)
                 obtenerTokenKerkly(telefonoKerkly, problema,nombreCliente)
-                val intent = Intent(this, SolicitarServicio::class.java)
-                intent.putExtra("Telefono",telefono)
+              //  val intent = Intent(this, SolicitarServicio::class.java)
+                //intent.putExtra("Telefono",telefono)
+                //startActivity(intent)
+
+                val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+                b!!.putBoolean("Express", true)
+                intent.putExtras(b!!)
                 startActivity(intent)
             }
 

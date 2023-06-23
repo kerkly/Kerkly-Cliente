@@ -17,6 +17,7 @@ import java.util.*
 class FirebaseNoti: FirebaseMessagingService() {
 
     lateinit var token1: String
+    lateinit var m : RemoteMessage
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         token1 = token
@@ -26,7 +27,7 @@ class FirebaseNoti: FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         val from: String = message.getFrom()!!
-
+        m = message
         if (message.getData().size > 0) {
             val titulo: String = message.getData().get("titulo")!!
             val detalle: String = message.getData().get("detalle")!!
@@ -68,7 +69,6 @@ class FirebaseNoti: FirebaseMessagingService() {
 
     private fun clicknoti(): PendingIntent? {
         val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-
         val nf = Intent(applicationContext, PantallaInicio::class.java)
         val pendingIntent : PendingIntent = PendingIntent.getActivity(applicationContext, 0, nf, flags)
         nf.putExtra("notificacion", "chat")
@@ -77,5 +77,9 @@ class FirebaseNoti: FirebaseMessagingService() {
 
     }
 
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        onMessageReceived(m)
+//    }
 
 }

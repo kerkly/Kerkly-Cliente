@@ -111,7 +111,7 @@ class SolicitarServicio : AppCompatActivity() {
      var photoUrl: String? = null
     private lateinit var token: String
     private lateinit var nombreCompletoCliente: String
-   // val setProgressDialog = setProgressDialog()
+    val setProgressDialog = setProgressDialog()
 
 
 
@@ -121,7 +121,7 @@ class SolicitarServicio : AppCompatActivity() {
         setContentView(binding.root)
         dialog2 = Dialog(this)
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
-        //setProgressDialog.setProgressDialog(this)
+        setProgressDialog.setProgressDialog(this)
         b = intent.extras!!
         telefono = b!!.getString("Telefono").toString()
         println("--------------> $telefono")
@@ -269,79 +269,8 @@ class SolicitarServicio : AppCompatActivity() {
         startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
     }
 
-    @SuppressLint("SuspiciousIndentation")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
-            filePath = data.data!!
-            try {
-                //Cómo obtener el mapa de bits de la Galería
-              var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
-                if (bitmap!!.width <= 500){
-                  //  Toast.makeText(this, "Es mejor que 500", Toast.LENGTH_SHORT).show()
-                    val imagen = getStringImagen( bitmap!!)!!
-                    // val imagen = getStringImagen(bitmap!!)!!
-                    if (bitmap!!.width > bitmap.height) {
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.height, bitmap.height)
-
-                    } else if (bitmap.width < bitmap.height) {
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.width
-                        )
-                    }
-
-                    //Configuración del mapa de bits en ImageView
-                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
-
-                    roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
-                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
-                    fotoPerfil.setImageDrawable(roundedDrawable)
-
-                }else{
-                   // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
-                    val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
-                    val imagen = getStringImagen(bmp!!)!!
-                    var originalBitmap = bmp
-
-                    // val imagen = getStringImagen(bitmap!!)!!
-                  if (originalBitmap!!.width > originalBitmap.height) {
-                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
-
-                    } else if (originalBitmap.width < originalBitmap.height) {
-                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
-                        )
-                    }
-
-                    //Configuración del mapa de bits en ImageView
-                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
-
-                    roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
-                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
-                    fotoPerfil.setImageDrawable(roundedDrawable)
-                   // System.out.println("AQui la imagen" +filePath.toString())
 
 
-
-                }
-
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-
-
-        if (requestCode == MY_REQUEST_CODE) {
-            val response = IdpResponse.fromResultIntent(data)
-            if (requestCode == RESULT_OK) {
-                val user = FirebaseAuth.getInstance().currentUser
-                //    Toast.makeText(this, "saludos" + user!!.email, Toast.LENGTH_SHORT).show()
-                //correo = currentUser!!.getEmail()!!
-                //verficar numero
-
-            }
-
-
-        }
-    }
 
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
@@ -501,13 +430,10 @@ class SolicitarServicio : AppCompatActivity() {
 
     private fun getJson() {
       //  setProgressDialog.setProgressDialog(this)
-        System.out.println("entro en metodo JSON")
         val ROOT_URL = Url().url
-
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-
         val retrofit = Retrofit.Builder()
             .baseUrl("$ROOT_URL/")
             .client(client)
@@ -526,7 +452,7 @@ class SolicitarServicio : AppCompatActivity() {
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
                 if(postList.size == null){
                     System.out.println("no hay nada")
-                   // setProgressDialog.dialog.dismiss()
+                   setProgressDialog.dialog.dismiss()
                     //carsModels = response.body() as ArrayList<presupuestok>
                     //    Log.d("Lista", postList[0].toString())
 
@@ -692,44 +618,224 @@ class SolicitarServicio : AppCompatActivity() {
         requestQueue.add(stringRequest)
 
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
+            filePath = data.data!!
+            try {
+                //Cómo obtener el mapa de bits de la Galería
+                var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                if (bitmap!!.width <= 500){
+                    //  Toast.makeText(this, "Es mejor que 500", Toast.LENGTH_SHORT).show()
+                    val imagen = getStringImagen( bitmap!!)!!
+                    // val imagen = getStringImagen(bitmap!!)!!
+                    if (bitmap!!.width > bitmap.height) {
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.height, bitmap.height)
 
+                    } else if (bitmap.width < bitmap.height) {
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.width
+                        )
+                    }
+                    //Configuración del mapa de bits en ImageView
+                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
+
+                    roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
+                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
+                    fotoPerfil.setImageDrawable(roundedDrawable)
+
+                }else{
+                    // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
+                    val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
+                    val imagen = getStringImagen(bmp!!)!!
+                    var originalBitmap = bmp
+
+                    // val imagen = getStringImagen(bitmap!!)!!
+                    if (originalBitmap!!.width > originalBitmap.height) {
+                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
+
+                    } else if (originalBitmap.width < originalBitmap.height) {
+                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
+                        )
+                    }
+                    //Configuración del mapa de bits en ImageView
+                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
+                    roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
+                    EnviarFotoPerfil(imagen, telefono, NombreF.toString())
+                    fotoPerfil.setImageDrawable(roundedDrawable)
+                    // System.out.println("AQui la imagen" +filePath.toString())
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        //condicion para saber si se selecciono una cuenta
+        if (requestCode == MY_REQUEST_CODE) {
+            currentUser = mAuth!!.currentUser
+            val ROOT_URL = Url().url
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
+            val retrofit = Retrofit.Builder().baseUrl("$ROOT_URL/").client(client).addConverterFactory(GsonConverterFactory.create()).build()
+            val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
+            val call = presupuestoGET.getCliente(telefono)
+            call?.enqueue(object : Callback<List<ClienteModelo?>?> {
+                override fun onResponse(
+                    call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
+                    val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
+                    if(postList.size == null){
+                        System.out.println("no hay nada")
+                        setProgressDialog.dialog.dismiss()
+                        //carsModels = response.body() as ArrayList<presupuestok>
+                        //    Log.d("Lista", postList[0].toString())
+
+                    }else{
+                        NombreF = postList[0].Nombre
+                        val ap = postList[0].Apellido_Paterno
+                        val am = postList[0].Apellido_Materno
+                        val foto = postList[0].fotoPerfil
+                        nombre = "$NombreF $ap $am"
+                        correo = postList[0].Correo
+
+                        if (correo == currentUser!!.email){
+                           // Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
+                            nombreCompletoCliente = nombre as String
+                            txt_nombre.text = nombre
+                            txt_correo.text = correo
+                            if (foto ==null){
+                                //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                                //hay que poner una imagen por defecto
+                                photoUrl = currentUser!!.photoUrl.toString()
+                                val foto2 = photoUrl
+                                cargarImagen(foto2!!)
+                                setProgressDialog.dialog.dismiss()
+                            }else{
+                                cargarImagen(foto)
+                                setProgressDialog.dialog.dismiss()
+                            }
+                            //setFragmentHome(nombre!!)
+                            sesion(correo)
+                        }else{
+                            cerrarSesion()
+                            Toast.makeText(this@SolicitarServicio, "Este Correo ${currentUser!!.email} no pertenece a esta cuenta", Toast.LENGTH_LONG).show()
+
+                            setProgressDialog.dialog.dismiss()
+                        }
+
+                    }
+                }
+
+                override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Codigo de respuesta de error: $t",
+                        Toast.LENGTH_SHORT
+                    ).show();
+
+                    setProgressDialog.dialog.dismiss()
+                }
+
+            })
+
+        }
+    }
 
 
     override fun onStart() {
         super.onStart()
         currentUser = mAuth!!.currentUser
         if(currentUser != null){
-            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
-            firebaseMessaging.addOnCompleteListener {
-                //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
-            }
+            val ROOT_URL = Url().url
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
+            val retrofit = Retrofit.Builder().baseUrl("$ROOT_URL/").client(client).addConverterFactory(GsonConverterFactory.create()).build()
+            val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
+            val call = presupuestoGET.getCliente(telefono)
+            call?.enqueue(object : Callback<List<ClienteModelo?>?> {
+                override fun onResponse(call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
+                    val postList: ArrayList<ClienteModelo> =
+                        response.body() as ArrayList<ClienteModelo>
 
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                    return@OnCompleteListener
+                    if (postList.size == null) {
+                        System.out.println("no hay nada")
+                        setProgressDialog.dialog.dismiss()
+                        //carsModels = response.body() as ArrayList<presupuestok>
+                        //    Log.d("Lista", postList[0].toString())
+
+                    } else {
+                        NombreF = postList[0].Nombre
+                        val ap = postList[0].Apellido_Paterno
+                        val am = postList[0].Apellido_Materno
+                        val foto = postList[0].fotoPerfil
+                        nombre = "$NombreF $ap $am"
+                        correo = postList[0].Correo
+
+                        if (correo == currentUser!!.email) {
+                            //Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
+                            nombreCompletoCliente = nombre as String
+                            txt_nombre.text = nombre
+                            txt_correo.text = correo
+                            if (foto == null) {
+                                //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
+                                //hay que poner una imagen por defecto
+                                photoUrl = currentUser!!.photoUrl.toString()
+                                val foto2 = photoUrl
+                                cargarImagen(foto2!!)
+                                setProgressDialog.dialog.dismiss()
+                            } else {
+                                cargarImagen(foto)
+                                setProgressDialog.dialog.dismiss()
+                            }
+                            //setFragmentHome(nombre!!)
+                            sesion(correo)
+                            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
+                            firebaseMessaging.addOnCompleteListener {
+                            //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+                            }
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                                    return@OnCompleteListener
+                                }
+                                token = task.result
+                                val name = currentUser!!.displayName
+                                val email = currentUser!!.email
+                                photoUrl = currentUser!!.photoUrl.toString()
+                                val uid = currentUser!!.uid
+                                val foto = photoUrl.toString()
+                                val database = FirebaseDatabase.getInstance()
+                                val databaseReference = database.getReference("UsuariosR").child(telefono)
+                                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                                val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
+                                databaseReference.child("MisDatos").setValue(u) { error, ref ->
+                                // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
+                                  setProgressDialog.dialog.dismiss()
+
+                                }
+                            })
+
+                        } else {
+                            Toast.makeText(this@SolicitarServicio, "Este Correo ${currentUser!!.email} no pertenece a esta cuenta", Toast.LENGTH_LONG).show()
+                            cerrarSesion()
+                        }
+                    }
                 }
-                token = task.result
-                // muestraOpciones()
-                val name = currentUser!!.displayName
-                val email = currentUser!!.email
-                photoUrl = currentUser!!.photoUrl.toString()
-                val uid = currentUser!!.uid
-                val foto = photoUrl.toString()
-                val database = FirebaseDatabase.getInstance()
-                val databaseReference = database.getReference("UsuariosR").child(telefono)
-                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-                val usuario = usuarios()
-                val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
-                databaseReference.child("MisDatos").setValue(u) { error, ref ->
-                     // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
-                  //  setProgressDialog.dialog.dismiss()
+                override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
+                    Toast.makeText(
+                        applicationContext,
+                        "Codigo de respuesta de error: $t",
+                        Toast.LENGTH_SHORT
+                    ).show();
+
+                    setProgressDialog.dialog.dismiss()
                 }
+
             })
+
 
         }else {
             muestraOpciones()
-           // setProgressDialog.dialog.dismiss()
+            setProgressDialog.dialog.dismiss()
 
         }
 

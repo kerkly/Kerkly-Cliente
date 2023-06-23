@@ -156,9 +156,6 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
             p.add(ph2)
             documento.add(p)
 
-            if (TipodeUsuario =="ServicioNR"){
-
-            }else{
                 f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
                 f2 = FontFactory.getFont(FontFactory.HELVETICA)
                 ph2 = Phrase(correo, f2)
@@ -166,8 +163,6 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
                 p = Paragraph(ph1)
                 p.add(ph2)
                 documento.add(p)
-
-            }
 
             f1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD)
             f2 = FontFactory.getFont(FontFactory.HELVETICA)
@@ -191,7 +186,7 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
             documento.add(p)
 
             documento.add(Paragraph("En el presente documento se le hace llegar la cotización" +
-                    "de sericios solicitados que se de detallan a continuación."))
+                    "de servicios solicitados que se de detallan a continuación."))
 
             documento.add(Paragraph("\n"))
 

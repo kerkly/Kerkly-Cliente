@@ -25,6 +25,8 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
 
         var layoutmensaje = view.findViewById<LinearLayout>(R.id.layout_mensaje_card)
         var layoutHora = view.findViewById<LinearLayout>(R.id.layout_hora_card)
+        var txtMensajeLeido = view.findViewById<TextView>(R.id.txtMensajeLeido)
+        var layoutMensajeLeido = view.findViewById<LinearLayout>(R.id.layout_MensajeLeido)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,61 +38,101 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.txt_mensaje.text = lista[position].mensaje
         holder.txt_fecha.text = lista[position].hora
+        holder.txtMensajeLeido.text = lista[position].mensajeLeido
 
         var tipo_usuario = lista[position].tipo_usuario.trim()
 
         if (tipo_usuario == "cliente") {
-
-            holder.layoutmensaje.style {
-                this.backgroundRes(R.drawable.burbuja_chat_der)
-                this.layoutGravity(Gravity.END)
-            }
-            holder.layoutHora.style{
+                holder.txtMensajeLeido.visibility = View.VISIBLE
+                holder.layoutMensajeLeido.style {
                 this.layoutGravity(Gravity.END)
 
-            }
-
-            if (position > 0) {
-                if (tipo_usuario == lista[position-1].tipo_usuario.trim()) {
-                    holder.layoutmensaje.style {
-                        this.layoutMarginTopDp(5)
-                    }
-                } else {
-                    holder.layoutmensaje.style {
-                        this.layoutMarginTopDp(20)                    }
                 }
-            }
+                holder.layoutmensaje.style {
+                    this.backgroundRes(R.drawable.burbuja_chat_der)
+                    this.layoutGravity(Gravity.END)
+                }
+                holder.layoutHora.style {
+                    this.layoutGravity(Gravity.END)
 
-        } else if (tipo_usuario == "Kerkly") {
+                }
 
-            holder.layoutmensaje.style {
-                this.backgroundRes(R.drawable.burbuja_chat)
-                this.layoutGravity(Gravity.START)
-            }
-            holder.layoutHora.style{
-                this.layoutGravity(Gravity.START)
-            }
-
-            if (position > 0) {
-                if (tipo_usuario == lista[position-1].tipo_usuario.trim()) {
-                    holder.layoutmensaje.style {
-                        this.layoutMarginTopDp(5)
-                    }
-                } else {
-                    holder.layoutmensaje.style {
-                        this.layoutMarginTopDp(20)
+                if (position > 0) {
+                    if (tipo_usuario == lista[position].tipo_usuario.trim()) {
+                        holder.layoutmensaje.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutHora.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutMensajeLeido.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                    } else {
+                        holder.layoutmensaje.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutHora.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutMensajeLeido.style {
+                            this.layoutMarginTopDp(5)
+                        }
                     }
                 }
-            }
+
+        }
+        if (tipo_usuario == "Kerkly") {
+            holder.txtMensajeLeido.visibility = View.GONE
+                holder.layoutmensaje.style {
+                    this.backgroundRes(R.drawable.burbuja_chat)
+                    this.layoutGravity(Gravity.START)
+                }
+                holder.layoutHora.style{
+                    this.layoutGravity(Gravity.START)
+                }
+
+                holder.layoutMensajeLeido.style{
+                    this.layoutGravity(Gravity.START)
+                }
+
+                if (position > 0) {
+                    if (tipo_usuario == lista[position-1].tipo_usuario.trim()) {
+                        holder.layoutmensaje.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutHora.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutMensajeLeido.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                    } else {
+                        holder.layoutmensaje.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutHora.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                        holder.layoutMensajeLeido.style {
+                            this.layoutMarginTopDp(5)
+                        }
+                    }
+                }
         }
     }
 
     override fun getItemCount(): Int {
         return lista.size
     }
-
     fun addMensaje(m: Mensaje) {
         lista.add(m)
+        notifyItemInserted(lista.size)
+    }
+
+    fun addMensajeClear() {
+        var tam = lista.size
+        lista.remove(lista.get(tam-1))
         notifyItemInserted(lista.size)
     }
 }
