@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_mensaje_view"
     android:layout_width="match_parent"
     app:cardBackgroundColor="@color/transparente"
@@ -27,9 +28,21 @@
             android:textColor="@color/black"
             android:textSize="15sp"
             android:layout_marginEnd="10dp"/>
+        <LinearLayout
+            android:id="@+id/layoutArchivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/imageViewArchivo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:srcCompat="@drawable/icono_pdf" />
+        </LinearLayout>
     </LinearLayout>
-
-
         <LinearLayout
             android:id="@+id/layout_MensajeLeido"
             android:layout_width="wrap_content"

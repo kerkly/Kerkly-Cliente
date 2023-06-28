@@ -7,7 +7,6 @@
     tools:context=".MainActivityChats">
 
 
-
         <LinearLayout
             android:id="@+id/layout_chat"
             android:layout_width="match_parent"
@@ -72,7 +71,7 @@
                 />
 
             <ImageButton
-                android:id="@+id/imageButtonSelecionarFoto"
+                android:id="@+id/imageButtonSelecionarArchivo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

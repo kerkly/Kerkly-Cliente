@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.OpenableColumns
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +22,8 @@ import com.example.kerklyv5.modelo.MensajeCopia
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import java.text.DateFormat
@@ -39,7 +43,7 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var txt_nombreKerkly: TextView
     private lateinit var b: Bundle
     private lateinit var imageViewPerfil: ImageView
-    private lateinit var imageButtonSeleccionarFoto: ImageButton
+    private lateinit var imageButtonSeleccionarArchivo: ImageButton
     lateinit var telefonoKerkly: String
     lateinit var nombreKerkly: String
     private final var PICK_IMAGE_REQUEST  = 600
@@ -51,7 +55,9 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var telefonoCliente: String
     private lateinit var childEventListener: ChildEventListener
     private lateinit var childEventListener2: ChildEventListener
-
+    private val REQUEST_CODE_FILE = 1
+    private lateinit var progressBar: ProgressBar
+    private lateinit var uriArchivo: Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +68,7 @@ class MainActivityChats : AppCompatActivity() {
         recyclerView = findViewById(R.id.recycler_chat)
         txt_nombreKerkly = findViewById(R.id.txt_nombre_kerkly_chats)
         imageViewPerfil = findViewById(R.id.image_usuario)
-        imageButtonSeleccionarFoto = findViewById<ImageButton>(R.id.imageButtonSelecionarFoto)
+        imageButtonSeleccionarArchivo = findViewById<ImageButton>(R.id.imageButtonSelecionarArchivo)
         b = intent.extras!!
 
          nombreKerkly = b.getString("nombreCompletoK").toString()
@@ -118,8 +124,8 @@ class MainActivityChats : AppCompatActivity() {
           }else{
 
            //adapter.addMensaje(Mensaje(editText.text.toString(), "00:00"))
-           databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),""))
-           databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),""))
+           databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
+           databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
          llamartopico.llamartopico(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente)
            editText.setText("")
 
@@ -181,8 +187,8 @@ class MainActivityChats : AppCompatActivity() {
             }
 
         })
-        imageButtonSeleccionarFoto.setOnClickListener {
-            SeleccionarFoto()
+        imageButtonSeleccionarArchivo.setOnClickListener {
+            SeleccionarArchivo()
 
         }
 
@@ -216,18 +222,124 @@ class MainActivityChats : AppCompatActivity() {
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
         return currentDateTimeString
     }
-    fun SeleccionarFoto(){
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    fun SeleccionarArchivo(){
+      //  progressBar.visibility = View.VISIBLE
+//        val intent = Intent(Intent.ACTION_GET_CONTENT)
+//        intent.type = "application/pdf"
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.type = "*/*" // Puedes especificar el tipo de archivo deseado, por ejemplo, "application/pdf" para archivos PDF
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        startActivityForResult(intent, REQUEST_CODE_FILE)
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
-            val selectedImageUri = data!!.data
-            println("url foto " + selectedImageUri.toString())
-            // Hacer algo con la URI de la imagen seleccionada, como cargarla en Firebase Storage
+        if (requestCode == REQUEST_CODE_FILE && resultCode == RESULT_OK && data != null) {
+            uriArchivo = data.data!!
+
+            uriArchivo?.let { uri ->
+                val fileType: String? = contentResolver.getType(uri)
+                fileType?.let {
+                    // Aquí tienes el tipo de archivo seleccionado
+                    // Puedes realizar acciones adicionales en función del tipo de archivo
+                    System.out.println("uri $fileType")
+                    if (fileType  == "application/pdf"){
+                        println("seleciono un pdf")
+                        // Realiza las operaciones necesarias con el archivo PDF seleccionado
+                        EnviarArchivo(uriArchivo, "pdf")
+                    }else{
+                        EnviarArchivo(uriArchivo, "imagen")
+                        println("otro archivo")
+                    }
+                }
+
+            }
+
+        }else{
+            println("no entro archivo")
         }
+
+    }
+
+    private fun EnviarArchivo(uriArchivo: Uri, tipoArchivo: String){
+        val nombreArchivo: String = obtenerNombreArchivo(uriArchivo)
+        // Obtén una referencia al storage de Firebase
+        val storageRef = FirebaseStorage.getInstance().reference
+        // Crea un nombre de archivo único para evitar conflictos
+        val filename = nombreArchivo
+        val fileRef = storageRef.child("UsuariosR").child(telefonoCliente.toString()).child("chats")
+            .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(filename)
+
+        if (tipoArchivo == "pdf"){
+            println("nombre del archivo " + nombreArchivo)
+            // Carga el archivo PDF en Firebase Storage
+            val uploadTask = fileRef.putFile(uriArchivo)
+            // Registra un Listener para obtener la URL del archivo una vez cargado
+            uploadTask.addOnProgressListener {taskSnapshot ->
+                // Calcula el progreso en porcentaje
+                val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
+                // Actualiza la barra de progreso
+              //  progressBar.progress = progress.toInt()
+            }
+            uploadTask.addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
+                // Obtiene la URL de descarga del archivo
+                fileRef.downloadUrl
+                    .addOnSuccessListener { uri: Uri ->
+                        // Guarda la URL del archivo en Firebase Realtime Database
+                        //val databaseRef = FirebaseDatabase.getInstance().reference
+                        val fileUrl = uri.toString()
+                        databaseReferenceKerkly.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        storageRef.child("$tipoArchivo").child(fileUrl)
+                        llamartopico.llamartopico(this,tokenKerkly, nombreArchivo, nombreCompletoCliente)
+                        Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }else{
+            // Carga el archivo PDF en Firebase Storage
+            val uploadTask = fileRef.putFile(uriArchivo)
+            // Registra un Listener para obtener la URL del archivo una vez cargado
+            uploadTask.addOnProgressListener {taskSnapshot ->
+                // Calcula el progreso en porcentaje
+                val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
+                // Actualiza la barra de progreso
+              //  progressBar.progress = progress.toInt()
+            }
+            uploadTask.addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
+                // Obtiene la URL de descarga del archivo
+                fileRef.downloadUrl
+                    .addOnSuccessListener { uri: Uri ->
+                        // Guarda la URL del archivo en Firebase Realtime Database
+                        //val databaseRef = FirebaseDatabase.getInstance().reference
+                        val fileUrl = uri.toString()
+                        databaseReferenceKerkly.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        storageRef.child("$tipoArchivo").child(fileUrl)
+                        llamartopico.llamartopico(this,tokenKerkly, nombreArchivo, nombreCompletoCliente)
+                        Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+    }
+
+    @SuppressLint("Range")
+    private fun obtenerNombreArchivo(uri: Uri): String {
+        var nombre: String? = null
+        if (uri.scheme.equals("content")) {
+            contentResolver.query(uri, null, null, null, null).use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                    nombre = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (nombre == null) {
+            nombre = uri.path
+            val index = nombre!!.lastIndexOf("/")
+            if (index != -1) {
+                nombre = nombre!!.substring(index + 1)
+            }
+        }
+        return nombre!!
     }
 
     override fun onBackPressed() {
