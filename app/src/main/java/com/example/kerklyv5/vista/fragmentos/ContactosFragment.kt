@@ -136,7 +136,7 @@ class ContactosFragment : Fragment() {
         println(" tel: " + snapshot.value)
         array = arrayListOf(snapshot.value.toString())
         firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(snapshot.value.toString()).child("MisDatos")
+        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(snapshot.child("telefono").value.toString()).child("MisDatos")
 
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

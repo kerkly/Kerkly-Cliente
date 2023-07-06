@@ -69,11 +69,7 @@ class HomeFragment : Fragment(){
     private lateinit var btn_otrosOficios: MaterialButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        /*homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)*/
         val root = inflater.inflate(R.layout.fragment_home, container, false)
-        // Obtienes el Bundle del Intent
-
        b = Bundle()
 
       spinner = root.findViewById(R.id.spinnerNormal)
@@ -115,35 +111,8 @@ class HomeFragment : Fragment(){
             }
         }
 
-       /* buscar = root.findViewById(R.id.search_oficios)
-        recyclerViewOficios = root.findViewById(R.id.recycler_oficios)
-        listaArrayOficios = ArrayList<Oficio>()
-        recyclerViewOficios.setHasFixedSize(true)
-        recyclerViewOficios.layoutManager = LinearLayoutManager(context)*/
         getOficios()
 
-     /*   val plomero= "plomero"
-        val regex = "[A-Za-z]+@[a-z]+\\.[a-z]+" //expresion para reconocer correos
-        val nombreA = "^[A-ZÑa-zñáéíóúÁÉÍÓÚ'° ]+\$" //Expresion Para reconocer nombres y apellidos
-        val palabras = "(?i)(\\W|^)(tontería|maldito|caray|$plomero|madre\\smía|ostras)(\\W|\$)"
-
-        val patron: Pattern = Pattern.compile(palabras)
-        var texto = "plomero"
-            val emparejador: Matcher = patron.matcher(texto)
-            val esCoincidente = emparejador.find()
-            if (esCoincidente) {
-                println("texto Reconocido: ")
-            }else{
-                println("no reconocido: ")
-            }*/
-
-       // setprogress.setProgressDialog(requireContext())
-    /*    btnfiltro.setOnClickListener{
-            val aa = AdapterSpinner(requireActivity(), listaArrayOficios)
-           // spinner.adapter = aa
-          //   problema = textProblem.text.toString()
-          //  Miadapter.filtrado(problema)
-        }*/
         listaTextos = ArrayList()
         textProblem.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -202,6 +171,7 @@ class HomeFragment : Fragment(){
     }
 
     private fun getOficios () {
+        setprogress.setProgressDialog(requireContext())
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
             .setLenient()
@@ -229,46 +199,16 @@ class HomeFragment : Fragment(){
                     oficio = listaArrayOficios[i].nombreO
                     pal = pal+ oficio +"|"
                 }
-                 expresion = "$inicio$pal$final"
+                 expresion = "$inicio$pal"+"$final"
                 println("expresion armada $inicio"+pal+final)
-               /*
-                val inicio = "(?i)(\\W|^)("
-                var pal = ""
-                val final ="\\smía|ostras)(\\W|\$)"
-                var oficio = ""
-            for (i in 0 until listaArrayOficios!!.size){
-                oficio = listaArrayOficios[i].nombreO
-                pal = pal+ oficio +"|"
-            }
-                val expresion = "$inicio$pal$final"
-                println("expresion armada $inicio"+pal+final)
-                val patron: Pattern = Pattern.compile(expresion)
-                var texto = "plomero"
-                val emparejador: Matcher = patron.matcher(texto)
-                val esCoincidente = emparejador.find()
-                if (esCoincidente) {
-                    println("texto Reconocido: ")
-                    val aa = AdapterSpinner(requireActivity(), listaArrayOficios)
-                }else{
-                    println("no reconocido: ")
-                }
-*/
+                setprogress.dialog.dismiss()
                 val aa = AdapterSpinner(requireActivity(), listaArrayOficios)
                 spinner.adapter = aa
 
-              //  setprogress.dialog.dismiss()
-             //   println("--->" + postList[0].nombreO)
-         /*     Miadapter = AdapterOficios(listaArrayOficios, listaArrayOficios)
-               Miadapter.setOnClickListener{
-                   val nombreOfi = listaArrayOficios[recyclerViewOficios.getChildAdapterPosition(it)].nombreO.trim()
-                   Toast.makeText(requireContext(), "$nombreOfi", Toast.LENGTH_SHORT).show()
-                }
-                recyclerViewOficios.adapter = Miadapter
-                buscar.setOnQueryTextListener(this@HomeFragment)*/
             }
 
             override fun onFailure(call: Call<List<Oficio?>?>, t: Throwable) {
-               // setprogress.dialog.dismiss()
+                setprogress.dialog.dismiss()
                 Log.d("error del retrofit", t.toString())
                // Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
             }

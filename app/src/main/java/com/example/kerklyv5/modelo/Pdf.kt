@@ -2,6 +2,8 @@ package com.example.kerklyv5.modelo
 
 import android.os.Environment
 import android.util.Log
+import android.view.View
+import com.github.barteksc.pdfviewer.PDFView
 import com.lowagie.text.*
 import com.lowagie.text.pdf.PdfCell
 import com.lowagie.text.pdf.PdfPCell
@@ -15,8 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, TipodeUsuario: String, nombreKerkly: String) {
-
+class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, TipodeUsuario: String, nombreKerkly: String, pdfView: PDFView) {
     var nombre = nombreC
     var direccion = direccionC
     lateinit var telefono: String
@@ -31,6 +32,7 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
     var correo = correo
     var TipodeUsuario = TipodeUsuario
     var nombreKerly = nombreKerkly
+     var pdfView = pdfView
 
 
     fun getRuta(): File? {
@@ -38,13 +40,8 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
         // Descargas
         var ruta: File? = null
         if (Environment.MEDIA_MOUNTED == Environment
-                .getExternalStorageState()
-        ) {
-            ruta = File(
-                Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                NOMBRE_DIRECTORIO
-            )
+                .getExternalStorageState()) {
+            ruta = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), NOMBRE_DIRECTORIO)
             if (ruta != null) {
                 if (!ruta.mkdirs()) {
                     if (!ruta.exists()) {
@@ -55,7 +52,17 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
         }
         return ruta
     }
-
+     fun vizualizarPDF(){
+         pdfView.visibility = View.VISIBLE
+        // Ruta del archivo PDF
+        val filePath = getRuta().toString()
+       println("rutaa $filePath/"+NOMBRE_DOCUMENTO)
+        pdfView.fromFile(File(filePath+"/"+NOMBRE_DOCUMENTO))
+            .defaultPage(0)
+            .enableSwipe(true)
+            .swipeHorizontal(false)
+            .load()
+    }
     @Throws(IOException::class)
     fun crearFichero(nombreFichero: String?): File? {
         val ruta = getRuta()
@@ -63,10 +70,7 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
         if (ruta != null) fichero = File(ruta, nombreFichero)
         return fichero
     }
-
-
     fun generarPdf() {
-
         // Creamos el documento.
         val documento = Document()
         try {
@@ -297,14 +301,14 @@ class Pdf (nombreC: String, direccionC: String, folio: Int, correo: String, Tipo
             )*/
         } catch (e: DocumentException) {
             Log.e(ETIQUETA_ERROR, e.message!!)
-            println("aquiii_>")
         } catch (e: IOException) {
             e.message?.let { Log.e(ETIQUETA_ERROR, it) }
-            println("aquiii 308")
+
         } finally {
             // Cerramos el documento.
-            println("aquiii 311")
-            documento.close()
+
+           documento.close()
+            vizualizarPDF()
         }
     }
 

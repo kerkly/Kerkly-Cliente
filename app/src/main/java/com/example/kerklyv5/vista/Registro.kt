@@ -1,6 +1,9 @@
 package com.example.kerklyv5.vista
 
 import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -18,6 +21,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
@@ -121,7 +125,12 @@ class Registro : AppCompatActivity() {
             // EmailBuilder().build(),
             GoogleBuilder().build())
         mAuth = FirebaseAuth.getInstance()
+
     }
+
+
+
+
 
     private fun showFileChooser() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -16,6 +16,7 @@ import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
+import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.express.FormaPagoExrpess
 import com.example.kerklyv5.express.MensajesExpress
 import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
@@ -35,21 +36,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [OrdenesPendientesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class OrdenesPendientesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
     private lateinit var recyclerview: RecyclerView
     private lateinit var adapter: AdapterOrdenPendiente
     private lateinit var telefono: String
@@ -61,12 +48,11 @@ class OrdenesPendientesFragment : Fragment() {
 
     private lateinit var firebaseDatabase: FirebaseDatabase
     private lateinit var dabaseReference: DatabaseReference
+     val setProgress= setProgressDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
         }
     }
 
@@ -80,7 +66,6 @@ class OrdenesPendientesFragment : Fragment() {
         recyclerview = v.findViewById(R.id.recycler_ordenesPendientes)
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(context)
-
         img = v.findViewById(R.id.img_ordenesPendientes)
         txt = v.findViewById(R.id.txt_ordenesPendientes)
 
@@ -97,15 +82,12 @@ class OrdenesPendientesFragment : Fragment() {
     }
 
     private fun getOrdenes () {
+        setProgress.setProgressDialog(requireContext())
         val ROOT_URL = Url().url
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-
+        val gson = GsonBuilder().setLenient().create()
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client: OkHttpClient = OkHttpClient.Builder().build()
-
         val retrofit = Retrofit.Builder()
             .baseUrl("$ROOT_URL/")
             .client(client)
@@ -123,15 +105,17 @@ class OrdenesPendientesFragment : Fragment() {
                 val postList: ArrayList<OrdenPendiente> = response.body()
                         as ArrayList<OrdenPendiente>
 
-                Log.d("lista", postList.toString())
+                //Log.d("lista", postList.toString())
+               // postList.clear()
                 if (postList.size == 0) {
                     recyclerview.visibility = View.GONE
+                   setProgress.dialog.dismiss()
 
                 } else {
                     img.visibility = View.GONE
                     txt.visibility = View.GONE
-                    Log.d("estoyyyyy aqui", "holaaaa")
                     adapter = AdapterOrdenPendiente(postList)
+                    setProgress.dialog.dismiss()
 
                     adapter.setOnClickListener {
 
@@ -198,16 +182,13 @@ class OrdenesPendientesFragment : Fragment() {
                     recyclerview.adapter = adapter
                 }
             }
-
             override fun onFailure(call: Call<List<OrdenPendiente?>?>, t: Throwable) {
-
+                setProgress.dialog.dismiss()
                 Log.d("error del retrofit", t.toString())
                 Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
             }
-
         })
     }
-
     private fun obtenerPresupuestoFirebase(id: Int, telefonoKerkly: String) {
         dabaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuesto Normal"
         ).child("Presupuesto Normal $id")

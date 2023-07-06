@@ -6,6 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".express.MensajesExpress">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/pdfView"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+        <!--  <ImageView
+              android:id="@+id/imageViewPDF_Pan"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:visibility="gone"
+              android:src="@drawable/icono_pdf"/> -->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
 
             <TextView
                 android:id="@+id/textView9"
@@ -119,6 +140,8 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtPruebaSinR"

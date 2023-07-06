@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.example.kerklyv5.R
 import com.example.kerklyv5.express.FormaPagoExrpess
 import com.example.kerklyv5.modelo.Pdf
+import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -42,7 +43,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
     private lateinit var pagado: String
     private lateinit var mensaje_txt: TextView
     private var band = false
-
+    private lateinit var pdfView: PDFView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cuerpo_mensaje_recibido)
@@ -168,7 +169,7 @@ class CuerpoMensajeRecibidoActivity : AppCompatActivity() {
 
     fun generarPDF(view: View) {
         imgP = dialog.findViewById(R.id.imageViePdf)
-        val p = Pdf(cliente, direccion, 11, "","","")
+        val p = Pdf(cliente, direccion, 11, "","","", pdfView)
         p.telefono = telefono
         p.cabecera = header
         p.correo = correo

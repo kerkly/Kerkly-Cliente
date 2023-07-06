@@ -47,7 +47,6 @@ import java.util.concurrent.TimeUnit
 
 
 class MainActivityVerificarSMS : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainVerificarSmsBinding
     lateinit var auth: FirebaseAuth
     var storedVerificationId: String? = ""

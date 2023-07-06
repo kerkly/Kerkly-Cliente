@@ -113,8 +113,6 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var nombreCompletoCliente: String
     val setProgressDialog = setProgressDialog()
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
@@ -205,6 +203,7 @@ class SolicitarServicio : AppCompatActivity() {
 
 
             }*/
+
     }
 
     override fun onBackPressed() {
@@ -248,10 +247,7 @@ class SolicitarServicio : AppCompatActivity() {
 
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ){ isGranted ->
-
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted ->
         if (isGranted){
             pickPhotoFromGallery()
         }else{
@@ -269,9 +265,6 @@ class SolicitarServicio : AppCompatActivity() {
         startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
     }
 
-
-
-
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
@@ -287,9 +280,6 @@ class SolicitarServicio : AppCompatActivity() {
         val titulo
         llamarTopico.llamartopico(this, "","","")*/
     }
-
-
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.solicitar_servicio, menu)
@@ -461,10 +451,7 @@ class SolicitarServicio : AppCompatActivity() {
                     val ap = postList[0].Apellido_Paterno
                     val am = postList[0].Apellido_Materno
                     val foto = postList[0].fotoPerfil
-
                     //    Log.d("nombre", n)
-
-
                     nombre = "$NombreF $ap $am"
 
                     correo = postList[0].Correo
@@ -475,27 +462,22 @@ class SolicitarServicio : AppCompatActivity() {
                       //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                         //hay que poner una imagen por defecto
                         if (photoUrl == null){
-                           // setProgressDialog.dialog.dismiss()
+                            setProgressDialog.dialog.dismiss()
                         }else{
                             val foto2 = photoUrl
                             cargarImagen(foto2!!)
-                           // setProgressDialog.dialog.dismiss()
+                            setProgressDialog.dialog.dismiss()
 
                         }
 
                     }else{
                         cargarImagen(foto)
-                       // setProgressDialog.dialog.dismiss()
+                        setProgressDialog.dialog.dismiss()
                     }
 
                     setFragmentHome(nombre!!)
                     sesion(correo)
-
-
-
                 }
-
-
             }
 
             override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
@@ -504,10 +486,8 @@ class SolicitarServicio : AppCompatActivity() {
                     "Codigo de respuesta de error: $t",
                     Toast.LENGTH_SHORT
                 ).show();
-
-                //setProgressDialog.dialog.dismiss()
+                setProgressDialog.dialog.dismiss()
             }
-
         })
     }
 
@@ -518,28 +498,6 @@ class SolicitarServicio : AppCompatActivity() {
 
         Picasso.get().load(urlImagen).into(object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                // loaded bitmap is here (bitmap)
-               // fotoPerfil.setImageBitmap(bitmap)
-                System.out.println("Respuesta 1 " )
-                //Configuración del mapa de bits en ImageView
-                // val imagen = getStringImagen(bitmap!!)!!
-            /*   var bitmapO = bitmap
-                if (bitmapO != null) {
-                    if (bitmapO.width > bitmapO.height) {
-                        bitmapO = Bitmap.createBitmap(bitmapO, 0, 0, bitmapO.height, bitmapO.height)
-
-                    } else
-                        if (bitmapO.width < bitmapO.height) {
-                            bitmapO = Bitmap.createBitmap(bitmapO, 0, 0, bitmapO.width, bitmapO.width)
-                        }
-                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmapO)
-                    roundedDrawable.cornerRadius = bitmapO!!.getWidth().toFloat()
-                  //  fotoPerfil!!.setImageDrawable(roundedDrawable)
-                  //  Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 1", Toast.LENGTH_SHORT).show()
-
-                }*/
-
-              //  fotoPerfil.setImageBitmap(bitmap)
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
@@ -548,16 +506,12 @@ class SolicitarServicio : AppCompatActivity() {
                 Glide.with(this@SolicitarServicio).load(file)
                     .apply(RequestOptions.bitmapTransform(multi))
                     .into(fotoPerfil)
-               //setProgressDialog.dialog.dismiss()
-                /* Picasso.get().load(file)
-                    .resize(50,50)
-                    .into(fotoPerfil)*/
-                // Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 2", Toast.LENGTH_SHORT).show()
+               setProgressDialog.dialog.dismiss()
 
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 System.out.println("Respuesta error 3 "+ e.toString())
-               // setProgressDialog.dialog.dismiss()
+                setProgressDialog.dialog.dismiss()
                 //Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
             }
 
@@ -712,7 +666,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 cargarImagen(foto)
                                 setProgressDialog.dialog.dismiss()
                             }
-                            //setFragmentHome(nombre!!)
+                            setFragmentHome(nombre!!)
                             sesion(correo)
                         }else{
                             cerrarSesion()
@@ -810,7 +764,6 @@ class SolicitarServicio : AppCompatActivity() {
                                 databaseReference.child("MisDatos").setValue(u) { error, ref ->
                                 // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
                                   setProgressDialog.dialog.dismiss()
-
                                 }
                             })
 

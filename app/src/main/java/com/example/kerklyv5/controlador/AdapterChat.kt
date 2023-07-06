@@ -17,7 +17,7 @@ import com.example.kerklyv5.modelo.Mensaje
 import com.squareup.picasso.Picasso
 
 class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
-    private var lista = ArrayList<Mensaje>()
+     var lista = ArrayList<Mensaje>()
     var context = c
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -59,7 +59,7 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
                     val photoUrl = Uri.parse(lista[position].archivo)
                     Picasso.get()
                         .load(photoUrl)
-                        .resize(400,400)
+                        .resize(800,800)
                         .into(holder.imageViewArchivo)
                 }
                 if (lista[position].tipoArchivo == "pdf"){
@@ -122,7 +122,7 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
                     println("si hay archivo $photoUrl")
                     Picasso.get()
                         .load(photoUrl)
-                        .resize(400,400)
+                        .resize(800,800)
                         .into(holder.imageViewArchivo)
                 }
                 if (lista[position].tipoArchivo == "pdf"){

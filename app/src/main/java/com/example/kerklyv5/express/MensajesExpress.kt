@@ -15,6 +15,7 @@ import androidx.core.view.isInvisible
 import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.R
 import com.example.kerklyv5.modelo.Pdf
+import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -37,6 +38,7 @@ class MensajesExpress : AppCompatActivity() {
     private lateinit var btnContinuar: Button
     private lateinit var imgP: ImageView
     private var header: ArrayList<String> = ArrayList<String>()
+    private lateinit var databaseReferenceNR: DatabaseReference
     private lateinit var databaseReference: DatabaseReference
     private lateinit var firebaseDatabase: FirebaseDatabase
     var lista: MutableList<MutableList<String>>? = null
@@ -49,8 +51,7 @@ class MensajesExpress : AppCompatActivity() {
     private lateinit var direccionKerkly: String
     private lateinit var correoKerkly: String
     lateinit var txtPruebaSinR: TextView
-
-
+    private lateinit var imageViewPDF: PDFView
 
 
     @SuppressLint("SetTextI18n")
@@ -64,6 +65,7 @@ class MensajesExpress : AppCompatActivity() {
         txt_fecha = findViewById(R.id.txt_fechaMensaje)
         mensaje_txt = findViewById(R.id.txt_cuerpoMensaje)
         txtPruebaSinR = findViewById(R.id.txtPruebaSinR)
+        imageViewPDF = findViewById(R.id.pdfView)
 
         dialog = Dialog(this)
 
@@ -120,8 +122,8 @@ class MensajesExpress : AppCompatActivity() {
             header.add("Concepto")
             header.add("Pago")
             println("foliooo ---> " +  "$calle $colonia $ext $cp $ref")
-            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
-            databaseReference.addValueEventListener(postListener)
+            databaseReferenceNR = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
+            databaseReferenceNR.addValueEventListener(postListener)
         }
 
         if (tipoUsuario == "Registrado"){
@@ -137,9 +139,8 @@ class MensajesExpress : AppCompatActivity() {
             header.add("Item")
             header.add("Concepto")
             header.add("Pago")
-            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal $folio")
+            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal 65")
             databaseReference.addValueEventListener(postListener)
-
         }
         btnContinuar.setOnClickListener {
             if (tipoUsuario =="NoRegistrado"){
@@ -162,23 +163,20 @@ class MensajesExpress : AppCompatActivity() {
                 intent.putExtra("problema", problema)
                 startActivity(intent)
             }
-
-
         }
-
     }
-
     val postListener = object:ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            System.out.println(snapshot.value)
+            System.out.println("presupuesto " +snapshot.value)
           // var coleccion = snapshot.child("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal $folio").value as MutableList<*>
+           if (snapshot.value == null){
+               Toast.makeText(this@MensajesExpress,"Lo sentimos hubo un problema $telefonoKerkly",Toast.LENGTH_SHORT).show()
+           }else{
             var sn = snapshot.value as MutableList<*>
             val c = sn[1] as HashMap<*,*>
             var l1 = ArrayList<ArrayList<String>>()
             lista = l1.toMutableList()
             lista!!.clear()
-
-
             for(i in 1 until sn.size) {
                 var dicc = sn[i] as HashMap<*,*>
                 var l: ArrayList<String>? = ArrayList<String>()
@@ -187,36 +185,29 @@ class MensajesExpress : AppCompatActivity() {
                 l.add(dicc.get("descripcion") as String)
                 l.add(dicc.get("pago") as String)
                 lista?.add(l)
-
             }
-            Log.d("coleccion", lista.toString())
+           // Log.d("coleccion", lista.toString())
             pdf()
         }
-
+        }
         override fun onCancelled(error: DatabaseError) {
             TODO("Not yet implemented")
         }
 
     }
-
     fun pdf() {
         dialog.setContentView(R.layout.presupuesto_listo)
         dialog.show()
     }
-
     fun aceptar(view: View) {
         generarPDF()
-
     }
-
-
     fun rechazar(view: View) {
         dialog.dismiss()
     }
-
     fun generarPDF() {
         imgP = dialog.findViewById(R.id.imageViePdf)
-        val p = Pdf(cliente, direccionKerkly, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly)
+      val p= Pdf(cliente, direccionKerkly, folio, correoKerkly, tipoUsuario, nombreCompletoKerkly, imageViewPDF)
         p.telefono = telefonoKerkly
         p.cabecera = header
         p.correo = correoKerkly
@@ -226,9 +217,10 @@ class MensajesExpress : AppCompatActivity() {
         p.total = total
         p.lista = lista
         p.generarPdf()
-
         Toast.makeText(this, "Se descargo el archivo pdf", Toast.LENGTH_SHORT).show()
         dialog.dismiss()
+
     }
+
 
 }

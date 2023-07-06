@@ -134,6 +134,7 @@
                    android:textColor="@color/black"
                    app:backgroundTint="@color/colorBoton"
                    app:iconTint="@color/black"
+                   android:visibility="gone"
                    tools:ignore="OnClick,TouchTargetSizeCheck" />
 
             </LinearLayout>

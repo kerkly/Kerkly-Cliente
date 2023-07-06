@@ -1,16 +1,27 @@
 package com.example.kerklyv5
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Environment
 import android.provider.OpenableColumns
+import android.provider.Settings
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -20,12 +31,15 @@ import com.example.kerklyv5.controlador.AdapterChat
 import com.example.kerklyv5.modelo.Mensaje
 import com.example.kerklyv5.modelo.MensajeCopia
 import com.example.kerklyv5.notificaciones.llamarTopico
+import com.github.barteksc.pdfviewer.PDFView
 import com.google.firebase.database.*
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.text.DateFormat
 import java.util.*
 
@@ -58,6 +72,10 @@ class MainActivityChats : AppCompatActivity() {
     private val REQUEST_CODE_FILE = 1
     private lateinit var progressBar: ProgressBar
     private lateinit var uriArchivo: Uri
+    private lateinit var imagenCompleta: ImageView
+    private lateinit var pdfRenderer: PdfRenderer
+     private var  REQUEST_CODE = 0
+    private lateinit var PantallaCompletaPdf: PDFView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +87,8 @@ class MainActivityChats : AppCompatActivity() {
         txt_nombreKerkly = findViewById(R.id.txt_nombre_kerkly_chats)
         imageViewPerfil = findViewById(R.id.image_usuario)
         imageButtonSeleccionarArchivo = findViewById<ImageButton>(R.id.imageButtonSelecionarArchivo)
+        imagenCompleta = findViewById(R.id.fullscreenImageView)
+        PantallaCompletaPdf = findViewById(R.id.pdfView)
         b = intent.extras!!
 
          nombreKerkly = b.getString("nombreCompletoK").toString()
@@ -126,11 +146,9 @@ class MainActivityChats : AppCompatActivity() {
            //adapter.addMensaje(Mensaje(editText.text.toString(), "00:00"))
            databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
            databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
-         llamartopico.llamartopico(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente)
+           llamartopico.llamartopico(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente)
            editText.setText("")
-
           }
-
         }
      childEventListener =  databaseReferenceCliente.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -138,9 +156,76 @@ class MainActivityChats : AppCompatActivity() {
                // notificacionMensajeEntrantes(m!!.mensaje)
                // Toast.makeText(applicationContext, "mensaje nuevo" , Toast.LENGTH_SHORT).show()
                 adapter.addMensaje(m!!)
+                setScrollBar()
                 if (m!!.tipo_usuario == "Kerkly"){
                     mensajeVistoCliente(snapshot.key!!)
                 }
+                val mGestureDetector = GestureDetector(applicationContext,
+                    object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
+                recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener{
+                    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+
+                        try {
+                            val child = recyclerView.findChildViewUnder(e.x, e.y)
+                            if (child != null && mGestureDetector.onTouchEvent(e)) {
+                                val position = recyclerView.getChildAdapterPosition(child)
+                               // Toast.makeText(applicationContext, "click en ${adapter.lista[position].mensaje}",Toast.LENGTH_SHORT).show()
+                                if (adapter.lista[position].tipo_usuario == "cliente"){
+                                    if (adapter.lista[position].tipoArchivo == "imagen"){
+                                        imagenCompleta.visibility = View.VISIBLE
+                                        val url = Uri.parse(adapter.lista[position].archivo)
+                                        // println("url imagen " +adapter.lista[position].archivo)
+                                        Glide.with(applicationContext)
+                                            .load(url)
+                                            .into(imagenCompleta)
+                                    }
+
+                                    //Toast.makeText(applicationContext, "es mensaje de kerkly ${adapter.lista[position].mensaje}",Toast.LENGTH_SHORT).show()
+                                }
+                                if (adapter.lista[position].tipo_usuario == "Kerkly"){
+                                    val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                    if (ContextCompat.checkSelfPermission(applicationContext, permission) != PackageManager.PERMISSION_GRANTED) {
+                                        permisoParaAccerAlAlmacenamiento()
+                                    }else{
+                                    if (adapter.lista[position].tipoArchivo == "pdf"){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                            if (!Environment.isExternalStorageManager()) {
+                                                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                                                startActivity(intent)
+                                            }else{
+                                                showOptionsDialogPDF(adapter.lista[position].mensaje)
+                                            }
+
+                                        }else{
+                                            showOptionsDialogPDF(adapter.lista[position].mensaje)
+                                        }
+                                    }
+                                    if (adapter.lista[position].tipoArchivo == "imagen"){
+                                        showOptionsDialog(adapter.lista[position].mensaje, adapter.lista[position].archivo)
+                                    }
+                                    }
+                                }
+                                return true
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        return false
+                    }
+
+                    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                        TODO("Not yet implemented")
+                    }
+
+                })
 
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -187,11 +272,259 @@ class MainActivityChats : AppCompatActivity() {
             }
 
         })
+        progressBar= findViewById(R.id.progressBar)
         imageButtonSeleccionarArchivo.setOnClickListener {
             SeleccionarArchivo()
 
         }
 
+
+        permisoParaAccerAlAlmacenamiento()
+
+
+    }
+
+
+    private fun permisoParaAccerAlAlmacenamiento() {
+        val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(permission), REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido, realizar las acciones necesarias aquí
+               // Toast.makeText(this,"Permiso concedido",Toast.LENGTH_SHORT).show()
+              // println("permiso $REQUEST_CODE")
+            } else {
+                // Permiso denegado, manejar la situación de permiso denegado
+              //  Toast.makeText(this,"Permiso denegado",Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun showOptionsDialogPDF(Nombrearchivo: String) {
+        val options = arrayOf("Ver PDF", "Descargar PDF")
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Opciones")
+        builder.setItems(options) { dialog: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                            PantallaCompletaPdf.visibility = View.VISIBLE
+                            progressBar.visibility = View.VISIBLE
+                            //descargar pdf
+                            val storage = FirebaseStorage.getInstance()
+                            val storageRef = storage.reference
+                            // Reemplaza "nombre_del_archivo.pdf" con el nombre del archivo PDF que deseas descargar
+                            val pdfRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(Nombrearchivo)
+                            val localFile = File.createTempFile("$Nombrearchivo", "pdf")
+                            val ruta = getRuta(Nombrearchivo)
+                            println("rutaa  $ruta")
+                            val uploadTask = pdfRef.getFile(ruta!!)
+                            // Registra un Listener para obtener la URL del archivo una vez cargado
+                            uploadTask.addOnProgressListener {taskSnapshot ->
+                                // Calcula el progreso en porcentaje
+                                val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
+                                // Actualiza la barra de progreso
+                                progressBar.progress = progress.toInt()
+                            }
+                            pdfRef.getFile(localFile)
+                                .addOnSuccessListener {
+                                    // El archivo PDF se descargó exitosamente, puedes realizar las operaciones necesarias aquí
+                                    // localFile contiene la ubicación del archivo descargado en el dispositivo
+                                    val destinationFile = File(ruta!!.toURI())
+                                    localFile.copyTo(destinationFile, overwrite = true)
+                                    Toast.makeText(applicationContext, "Archivo Descargado",Toast.LENGTH_SHORT).show()
+                                    progressBar.visibility = View.GONE
+                                    PantallaCompletaPdf.fromFile(File(destinationFile.toURI()))
+                                        .defaultPage(0)
+                                        .enableSwipe(true)
+                                        .swipeHorizontal(false)
+                                        .load()
+
+                                    /*GlobalScope.launch(Dispatchers.IO) {
+                                        val parcelFileDescriptor: ParcelFileDescriptor =
+                                            ParcelFileDescriptor.open(destinationFile, ParcelFileDescriptor.MODE_READ_ONLY)
+                                        pdfRenderer = PdfRenderer(parcelFileDescriptor)
+
+                                        showPdfPage(0) // Muestra la primera página del PDF
+
+                                    }*/
+                                    // showPdf(destinationFile)
+                                }
+                                .addOnFailureListener { exception ->
+                                    // Ocurrió un error al descargar el archivo PDF
+                                    // Maneja el error de acuerdo a tus necesidades
+                                    Toast.makeText(applicationContext, "Ocurrió un error al descargar el archivo PDF",Toast.LENGTH_SHORT).show()
+                                    progressBar.visibility = View.GONE
+                                }
+                    }
+
+
+                1 -> {
+                    // Acción para "Descargar PDF"
+                    //imagenCompleta.visibility = View.VISIBLE
+                    progressBar.visibility = View.VISIBLE
+                    //descargar pdf
+                    val storage = FirebaseStorage.getInstance()
+                    val storageRef = storage.reference
+                    // Reemplaza "nombre_del_archivo.pdf" con el nombre del archivo PDF que deseas descargar
+                    val pdfRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(Nombrearchivo)
+                    val localFile = File.createTempFile("$Nombrearchivo", "pdf")
+                    val ruta = getRuta(Nombrearchivo)
+                    println("ruta $ruta")
+                    val uploadTask = pdfRef.getFile(ruta!!)
+                    // Registra un Listener para obtener la URL del archivo una vez cargado
+                    uploadTask.addOnProgressListener {taskSnapshot ->
+                        // Calcula el progreso en porcentaje
+                        val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
+                        // Actualiza la barra de progreso
+                        progressBar.progress = progress.toInt()
+                    }
+                    pdfRef.getFile(localFile)
+                        .addOnSuccessListener {
+                            // El archivo PDF se descargó exitosamente, puedes realizar las operaciones necesarias aquí
+                            // localFile contiene la ubicación del archivo descargado en el dispositivo
+                            val destinationFile = File(ruta!!.toURI())
+                            localFile.copyTo(destinationFile, overwrite = true)
+                            Toast.makeText(applicationContext, "Archivo Descargado",Toast.LENGTH_SHORT).show()
+                            progressBar.visibility = View.GONE
+                        }
+                        .addOnFailureListener { exception ->
+                            // Ocurrió un error al descargar el archivo PDF
+                            // Maneja el error de acuerdo a tus necesidades
+                            Toast.makeText(applicationContext, "Ocurrió un error al descargar el archivo PDF",Toast.LENGTH_SHORT).show()
+                            progressBar.visibility = View.GONE
+                        }
+
+                }
+            }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancelar") { dialog: DialogInterface, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+
+    }
+
+    private fun showOptionsDialog(archivo: String, urlImagen: String) {
+        val options = arrayOf("Ver imagen", "Descargar imagen")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Opciones")
+        builder.setItems(options) { dialog: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                    // Acción para "Ver imagen"
+                    imagenCompleta.visibility = View.VISIBLE
+                    val url = Uri.parse(urlImagen)
+                    //  println("url imagen " +adapter.lista[position].archivo)
+                    Glide.with(applicationContext)
+                        .load(url)
+                        .into(imagenCompleta)
+
+                }
+                1 -> {
+                    // Acción para "Descargar imagen"
+                    progressBar.visibility = View.VISIBLE
+                    //descargar la imagen
+                    val storage = FirebaseStorage.getInstance()
+                    val storageRef = storage.reference
+                    // Reemplaza "nombre_del_archivo.jpg" con el nombre del archivo de imagen que deseas descargar
+                    val imageRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(archivo)
+                   // crea un archivo temporal con un nombre único en el sistema de archivos local, utilizando el valor de la variable archivo como prefijo y la extensión ".jpg".
+                    val localFile = File.createTempFile("$archivo", "jpg")
+                    val ruta = getRuta(archivo)
+                    val uploadTask = storageRef.getFile(ruta!!)
+                    // Registra un Listener para obtener la URL del archivo una vez cargado
+                    uploadTask.addOnProgressListener {taskSnapshot ->
+                        // Calcula el progreso en porcentaje
+                        val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
+                        // Actualiza la barra de progreso
+                        progressBar.progress = progress.toInt()
+                    }
+                    imageRef.getFile(localFile)
+                        .addOnSuccessListener {
+                            // La imagen se descargó exitosamente
+                            // Puedes guardar la imagen en una ubicación específica utilizando el siguiente código
+
+                            val destinationFile = File(ruta!!.toURI())
+                            localFile.copyTo(destinationFile, overwrite = true)
+                            Toast.makeText(applicationContext, "Imagen Descargada",Toast.LENGTH_SHORT).show()
+                            // La imagen se ha guardado en la ubicación especificada
+                            progressBar.visibility = View.GONE
+
+                        }
+                        .addOnFailureListener { exception ->
+                            // Ocurrió un error al descargar la imagen
+                            // Maneja el error de acuerdo a tus necesidades
+                            Toast.makeText(applicationContext, "Ocurrió un error al descargar la imagen",Toast.LENGTH_SHORT).show()
+                            progressBar.visibility = View.GONE
+                        }
+                }
+            }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancelar") { dialog: DialogInterface, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private suspend fun showPdfPage(pageIndex: Int) {
+        withContext(Dispatchers.IO) {
+            val page: PdfRenderer.Page = pdfRenderer.openPage(pageIndex)
+
+            val bitmap: Bitmap = Bitmap.createBitmap(
+                page.width,
+                page.height,
+                Bitmap.Config.ARGB_8888
+            )
+
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+            withContext(Dispatchers.Main) {
+                imagenCompleta.setImageBitmap(bitmap)
+            }
+
+            page.close()
+        }
+    }
+
+    fun getRuta(NOMBRE_DIRECTORIO: String): File? {
+        // El fichero sera almacenado en un directorio dentro del directorio
+        // Descargas
+        var ruta: File? = null
+        if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
+           //  println("nombre archivo 325 " +NOMBRE_DIRECTORIO)
+            ruta = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), NOMBRE_DIRECTORIO)
+            if (ruta.exists()) {
+                // El directorio de descargas existe
+                println("El directorio de descargas existe")
+            } else {
+                // El directorio de descargas no existe
+                println("El directorio de descargas no existe")
+                ruta.mkdirs()
+            }
+            /*   if (ruta != null) {
+                    if (!ruta.mkdirs()) {
+                        if (!ruta.exists()) {
+                            return null
+                        }
+                    }
+                }*/
+        }
+        return ruta
     }
 
     private fun mensajeVistoKerkly(key: String) {
@@ -223,20 +556,43 @@ class MainActivityChats : AppCompatActivity() {
         return currentDateTimeString
     }
     fun SeleccionarArchivo(){
-      //  progressBar.visibility = View.VISIBLE
-//        val intent = Intent(Intent.ACTION_GET_CONTENT)
-//        intent.type = "application/pdf"
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.type = "*/*" // Puedes especificar el tipo de archivo deseado, por ejemplo, "application/pdf" para archivos PDF
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        startActivityForResult(intent, REQUEST_CODE_FILE)
+        val options = arrayOf("Enviar Imagen", "Enviar PDF")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Opciones")
+        builder.setItems(options) { dialog: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                    progressBar.visibility = View.VISIBLE
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.type = "image/*"
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    startActivityForResult(intent, REQUEST_CODE_FILE)
+                }
+                1 -> {
+                      progressBar.visibility = View.VISIBLE
+                     val intent = Intent(Intent.ACTION_GET_CONTENT)
+                     intent.type = "application/pdf"
+                    // intent.type = "*/*" // Puedes especificar el tipo de archivo deseado, por ejemplo, "application/pdf" para archivos PDF
+                     intent.addCategory(Intent.CATEGORY_OPENABLE)
+                      startActivityForResult(intent, REQUEST_CODE_FILE)
+
+                }
+            }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Cancelar") { dialog: DialogInterface, _ ->
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_FILE && resultCode == RESULT_OK && data != null) {
+            progressBar.visibility = View.VISIBLE
             uriArchivo = data.data!!
-
             uriArchivo?.let { uri ->
                 val fileType: String? = contentResolver.getType(uri)
                 fileType?.let {
@@ -279,7 +635,7 @@ class MainActivityChats : AppCompatActivity() {
                 // Calcula el progreso en porcentaje
                 val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
                 // Actualiza la barra de progreso
-              //  progressBar.progress = progress.toInt()
+               progressBar.progress = progress.toInt()
             }
             uploadTask.addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
                 // Obtiene la URL de descarga del archivo
@@ -293,6 +649,7 @@ class MainActivityChats : AppCompatActivity() {
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.llamartopico(this,tokenKerkly, nombreArchivo, nombreCompletoCliente)
                         Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
+                        progressBar.visibility =View.GONE
                     }
             }
         }else{
@@ -303,7 +660,7 @@ class MainActivityChats : AppCompatActivity() {
                 // Calcula el progreso en porcentaje
                 val progress = 100.0 * taskSnapshot!!.bytesTransferred / taskSnapshot!!.totalByteCount
                 // Actualiza la barra de progreso
-              //  progressBar.progress = progress.toInt()
+               progressBar.progress = progress.toInt()
             }
             uploadTask.addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
                 // Obtiene la URL de descarga del archivo
@@ -317,6 +674,7 @@ class MainActivityChats : AppCompatActivity() {
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.llamartopico(this,tokenKerkly, nombreArchivo, nombreCompletoCliente)
                         Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
+                        progressBar.visibility =View.GONE
                     }
             }
         }
@@ -343,15 +701,30 @@ class MainActivityChats : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        finish()
-        if (childEventListener == null || childEventListener2 == null) {
-           // Toast.makeText(applicationContext, "null el childEventListener", Toast.LENGTH_SHORT) .show()
-        } else {
-            //Toast.makeText(applicationContext, "childEventListener detnido ", Toast.LENGTH_SHORT) .show()
-            databaseReferenceCliente.removeEventListener(childEventListener!!);
-            databaseReferenceKerkly.removeEventListener(childEventListener2!!);
+        if ( imagenCompleta.visibility == View.VISIBLE){
+            imagenCompleta.visibility = View.GONE
+            // Liberar la referencia a la imagen en imageView
+            imagenCompleta?.setImageDrawable(null)
+            //imagenCompleta = null
 
+            // Llamar al onBackPressed de la clase base
+         //   super.onBackPressed()
+
+    }else{
+            if (childEventListener == null || childEventListener2 == null){
+                //  Toast.makeText(applicationContext, "null el childEventListener", Toast.LENGTH_SHORT).show()
+            }else {
+                if (PantallaCompletaPdf.visibility == View.VISIBLE){
+                    PantallaCompletaPdf.visibility  =View.GONE
+
+                }else
+                    finish()
+                //  Toast.makeText(applicationContext, "childEventListener detnido ", Toast.LENGTH_SHORT).show()
+                databaseReferenceKerkly.removeEventListener(childEventListener!!);
+                databaseReferenceCliente.removeEventListener(childEventListener2!!);
+
+            }
         }
-    }
+        }
 
 }

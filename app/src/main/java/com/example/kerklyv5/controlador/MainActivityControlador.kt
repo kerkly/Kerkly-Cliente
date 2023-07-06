@@ -243,7 +243,7 @@ class MainActivityControlador {
                 override fun failure(error: RetrofitError?) {
                     println("error244 $error")
                     Toast.makeText(contexto, "Tenemos Problemas con el Servidor.... por favor intente mas tarde", Toast.LENGTH_SHORT).show()
-                    //contexto.finish()
+                    contexto.finish()
                 }
             }
         )
