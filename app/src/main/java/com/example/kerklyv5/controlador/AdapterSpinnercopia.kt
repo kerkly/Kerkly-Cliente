@@ -16,7 +16,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 
-class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
+class AdapterSpinnercopia(c:Context, l: ArrayList<MisOficios>): BaseAdapter() {
     var contexto = c
     var lista = l
 
@@ -25,7 +25,7 @@ class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
     }
 
     override fun getItem(position: Int): Any {
-        return lista[position].nombreO
+        return lista[position].nombreOfi
     }
 
     override fun getItemId(position: Int): Long {
@@ -40,7 +40,7 @@ class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
         view = layout.inflate(R.layout.spinner_s, null)
 
         var txt = view.findViewById<TextView>(R.id.tv_oficio)
-        txt.text = lista[position].nombreO
+        txt.text = lista[position].nombreOfi
 
         return view
 
@@ -52,7 +52,7 @@ class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
         val final ="\\smía|ostras)(\\W|\$)"
         var oficio = ""
         for (i in 0 until lista!!.size){
-            oficio = lista[i].nombreO
+            oficio = lista[i].nombreOfi
             pal = pal+ oficio +"|"
         }
         val expresion = "$inicio$pal$final"
@@ -62,7 +62,7 @@ class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
         val esCoincidente = emparejador.find()
         if (esCoincidente) {
             println("texto Reconocido: ")
-            val collecion: List<Oficio> = lista
+            val collecion: List<MisOficios> = lista
             notifyDataSetChanged()
 
         }else{

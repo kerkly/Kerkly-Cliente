@@ -19,7 +19,6 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import com.example.kerklyv5.MensajesActivity
-import com.example.kerklyv5.controlador.Notificacion
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterSpinner
 import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
@@ -41,7 +40,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.activity_pedir_servicio_express.inputProblematicaExpres
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
@@ -119,6 +117,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var firebaseDatabaseUsu: FirebaseDatabase
     private lateinit var databaseUsu: DatabaseReference
     lateinit var arraylistUsuarios: ArrayList<usuarios>
+    lateinit var inputProblematicaExpres: TextInputEditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pedir_servicio_express)
@@ -126,6 +125,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
         editProblematica = findViewById(R.id.inputProblematicaExpres)
         layoutProblematica = findViewById(R.id.layoutProblematicaExpress)
+        inputProblematicaExpres = findViewById(R.id.inputProblematicaExpres)
         spinner = findViewById(R.id.spinnerExpress)
 
         dialog = Dialog(this)
@@ -660,11 +660,8 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                 val direccion: List<Address>
                 geocoder = Geocoder(this, Locale.getDefault())
 
-                direccion = geocoder.getFromLocation(
-                    loc.latitude,
-                    loc.longitude,
-                    1
-                ) // 1 representa la cantidad de resultados a obtener
+                direccion =
+                    geocoder.getFromLocation(loc.latitude, loc.longitude, 1)!! // 1 representa la cantidad de resultados a obtener
                 val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
 
 

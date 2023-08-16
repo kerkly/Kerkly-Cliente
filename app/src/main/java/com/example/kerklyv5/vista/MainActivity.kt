@@ -40,7 +40,7 @@ import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.activity_main.*
+//import kotlinx.android.synthetic.main.activity_main.*
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
@@ -230,7 +230,6 @@ class MainActivity : AppCompatActivity() {
                  //val i = Intent(this, SolicitarServicio::class.java)
                 //i.putExtras(b)
 
-
                 val u = Cliente(editUsuario.text.toString(), editContra.text.toString())
                 controlador.verficiarUsuario(u, this)
 
@@ -372,4 +371,6 @@ class MainActivity : AppCompatActivity() {
         vv_fondo.start()
 
     }
+
+
 }

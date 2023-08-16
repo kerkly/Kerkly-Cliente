@@ -173,7 +173,6 @@ class ContactosFragment : Fragment() {
                                  token =Miadapter.lista[position].token
 
                                 val intent = Intent(requireContext(), MainActivityChats::class.java)
-
                                 b!!.putString("nombreCompletoK", nombre)
                                 b!!.putString("correoK", correo)
                                 b!!.putString("telefonok",telefono)
@@ -184,7 +183,6 @@ class ContactosFragment : Fragment() {
                                 b!!.putString("urlFotoKerkly",urlfoto)
                                 intent.putExtras(b!!)
                                 startActivity(intent)
-
                                 return true
                             }
                         } catch (e: Exception) {

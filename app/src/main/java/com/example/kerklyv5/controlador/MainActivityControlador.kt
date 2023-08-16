@@ -124,7 +124,6 @@ class MainActivityControlador {
                     } else {
                         //si entrada es igual al numero ingresado, significa que el numero ya esta registrado en las tablas de cliente no registrado
                         if (entrada == usuario.getTelefonoNoR()){
-                            println("----->entro 127 $entrada")
                             //verificar intentos
                             val ROOT_URL = Url().url
                             val gson = GsonBuilder().setLenient().create()

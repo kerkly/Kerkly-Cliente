@@ -1,7 +1,12 @@
 package com.example.kerklyv5.modelo
 
+import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
@@ -16,7 +21,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.R
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
-import java.lang.Exception
 
 
 class adapterUsuarios(c: Context): RecyclerView.Adapter<adapterUsuarios.ViewHolder>() {
@@ -68,6 +72,7 @@ class adapterUsuarios(c: Context): RecyclerView.Adapter<adapterUsuarios.ViewHold
                     .into(holder.imageViewFoto)
 
             }
+
 
         })
 

@@ -14,9 +14,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.RecuperarCuentaControlador
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.activity_recuperar_cuenta.*
+//import kotlinx.android.synthetic.main.activity_recuperar_cuenta.*
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -48,6 +49,7 @@ class RecuperarCuenta : AppCompatActivity() {
     private lateinit var editCodigo: TextInputEditText
     private lateinit var layoutCodigp: TextInputLayout
     private lateinit var controlador: RecuperarCuentaControlador
+    private lateinit var botonVerificarCorreo: MaterialButton
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +61,7 @@ class RecuperarCuenta : AppCompatActivity() {
         editCodigo = findViewById(R.id.codigoSeguridad_edit)
         layoutCodigp = findViewById(R.id.layout_codigoSeguridad)
         controlador = RecuperarCuentaControlador()
+        botonVerificarCorreo = findViewById(R.id.botonVerificarCorreo)
 
         botonVerificarCorreo.setOnClickListener {
             enviarEmail()

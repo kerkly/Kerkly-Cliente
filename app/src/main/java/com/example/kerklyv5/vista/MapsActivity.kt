@@ -35,7 +35,7 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.*
 import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.confirmar_direccion.*
+//import kotlinx.android.synthetic.main.confirmar_direccion.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
@@ -209,8 +209,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             // mMap.isMyLocationEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = true
 
-            locationManager =
-                this@MapsActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager = this@MapsActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val locationListener: LocationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
                     val miUbicacion = LatLng(location.getLatitude(), location.getLongitude())
@@ -437,7 +436,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 val direccion: List<Address>
                 geocoder = Geocoder(this, Locale.getDefault())
 
-                direccion = geocoder.getFromLocation(latitud, longitud, 1) // 1 representa la cantidad de resultados a obtener
+                direccion =
+                    geocoder.getFromLocation(latitud, longitud, 1)!! // 1 representa la cantidad de resultados a obtener
                 //val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 //Toast.makeText(this, "Entroooo ${direccion[0].locality}", Toast.LENGTH_SHORT).show()
                 if (direccion[0].locality == null || direccion[0].subLocality == null || direccion[0].thoroughfare == null){
@@ -458,7 +458,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                colonia =  direccion[0].subLocality// colonia
                num_ext = direccion[0].subThoroughfare
                 }
-
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -566,10 +565,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                                     System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
                                     for (i in 0 until arraylistUsuarios.size) {
                                         System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
-                                        ingresarPresupuesto()
                                         val llamarTopico = llamarTopico()
                                         llamarTopico.llamartopico(this@MapsActivity, arraylistUsuarios[i].token, "(Servicio Urgente) $problema", "Usuario Nuevo-> $nombreCliente")
                                     }
+                                    ingresarPresupuesto()
                                 }else{
                                     System.out.println("-------------> Sin token")
                                 }

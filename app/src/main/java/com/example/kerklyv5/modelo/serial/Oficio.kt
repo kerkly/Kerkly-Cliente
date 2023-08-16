@@ -8,4 +8,7 @@ class Oficio {
     @SerializedName("nombreO")
     @Expose
     var nombreO: String = ""
+    @SerializedName("PalabrasClaves")
+    @Expose
+    var PalabrasClaves: String = ""
 }

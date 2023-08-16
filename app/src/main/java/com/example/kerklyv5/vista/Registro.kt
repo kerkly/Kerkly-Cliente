@@ -34,12 +34,13 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
 import com.firebase.ui.auth.AuthUI.IdpConfig.GoogleBuilder
 import com.firebase.ui.auth.IdpResponse
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.activity_registro.*
+//import kotlinx.android.synthetic.main.activity_registro.*
 import java.io.IOException
 import java.text.DateFormat
 import java.util.*
@@ -93,6 +94,7 @@ class Registro : AppCompatActivity() {
     private var name = null
     private var email = null
     private var photoUrl = null
+    private lateinit var subirFotoPerfil: MaterialButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
@@ -111,6 +113,7 @@ class Registro : AppCompatActivity() {
         editContra2 = findViewById(R.id.edit_contra2R)
         contra1_contendor = findViewById(R.id.layout_contra1R)
         contra2_layot = findViewById(R.id.layout_contra2R)
+        subirFotoPerfil = findViewById(R.id.subirFotoPerfil)
 
         iv = findViewById(R.id.Animacion)
         subirFotoPerfil.setOnClickListener {

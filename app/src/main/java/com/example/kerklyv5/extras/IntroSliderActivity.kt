@@ -10,17 +10,21 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.lottie.LottieAnimationView
 import com.example.kerklyv5.R
-import kotlinx.android.synthetic.main.activity_intro_slider.*
+//import kotlinx.android.synthetic.main.activity_intro_slider.*
 
 class IntroSliderActivity : AppCompatActivity() {
 
 
     private val fragmentList = ArrayList<Fragment>()
-
+private lateinit var vpIntroSlider: ViewPager2
+private lateinit var indicatorLayout: IndicatorLayout
+private lateinit var tvSkip: TextView
+private lateinit var tvNext: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -38,6 +42,11 @@ class IntroSliderActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_intro_slider)
          val adapter = IntroSliderAdapter(this)
+        vpIntroSlider = findViewById(R.id.vpIntroSlider)
+        indicatorLayout = findViewById(R.id.indicatorLayout)
+        tvSkip = findViewById(R.id.tvSkip)
+        tvNext = findViewById(R.id.tvNext)
+
         vpIntroSlider.adapter = adapter
 
         fragmentList.addAll(listOf(

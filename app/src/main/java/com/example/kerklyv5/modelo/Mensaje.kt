@@ -7,8 +7,6 @@ class Mensaje(m: String, h: String, mensajeLeido: String,archivo:String, tipoArc
     var mensajeLeido = mensajeLeido
     var archivo = archivo
     var tipoArchivo = tipoArchivo
-
-
+    
     constructor(): this("", "","","","")
-
 }

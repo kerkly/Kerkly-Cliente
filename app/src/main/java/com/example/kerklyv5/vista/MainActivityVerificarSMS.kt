@@ -17,6 +17,7 @@ import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -34,12 +35,13 @@ import com.example.kerklyv5.databinding.ActivityMainVerificarSmsBinding
 import com.example.kerklyv5.express.PedirServicioExpress
 import com.example.kerklyv5.url.Url
 import com.google.android.material.internal.ContextUtils.getActivity
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_main_verificar_sms.*
+//import kotlinx.android.synthetic.main.activity_main_verificar_sms.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
@@ -62,6 +64,8 @@ class MainActivityVerificarSMS : AppCompatActivity() {
     var progresDialog:ProgressDialog?=null
     var f: String? = ""
     private lateinit var dialog: Dialog
+    private lateinit var botonSMS: Button
+    private lateinit var edit_VerificarSMS: TextInputEditText
 
     var Callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -106,6 +110,8 @@ class MainActivityVerificarSMS : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
+        botonSMS = findViewById(R.id.botonSMS)
+        edit_VerificarSMS = findViewById(R.id.edit_VerificarSMS)
         binding.btnResend.setOnClickListener{
 
                //Toast.makeText(this@MainActivityVerificarSMS,numeroSMS,Toast.LENGTH_SHORT).show()

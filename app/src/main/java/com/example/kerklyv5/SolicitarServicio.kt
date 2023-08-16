@@ -20,7 +20,6 @@ import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.Nullable
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawable
@@ -41,26 +40,32 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import com.example.kerklyv5.SQLite.DataManager
+import com.example.kerklyv5.SQLite.MisOficios
 import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.databinding.ActivitySolicitarServicioBinding
 import com.example.kerklyv5.interfaces.CerrarSesionInterface
 import com.example.kerklyv5.interfaces.ObtenerClienteInterface
+import com.example.kerklyv5.interfaces.ObtenerOficiosInterface
 import com.example.kerklyv5.interfaces.SesionAbiertaInterface
 import com.example.kerklyv5.modelo.serial.ClienteModelo
+import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.modelo.usuarios
-import com.example.kerklyv5.notificaciones.llamarTopico
+import com.example.kerklyv5.modelo.usuariosSqlite
 import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
@@ -76,6 +81,7 @@ import java.io.BufferedReader
 
 import java.io.InputStreamReader
 import java.io.*
+import java.net.URL
 import java.text.DateFormat
 import java.util.*
 
@@ -101,7 +107,6 @@ class SolicitarServicio : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private val MY_REQUEST_CODE = 200
 
-    //subir foto
     //subir foto de perfil
     lateinit var fotoPerfil: ImageView
     var bitmap: Bitmap? = null
@@ -112,7 +117,10 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var token: String
     private lateinit var nombreCompletoCliente: String
     val setProgressDialog = setProgressDialog()
+    private lateinit var dataManager: DataManager
 
+
+    @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
@@ -122,10 +130,9 @@ class SolicitarServicio : AppCompatActivity() {
         setProgressDialog.setProgressDialog(this)
         b = intent.extras!!
         telefono = b!!.getString("Telefono").toString()
-        println("--------------> $telefono")
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         presupuestoListo = b!!.getBoolean("PresupuestoListo")
-
+        dataManager = DataManager(this)
 
         drawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -138,20 +145,16 @@ class SolicitarServicio : AppCompatActivity() {
         fotoPerfil.setOnClickListener {
             SeleecionarFoto()
         }
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
                 R.id.ordenesPendientesFragment,
-               // R.id.historialFragment,
+                //R.id.fragment_historial,
                 R.id.nav_mensajes
             ), drawerLayout
         )
-
-
-        // sesion(correo)
-
+      //  sesion(correo)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener {
@@ -171,90 +174,43 @@ class SolicitarServicio : AppCompatActivity() {
             dialog2.show()
         }
 
-        getJson()
-
         //Firebase
         providers = Arrays.asList(
             // EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
         mAuth = FirebaseAuth.getInstance()
-/*
-        //Primero Obtendremos la lista de numeros de telefonos
-        val firebaseDatabaseLista: FirebaseDatabase
-        var databaseReferenceLista: Task<DataSnapshot>
-        firebaseDatabaseLista = FirebaseDatabase.getInstance()
-        array = ArrayList<String>()
+        getOficios()
 
-        databaseReferenceLista = firebaseDatabaseLista.getReference("UsuariosR").child("7471503418")
-            .child("Lista de Usuarios").get().addOnCompleteListener { task ->
-
-                for (snapshot in task.result.children) {
-
-                    //array = arrayListOf(snapshot.key!!)
-                    //  println("claves" + snapshot.key)
-                    // myAdapter.notifyDataSetChanged();
-                    // println(" datos: " + snapshot.value)
-                    println(" tel: " + snapshot.child("telefono").value)
-                    array.add(snapshot.child("telefono").value.toString())
-
-
-                }
-
-
-            }*/
 
     }
-
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            //finish()
             setFragmentHome(nombre.toString())
-            /* val alert: AlertDialog.Builder = AlertDialog.Builder(this)
-             alert.setTitle(getString(R.string.cerrar_app))
-             alert.setMessage(getString(R.string.mensaje_alertaCerrarApp))
-             alert.setCancelable(false)
-             alert.setPositiveButton(getString(R.string.confirmar_alertCerrarApp)) {
-                     dialogo1, id -> finish() }
-             alert.setNegativeButton(getString(R.string.cancelar_alertCerrarApp)) { dialogo1, id -> dialogo1.dismiss() }
-             alert.show()*/
         }
     }
-
-
-
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             when {
-
                 ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     pickPhotoFromGallery()
                 }
-
                 else -> requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }else {
-            // Se llamará a la función para APIs 22 o inferior
-            // Esto debido a que se aceptaron los permisos
-            // al momento de instalar la aplicación
             pickPhotoFromGallery()
         }
-
     }
-
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted ->
         if (isGranted){
             pickPhotoFromGallery()
         }else{
-            Toast.makeText(
-                this,
-                "Permission denied",
-                Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -264,7 +220,6 @@ class SolicitarServicio : AppCompatActivity() {
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
     }
-
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
@@ -273,12 +228,6 @@ class SolicitarServicio : AppCompatActivity() {
     }
     fun cerrarVentana(v: View) {
         dialog2.dismiss()
-        /*
-        val llamarTopico = llamarTopico()
-        val token
-        val mensaje
-        val titulo
-        llamarTopico.llamartopico(this, "","","")*/
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -300,10 +249,8 @@ class SolicitarServicio : AppCompatActivity() {
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
-
         }
     }
-
     private fun setFragmentOrdenesPendientes() {
         val f = OrdenesPendientesFragment()
          val args = Bundle()
@@ -314,7 +261,6 @@ class SolicitarServicio : AppCompatActivity() {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
     }
-
     private fun setFragmentHistorial() {
         val f = HistorialFragment()
         // val args = Bundle()
@@ -324,7 +270,6 @@ class SolicitarServicio : AppCompatActivity() {
             replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
         }
     }
-
     private fun setFragmentMensajes() {
         /*val f = ListaChatsFragment()
         // val args = Bundle()
@@ -359,9 +304,7 @@ class SolicitarServicio : AppCompatActivity() {
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(SesionAbiertaInterface::class.java)
-        api.sesionAbierta(
-            correo,
-            id,
+        api.sesionAbierta(correo, id,
             object : retrofit.Callback<retrofit.client.Response?> {
                 override fun success(t: retrofit.client.Response?, response2: retrofit.client.Response?) {
                     var reader: BufferedReader? = null
@@ -429,23 +372,18 @@ class SolicitarServicio : AppCompatActivity() {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
         val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
-
         val call = presupuestoGET.getCliente(telefono)
         call?.enqueue(object : Callback<List<ClienteModelo?>?> {
 
             override fun onResponse(
-                call: Call<List<ClienteModelo?>?>,
-                response: Response<List<ClienteModelo?>?>
-            ) {
+                call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
                 val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
                 if(postList.size == null){
                     System.out.println("no hay nada")
                    setProgressDialog.dialog.dismiss()
                     //carsModels = response.body() as ArrayList<presupuestok>
                     //    Log.d("Lista", postList[0].toString())
-
                 }else{
                     NombreF = postList[0].Nombre
                     val ap = postList[0].Apellido_Paterno
@@ -453,11 +391,10 @@ class SolicitarServicio : AppCompatActivity() {
                     val foto = postList[0].fotoPerfil
                     //    Log.d("nombre", n)
                     nombre = "$NombreF $ap $am"
-
                     correo = postList[0].Correo
                     nombreCompletoCliente = nombre as String
-                    txt_nombre.text = nombre
-                    txt_correo.text = correo
+                 //   txt_nombre.text = nombre
+                //    txt_correo.text = correo
                     if (foto ==null){
                       //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                         //hay que poner una imagen por defecto
@@ -465,21 +402,36 @@ class SolicitarServicio : AppCompatActivity() {
                             setProgressDialog.dialog.dismiss()
                         }else{
                             val foto2 = photoUrl
-                            cargarImagen(foto2!!)
+                           // cargarImagen(foto2!!)
                             setProgressDialog.dialog.dismiss()
-
                         }
-
                     }else{
                         cargarImagen(foto)
                         setProgressDialog.dialog.dismiss()
                     }
-
+                    Glide.with(this@SolicitarServicio)
+                        .asBitmap()
+                        .load(photoUrl)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
+                                // Aquí tienes el objeto Bitmap de la foto
+                                // Puedes continuar trabajando con el bitmap según tus necesidades
+                                // Por ejemplo, puedes convertir el Bitmap en un ByteArray
+                                val outputStream = ByteArrayOutputStream()
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                                val photoByteArray = outputStream.toByteArray()
+                                val usuarios: usuariosSqlite
+                                val tel = telefono.toLong()
+                                usuarios = usuariosSqlite(tel,photoByteArray, nombre!!,ap,am,correo)
+                                dataManager.verificarSiElUsarioExiste(usuarios,telefono,photoByteArray,
+                                    nombre!!,ap,am,correo)
+                                // Luego, puedes guardar el photoByteArray en la base de datos SQLite o realizar otras operaciones
+                            }
+                        })
                     setFragmentHome(nombre!!)
                     sesion(correo)
                 }
             }
-
             override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
                 Toast.makeText(
                     applicationContext,
@@ -490,37 +442,6 @@ class SolicitarServicio : AppCompatActivity() {
             }
         })
     }
-
-    private fun cargarImagen(urlImagen: String) {
-        val file: Uri
-        file = Uri.parse(urlImagen)
-        System.out.println("imagen aqui: "+ file)
-
-        Picasso.get().load(urlImagen).into(object : com.squareup.picasso.Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                val multi = MultiTransformation<Bitmap>(RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
-
-                Glide.with(this@SolicitarServicio).load(file)
-                    .apply(RequestOptions.bitmapTransform(multi))
-                    .into(fotoPerfil)
-               setProgressDialog.dialog.dismiss()
-
-            }
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                System.out.println("Respuesta error 3 "+ e.toString())
-                setProgressDialog.dialog.dismiss()
-                //Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
-            }
-
-
-        })
-    }
-
-
-
     private fun EnviarFotoPerfil(fotoPerfil: String?, telefonoCliente: String, nombref: String) {
         val ROOT_URL = Url().url
         //Mostrar el diálogo de progreso
@@ -530,12 +451,10 @@ class SolicitarServicio : AppCompatActivity() {
             object : com.android.volley.Response.Listener<String?> {
                 override fun onResponse(s: String?) {
                     //Descartar el diálogo de progreso
-
                     loading.dismiss()
                     //Mostrando el mensaje de la respuesta
                     //Toast.makeText(this@SolicitarServicio, s, Toast.LENGTH_LONG).show()
                    // System.out.println("error aqui 1 $s")
-
                 }
             },
             object : com.android.volley.Response.ErrorListener {
@@ -592,11 +511,9 @@ class SolicitarServicio : AppCompatActivity() {
                     }
                     //Configuración del mapa de bits en ImageView
                     val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
-
                     roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
                     EnviarFotoPerfil(imagen, telefono, NombreF.toString())
                     fotoPerfil.setImageDrawable(roundedDrawable)
-
                 }else{
                     // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
                     val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
@@ -617,6 +534,7 @@ class SolicitarServicio : AppCompatActivity() {
                     EnviarFotoPerfil(imagen, telefono, NombreF.toString())
                     fotoPerfil.setImageDrawable(roundedDrawable)
                     // System.out.println("AQui la imagen" +filePath.toString())
+
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -637,11 +555,9 @@ class SolicitarServicio : AppCompatActivity() {
                     call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
                     val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
                     if(postList.size == null){
-                        System.out.println("no hay nada")
                         setProgressDialog.dialog.dismiss()
                         //carsModels = response.body() as ArrayList<presupuestok>
                         //    Log.d("Lista", postList[0].toString())
-
                     }else{
                         NombreF = postList[0].Nombre
                         val ap = postList[0].Apellido_Paterno
@@ -651,30 +567,30 @@ class SolicitarServicio : AppCompatActivity() {
                         correo = postList[0].Correo
 
                         if (correo == currentUser!!.email){
+                            getJson()
                            // Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
                             nombreCompletoCliente = nombre as String
-                            txt_nombre.text = nombre
+                           txt_nombre.text = nombre
                             txt_correo.text = correo
                             if (foto ==null){
                                 //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                                 //hay que poner una imagen por defecto
                                 photoUrl = currentUser!!.photoUrl.toString()
                                 val foto2 = photoUrl
-                                cargarImagen(foto2!!)
+                              //  cargarImagen(foto2!!)
                                 setProgressDialog.dialog.dismiss()
                             }else{
                                 cargarImagen(foto)
                                 setProgressDialog.dialog.dismiss()
                             }
                             setFragmentHome(nombre!!)
+                            obtenerDatosUsuario()
                             sesion(correo)
                         }else{
                             cerrarSesion()
                             Toast.makeText(this@SolicitarServicio, "Este Correo ${currentUser!!.email} no pertenece a esta cuenta", Toast.LENGTH_LONG).show()
-
                             setProgressDialog.dialog.dismiss()
                         }
-
                     }
                 }
 
@@ -687,7 +603,6 @@ class SolicitarServicio : AppCompatActivity() {
 
                     setProgressDialog.dialog.dismiss()
                 }
-
             })
 
         }
@@ -725,10 +640,11 @@ class SolicitarServicio : AppCompatActivity() {
                         correo = postList[0].Correo
 
                         if (correo == currentUser!!.email) {
+                            getJson()
                             //Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
                             nombreCompletoCliente = nombre as String
-                            txt_nombre.text = nombre
-                            txt_correo.text = correo
+                          //  txt_nombre.text = nombre
+                          //  txt_correo.text = correo
                             if (foto == null) {
                                 //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
                                 //hay que poner una imagen por defecto
@@ -763,7 +679,8 @@ class SolicitarServicio : AppCompatActivity() {
                                 val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
                                 databaseReference.child("MisDatos").setValue(u) { error, ref ->
                                 // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
-                                  setProgressDialog.dialog.dismiss()
+                                    obtenerDatosUsuario()
+                                    setProgressDialog.dialog.dismiss()
                                 }
                             })
 
@@ -816,6 +733,112 @@ class SolicitarServicio : AppCompatActivity() {
             }
         finish()
     }
+    private fun getOficios () {
 
+        val ROOT_URL = Url().url
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        val client: OkHttpClient = OkHttpClient.Builder().build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("$ROOT_URL/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+        val presupuestoGET = retrofit.create(ObtenerOficiosInterface::class.java)
+        val call = presupuestoGET.oficios()
+        call?.enqueue(object : retrofit2.Callback<List<Oficio?>?> {
+            override fun onResponse(call: Call<List<Oficio?>?>, response: retrofit2.Response<List<Oficio?>?>) {
+               val listaArrayOficios = response.body() as ArrayList<Oficio>
+                if (listaArrayOficios== null){
+
+                }else{
+//                inicio = "(?i)(\\W|^)("
+//                pal = ""
+//                final ="\\smía|ostras)(\\W|\$)"
+                var oficio = ""
+                var oficios: MisOficios
+               // dataManager.deleteAllOficios()
+                for (i in 0 until listaArrayOficios!!.size){
+                //    oficio = listaArrayOficios[i].nombreO
+                  //  pal = pal+ oficio +"|"
+                 //   println("oficio $oficio Palabras Claves: " + listaArrayOficios[i].PalabrasClaves)
+                    oficios = MisOficios(i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
+                    dataManager.insertOrUpdateOficio(oficios, i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
+                }
+                //expresion = "$inicio$pal"+"$final"
+               // println("expresion armada $inicio"+pal+final)
+             setProgressDialog.dialog.dismiss()
+               // var lista= dataManager.getAllOficios()
+               // val aa = AdapterSpinnercopia(requireActivity(), lista)
+                //spinner.adapter = aa
+             }
+            }
+
+            override fun onFailure(call: Call<List<Oficio?>?>, t: Throwable) {
+                setProgressDialog.dialog.dismiss()
+                Log.d("error del retrofit", t.toString())
+                // Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
+            }
+
+        })
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+   @SuppressLint("SuspiciousIndentation")
+   fun obtenerDatosUsuario(){
+     val datos = dataManager.DatosDelUsuario(this)
+       if (datos.size ==null) {
+           // println("datos ${datos.size}")
+          showToast("Base de datos vacia")
+       }else{
+           for (usuario in datos) {
+               val idTelefono = usuario.telefono
+               val fotoByteArray = usuario.foto
+               val nombre = usuario.nombre
+               val apellidoPa = usuario.apellidoPa
+               val apellidoMa = usuario.apellidoMa
+               val correo = usuario.correo
+
+               txt_nombre.text = "$nombre $apellidoPa $apellidoMa"
+               txt_correo.text = correo
+               val urlString: String =
+                   "data:image/jpeg;base64," + Base64.encodeToString(fotoByteArray, Base64.DEFAULT)
+               cargarImagen(urlString)
+           }
+       }
+    }
+
+    private fun cargarImagen(urlImagen: String) {
+        val file: Uri
+        file = Uri.parse(urlImagen)
+        System.out.println("imagen aqui: "+ file)
+
+        Picasso.get().load(urlImagen).into(object : com.squareup.picasso.Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                val multi = MultiTransformation<Bitmap>(RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
+
+                Glide.with(this@SolicitarServicio).load(file)
+                    .apply(RequestOptions.bitmapTransform(multi))
+                    .into(fotoPerfil)
+                setProgressDialog.dialog.dismiss()
+
+            }
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                System.out.println("Respuesta error 3 "+ e.toString())
+                setProgressDialog.dialog.dismiss()
+                //Toast.makeText(this@SolicitarServicio, "si hay foto respuesta 3", Toast.LENGTH_SHORT).show()
+            }
+
+        })
+    }
 
 }
