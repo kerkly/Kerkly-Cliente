@@ -6,19 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.EditText
 import android.widget.TextView
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SQLite.MisOficios
 import com.example.kerklyv5.modelo.serial.Oficio
-import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 
 class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
     var contexto = c
     var lista = l
+
 
     override fun getCount(): Int {
         return lista.size
@@ -62,7 +60,7 @@ class AdapterSpinner(c:Context, l: ArrayList<Oficio>): BaseAdapter() {
         val esCoincidente = emparejador.find()
         if (esCoincidente) {
             println("texto Reconocido: ")
-            val collecion: List<Oficio> = lista
+         //   val collecion: List<Oficio> = lista
             notifyDataSetChanged()
 
         }else{

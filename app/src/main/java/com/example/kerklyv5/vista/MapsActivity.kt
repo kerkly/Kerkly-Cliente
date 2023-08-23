@@ -20,11 +20,13 @@ import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
 import com.example.kerklyv5.interfaces.IngresarPresupuestoUrgente
 import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
+import com.example.kerklyv5.modelo.modeloSolicituUrgente
 import com.example.kerklyv5.modelo.modelokerklyCercanos
 import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
+import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -55,11 +57,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var mMap: GoogleMap
     private lateinit var marcador: Marker
-    var latitud: Double = 0.0
-    var longitud: Double = 0.0
+    private var latitud: Double = 0.0
+    private var longitud: Double = 0.0
     lateinit var BotonT: Button
     lateinit var BotonEnviarU: Button
-    var tipo = 1
+    private var tipo = 1
     lateinit var mapa: String
     private lateinit var b: Bundle
     private lateinit var curp: String
@@ -69,7 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var dialog: Dialog
     private lateinit var edit_referecia: TextInputEditText
 
-      var ciudad: String = ""
+    private   var ciudad: String = ""
     private lateinit var calle: String
     private lateinit var cp: String
     private lateinit var colonia: String
@@ -82,17 +84,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var locationManager: LocationManager? = null
    // val setProgress = setProgressDialog()
 
-    var postlist: java.util.ArrayList<Kerkly>? =null
-    lateinit var context: Context
-    var i2: Int? = 0
-    private lateinit var firebaseDatabaseUsu: FirebaseDatabase
-    private lateinit var databaseUsu: DatabaseReference
+    private var postlist: java.util.ArrayList<Kerkly>? =null
+    private lateinit var context: Context
+    private var i2: Int? = 0
     private lateinit var token: String
-    lateinit var arrayListTiempo: ArrayList<modelokerklyCercanos>
-    lateinit var arraylistUsuarios: ArrayList<usuarios>
-    lateinit var correoCliente:String
-
-
+    private lateinit var arrayListTiempo: ArrayList<modelokerklyCercanos>
+    private lateinit var arraylistUsuarios: ArrayList<usuarios>
+   private lateinit var correoCliente:String
+   private lateinit var instancias: Instancias
+    private lateinit var uid: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
@@ -100,10 +100,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
        // setProgress.setProgressDialog(this)
        // dialog = Dialog(this)
         context = this
+        instancias = Instancias()
         arrayListTiempo = ArrayList<modelokerklyCercanos>()
         arraylistUsuarios = ArrayList<usuarios>()
-
-
         /* curp = b.getString("Curp Kerkly").toString()
          problema = b.getString("Problema").toString()
          telefono = b.getString("Telefono").toString()
@@ -111,16 +110,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         band = b.getBoolean("Express")
         nombreCliente = b.getString("Nombre")!!
+        uid = b.getString("uid")!!
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         // val bandK = b.getBoolean("Ker")
-
             getLocalizacion()
-
-
         telefono = b.get("Telefono").toString()
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
@@ -141,7 +137,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         BotonEnviarU.setOnClickListener {
 
-
       locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!gpsEnabled) {
@@ -150,7 +145,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //setProgress.dialog.dismiss()
             getLocalizacion()
         }else {
-
             setLocation(latitud, longitud)
             if (!band) {
                 val i = Intent(applicationContext, KerklyListActivity::class.java)
@@ -167,6 +161,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     b.putString("Estado", estado)
                     b.putString("Pais", pais)
                     b.putString("nombreCliente", nombreCliente)
+                    b.putString("uid",uid)
                     i.putExtras(b)
                     startActivity(i)
                     finish()
@@ -232,7 +227,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     getKerklys()
 
                 }
-
                 override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
                     when (status) {
                         LocationProvider.AVAILABLE -> Log.d("debug", "LocationProvider.AVAILABLE")
@@ -246,12 +240,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         )
                     }
                 }
-
                 override fun onProviderEnabled(provider: String) {
                     Toast.makeText(this@MapsActivity, "GPS activado", Toast.LENGTH_SHORT).show()
                    // setProgress.dialog.dismiss()
                 }
-
                 override fun onProviderDisabled(provider: String) {
                    // setProgress.dialog.dismiss()
                     Toast.makeText(this@MapsActivity, "GPS Desactivado", Toast.LENGTH_SHORT).show()
@@ -271,28 +263,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 locationListener
             )
             //seccion donde se encuentran los mappas
-
             //los marcadores
             // Utils_k.Marcador(mMap, applicationContext, telefono)
             //  mMap!!.setOnMapLongClickListener(this)
             googleMap.setOnMarkerClickListener(this)
             googleMap.setOnMarkerDragListener(this)
-
             // mMap!!.setOnMarkerClickListener(this)
-
-
         }
     }
 
     private fun getLocalizacion() {
-        val permiso =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val permiso = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (permiso == PackageManager.PERMISSION_DENIED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             } else {
                 ActivityCompat.requestPermissions(
                     this,
@@ -300,8 +283,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     1
                 )
                 finish()
-
-
             }
         }
     }
@@ -336,9 +317,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
           //  System.out.println("entro")
             latitud = p0.position.latitude
             longitud = p0.position.longitude
-
         }
-
         return false
     }
 
@@ -388,7 +367,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                             Toast.makeText(applicationContext, "Peticion no  enviada, $entrada-->", Toast.LENGTH_LONG) .show()
                         }
                     }
-
                     override fun failure(error: RetrofitError?) {
                         println("error $error")
                         Toast.makeText(applicationContext, "error $error", Toast.LENGTH_LONG).show()
@@ -419,7 +397,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMarkerDrag(p0: Marker) {
         if (p0!!.equals(marcador!!)){
            // val nuevoTitulo  = String.format(Locale.getDefault(),getString(R.string.marker_detail), marcador.position.latitude, marcador.position.longitude)
-
           //setTitle(nuevoTitulo)
             latitud = p0.position.latitude
             longitud = p0.position.longitude
@@ -430,7 +407,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     fun setLocation(latitud: Double, longitud: Double) {
         if (latitud != 0.0 && longitud != 0.0) {
-
             try {
                 val geocoder: Geocoder
                 val direccion: List<Address>
@@ -495,13 +471,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     for (i in 0 until postlist!!.size) {
                         var latitudFinal = postlist!![i].latitud
                         var longitudFinal = postlist!![i].longitud
-
-                        val url2 = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=$latitud,$longitud&destinations=$latitudFinal,$longitudFinal&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyD9i-yAGqAoYnIcm8KcMeZ0nsHyiQxl_mo"
+                       val url2 = instancias.CalcularDistancia(latitud,longitud,latitudFinal,longitudFinal)
                         CalcularTiempoDistancia(context).execute(url2)
                         //primero Mandamos la solicitud a un kerkly
                         val telefoK =  postlist!![i].Telefonok
-                        System.out.println("el telefo del kerkly $telefoK")
-                        System.out.println("latitutinicial: $latitud longitudinicial $longitud latitudFinal $latitudFinal longitudFinal $longitudFinal")
+                       //System.out.println("el telefo del kerkly $telefoK")
+                       // System.out.println("latitutinicial: $latitud longitudinicial $longitud latitudFinal $latitudFinal longitudFinal $longitudFinal")
 
                     }
                    // setProgress.dialog.dismiss()
@@ -544,15 +519,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     fun recorrerLista (){
         if(postlist!!.size == 0){
-            print("____> vacio")
+          //  print("____> vacio")
         }else{
             for(i in 0 until postlist!!.size){
-                System.out.println(postlist!![i].Telefonok)
-                System.out.println("hora " + postlist!!.get(i).hora + ":" + postlist!!.get(i).minutos)
-
+              //  System.out.println(postlist!![i].Telefonok)
+                //System.out.println("hora " + postlist!!.get(i).hora + ":" + postlist!!.get(i).minutos)
                 //obtenerTokenKerkly(postlist!![i].Telefonok!!)
-                firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-                databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(postlist!![i].Telefonok).child("MisDatos")
+                val databaseUsu = instancias.referenciaInformacionDelUsuario(uid)
                 databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         //System.out.println("---->${snapshot.value}")
@@ -562,9 +535,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                             if (u2 != null) {
                                 arraylistUsuarios.add(u2)
                                 if (arraylistUsuarios.size != null){
-                                    System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
+                                  //  System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
                                     for (i in 0 until arraylistUsuarios.size) {
-                                        System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
+                                       // System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
                                         val llamarTopico = llamarTopico()
                                         llamarTopico.llamartopico(this@MapsActivity, arraylistUsuarios[i].token, "(Servicio Urgente) $problema", "Usuario Nuevo-> $nombreCliente")
                                     }
@@ -586,11 +559,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }
 
                 })
-
             } //setProgress.dialog.dismiss()
         }
-
     }
 
+    fun insertarSolicitudFirebaseUrgente(idPresupuesto: Int, pago_total: String, problema:String, correo: String, TipoServicio:String, idKerklyAcepto: String, fechaHora: String, latitud: Double,longitud: Double){
+        val reference = instancias.referenciaSolicitudUrgente(uid)
+        val modelo: modeloSolicituUrgente
+        modelo = modeloSolicituUrgente(idPresupuesto,pago_total,problema,correo,TipoServicio,idKerklyAcepto,fechaHora,latitud,longitud)
+        reference.setValue(modelo) { error, ref ->
+
+
+        }
+    }
 
 }

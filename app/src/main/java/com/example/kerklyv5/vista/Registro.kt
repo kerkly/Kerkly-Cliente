@@ -381,7 +381,8 @@ class Registro : AppCompatActivity() {
                 //val usuario = usuarios()
 
                 //val u = usuarios(uid, email, name, foto, currentDateTimeString)
-                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(), email.toString(), name.toString(), foto.toString(), currentDateTimeString.toString(),""), ) { error, ref -> //txtprueba.setText(uid + "latitud " + latitud + " longitud " + longitud);
+                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(), email.toString(), name.toString(), foto.toString(), currentDateTimeString.toString(),"",
+                    currentUser!!.uid),) { error, ref -> //txtprueba.setText(uid + "latitud " + latitud + " longitud " + longitud);
                   //  Toast.makeText(this@Registro, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
                 }
 

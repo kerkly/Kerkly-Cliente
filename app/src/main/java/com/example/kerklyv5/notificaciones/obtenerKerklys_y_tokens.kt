@@ -2,18 +2,18 @@ package com.example.kerklyv5.notificaciones
 
 import android.content.Context
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.url.Instancias
 import com.google.firebase.database.*
 
 
 class obtenerKerklys_y_tokens {
-    private lateinit var firebaseDatabaseUsu: FirebaseDatabase
-    private lateinit var databaseUsu: DatabaseReference
     private lateinit var token: String
+    private lateinit var instancias: Instancias
 
-      fun obtenerTokenKerkly(telefoK: String, problema: String, nombreCliente: String, context: Context){
+      fun obtenerTokenKerkly(uid: String, problema: String, nombreCliente: String, context: Context){
         val llamartopico = llamarTopico()
-        firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(telefoK).child("MisDatos")
+          instancias = Instancias()
+          val databaseUsu = instancias.referenciaInformacionDelUsuario(uid)
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val u2 = snapshot.getValue(usuarios::class.java)

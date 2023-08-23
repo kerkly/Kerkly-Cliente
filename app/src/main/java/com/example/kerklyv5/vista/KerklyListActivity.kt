@@ -19,6 +19,7 @@ import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
+import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.google.firebase.database.*
 import com.google.gson.GsonBuilder
@@ -62,7 +63,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var nombreCliente: String
     private  val setProgress = setProgressDialog()
     private val obtenerToken = obtenerKerklys_y_tokens()
-    lateinit var correoCliente:String
+    private lateinit var correoCliente:String
+    private lateinit var instancias: Instancias
+    private lateinit var uid:String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +75,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         b = intent.extras!!
 
         context = this
+        instancias = Instancias()
 
         latitud = b.getDouble("Latitud")
         longitud = b.getDouble("Longitud")
@@ -85,6 +89,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         pais = b.getString("Pais").toString()
         nombreCliente = b.getString("nombreCliente")!!
         correoCliente =  b.getString("correoCliente")!!
+        uid = b.getString("uid")!!
 
         recyclerview = findViewById(R.id.recycler_kerkly)
         recyclerview.setHasFixedSize(true)
@@ -134,7 +139,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                         var latitudFinal = postlist!![i].latitud
                         var longitudFinal = postlist!![i].longitud
 
-                        val url2 = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=$latitud,$longitud&destinations=$latitudFinal,$longitudFinal&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyAp-2jznuGLfRJ_en09y1sp6A-467zrXm0"
+                        val url2 = instancias.CalcularDistancia(latitud,longitud,latitudFinal,longitudFinal)
                         CalcularTiempoDistancia(context).execute(url2)
                     }
                 }
@@ -150,7 +155,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     val telefoK =  postlist!![recyclerview.getChildAdapterPosition(it)].Telefonok
                     System.out.println("el telefo del kerkly $telefoK")
                     setProgress.setProgressDialog(this@KerklyListActivity)
-                    obtenerToken.obtenerTokenKerkly(telefoK, problema, nombreCliente, this@KerklyListActivity)
+                    obtenerToken.obtenerTokenKerkly(uid, problema, nombreCliente, this@KerklyListActivity)
                     enviarSolicitud()
                 }
 

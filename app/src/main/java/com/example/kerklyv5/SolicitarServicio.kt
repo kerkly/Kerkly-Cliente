@@ -8,7 +8,6 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -38,8 +37,6 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.MultiTransformation
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.kerklyv5.SQLite.DataManager
@@ -55,6 +52,7 @@ import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.modelo.usuariosSqlite
 import com.example.kerklyv5.ui.home.HomeFragment
+import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
 import com.example.kerklyv5.vista.fragmentos.*
@@ -63,11 +61,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.GsonBuilder
-import com.squareup.picasso.Picasso
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -81,7 +76,6 @@ import java.io.BufferedReader
 
 import java.io.InputStreamReader
 import java.io.*
-import java.net.URL
 import java.text.DateFormat
 import java.util.*
 
@@ -89,9 +83,9 @@ import java.util.*
 class SolicitarServicio : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivitySolicitarServicioBinding
-     var b: Bundle? = null
+    var b: Bundle? = null
     private lateinit var txt_nombre: TextView
-   private lateinit var txt_correo: TextView
+    private lateinit var txt_correo: TextView
     lateinit var telefono: String
     private var nombre: String? = null
     private lateinit var correo: String
@@ -99,7 +93,7 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private var presupuestoListo = false
     private lateinit var dialog2: Dialog
-    var NombreF: String?=null
+    var NombreF: String? = null
 
     //Autenticacion para saber la hora activo
     var providers: MutableList<AuthUI.IdpConfig?>? = null
@@ -113,12 +107,13 @@ class SolicitarServicio : AppCompatActivity() {
     var PICK_IMAGE_REQUEST = 1
     var filePath: Uri? = null
     lateinit var array: ArrayList<String>
-     var photoUrl: String? = null
+    var photoUrl: String? = null
     private lateinit var token: String
     private lateinit var nombreCompletoCliente: String
     val setProgressDialog = setProgressDialog()
     private lateinit var dataManager: DataManager
 
+    lateinit var referencia : Instancias
 
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,7 +128,6 @@ class SolicitarServicio : AppCompatActivity() {
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         presupuestoListo = b!!.getBoolean("PresupuestoListo")
         dataManager = DataManager(this)
-
         drawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
@@ -154,12 +148,12 @@ class SolicitarServicio : AppCompatActivity() {
                 R.id.nav_mensajes
             ), drawerLayout
         )
-      //  sesion(correo)
+        //  sesion(correo)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_home -> setFragmentHome(nombre.toString())
+                // R.id.nav_home -> setFragmentHome(nombre.toString())
                 R.id.nav_notificaciones -> setNoficiaciontes()
                 R.id.nav_mensajes -> setContactosPresupuesto()
                 R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
@@ -180,17 +174,17 @@ class SolicitarServicio : AppCompatActivity() {
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
         mAuth = FirebaseAuth.getInstance()
-        getOficios()
-
 
     }
+
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            setFragmentHome(nombre.toString())
+            setFragmentHome(telefono)
         }
     }
+
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             when {
@@ -200,19 +194,22 @@ class SolicitarServicio : AppCompatActivity() {
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     pickPhotoFromGallery()
                 }
+
                 else -> requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
-        }else {
+        } else {
             pickPhotoFromGallery()
         }
     }
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted ->
-        if (isGranted){
-            pickPhotoFromGallery()
-        }else{
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                pickPhotoFromGallery()
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
     private fun pickPhotoFromGallery() {
         val intent = Intent()
@@ -220,15 +217,18 @@ class SolicitarServicio : AppCompatActivity() {
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "Seleciona imagen"), PICK_IMAGE_REQUEST)
     }
+
     fun getStringImagen(bmp: Bitmap): String? {
         val baos = ByteArrayOutputStream()
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val imageBytes = baos.toByteArray()
         return Base64.encodeToString(imageBytes, Base64.DEFAULT)
     }
+
     fun cerrarVentana(v: View) {
         dialog2.dismiss()
     }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.solicitar_servicio, menu)
@@ -240,36 +240,37 @@ class SolicitarServicio : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setFragmentHome(nombre: String) {
+    private fun setFragmentHome(telefono: String) {
         val f = HomeFragment()
-        b!!.putString("Nombre", nombre.toString())
         b!!.putString("Telefono", telefono)
-        b!!.putString("correoCliente", correo)
-       // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
+        // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+            replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
     }
+
     private fun setFragmentOrdenesPendientes() {
         val f = OrdenesPendientesFragment()
-         val args = Bundle()
+        val args = Bundle()
         args.putString("Telefono", telefono)
         args!!.putString("nombreCompletoCliente", nombreCompletoCliente)
         f.arguments = args
         var fm = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+            replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
     }
+
     private fun setFragmentHistorial() {
         val f = HistorialFragment()
         // val args = Bundle()
         //args.putString("Tel", telefono)
         f.arguments = b
         var fm = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+            replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
     }
+
     private fun setFragmentMensajes() {
         /*val f = ListaChatsFragment()
         // val args = Bundle()
@@ -284,20 +285,21 @@ class SolicitarServicio : AppCompatActivity() {
         //val f = MensajesPresupuestoFragment()
         val f = ContactosFragment()
         f.arguments = b
-       // b!!.putSerializable("arrayUsuarios", array)
+        // b!!.putSerializable("arrayUsuarios", array)
         b!!.putInt("IdContrato", 1)
         b!!.putString("telefonoCliente", telefono)
         b!!.putString("urlFotoCliente", photoUrl)
         b!!.putString("nombreCompletoCliente", nombreCompletoCliente)
-       println("tamaño array $telefono")
+        println("tamaño array $telefono")
         var fm = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_content_solicitar_servicio,f).commit()
+            replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
     }
 
     private fun setNoficiaciontes() {
 
     }
+
     private fun sesion(correo: String) {
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
@@ -306,17 +308,21 @@ class SolicitarServicio : AppCompatActivity() {
         val api = adapter.create(SesionAbiertaInterface::class.java)
         api.sesionAbierta(correo, id,
             object : retrofit.Callback<retrofit.client.Response?> {
-                override fun success(t: retrofit.client.Response?, response2: retrofit.client.Response?) {
+                override fun success(
+                    t: retrofit.client.Response?,
+                    response2: retrofit.client.Response?
+                ) {
                     var reader: BufferedReader? = null
                     var output = ""
                     try {
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
                         output = reader.readLine()
-                       // Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
+                        // Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
                 }
+
                 override fun failure(error: RetrofitError) {
                     println("error $error")
                 }
@@ -326,42 +332,46 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun cerrarSesion() {
-        Log.e("correo", correo)
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(CerrarSesionInterface::class.java)
-        api.cerrar(correo,
-                    object: retrofit.Callback<retrofit.client.Response?> {
-                        override fun success(t: retrofit.client.Response?, response: retrofit.client.Response?) {
-                            var reader: BufferedReader? = null
-                            var output = ""
-                            try {
-                                reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
-                                output = reader.readLine()
-                            } catch (e: IOException) {
-                                e.printStackTrace()
-                            }
-                            Log.e("output", output)
+        api.cerrar(
+            currentUser!!.email.toString(),
+            object : retrofit.Callback<retrofit.client.Response?> {
+                override fun success(
+                    t: retrofit.client.Response?,
+                    response: retrofit.client.Response?
+                ) {
+                    var reader: BufferedReader? = null
+                    var output = ""
+                    try {
+                        reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                        output = reader.readLine()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    Log.e("output", output)
 
-                            if (output == "1") {
-                                metodoSalir()
-                                Toast.makeText(applicationContext, "Sesión cerrada", Toast.LENGTH_SHORT).show()
-                                val i = Intent(applicationContext, MainActivity::class.java)
-                                startActivity(i)
-                                finish()
-                            }
-                        }
+                    if (output == "1") {
+                        metodoSalir()
+                        Toast.makeText(applicationContext, "Sesión cerrada", Toast.LENGTH_SHORT)
+                            .show()
+                        val i = Intent(applicationContext, MainActivity::class.java)
+                        startActivity(i)
+                        finish()
+                    }
+                }
 
-                        override fun failure(error: RetrofitError?) {
+                override fun failure(error: RetrofitError?) {
 
-                        }
+                }
 
-                    })
+            })
     }
 
-    private fun getJson() {
+    /*private fun getJson2() {
       //  setProgressDialog.setProgressDialog(this)
         val ROOT_URL = Url().url
         val interceptor = HttpLoggingInterceptor()
@@ -406,7 +416,7 @@ class SolicitarServicio : AppCompatActivity() {
                             setProgressDialog.dialog.dismiss()
                         }
                     }else{
-                        cargarImagen(foto)
+                        //cargarImagen(foto)
                         setProgressDialog.dialog.dismiss()
                     }
                     Glide.with(this@SolicitarServicio)
@@ -423,8 +433,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 val usuarios: usuariosSqlite
                                 val tel = telefono.toLong()
                                 usuarios = usuariosSqlite(tel,photoByteArray, nombre!!,ap,am,correo)
-                                dataManager.verificarSiElUsarioExiste(usuarios,telefono,photoByteArray,
-                                    nombre!!,ap,am,correo)
+                                dataManager.verificarSiElUsarioExiste(this@SolicitarServicio,fotoPerfil,txt_nombre,txt_correo, photoByteArray,usuarios,telefono,nombre.toString(),ap,am,correo)
                                 // Luego, puedes guardar el photoByteArray en la base de datos SQLite o realizar otras operaciones
                             }
                         })
@@ -441,20 +450,20 @@ class SolicitarServicio : AppCompatActivity() {
                 setProgressDialog.dialog.dismiss()
             }
         })
-    }
+    }*/
     private fun EnviarFotoPerfil(fotoPerfil: String?, telefonoCliente: String, nombref: String) {
         val ROOT_URL = Url().url
         //Mostrar el diálogo de progreso
         val loading = ProgressDialog.show(this, "Subiendo...", "Espere por favor...", false, false)
         val stringRequest: StringRequest = object : StringRequest(
-            Request.Method.POST, ROOT_URL+"/actualizacionFoto.php",
+            Request.Method.POST, ROOT_URL + "/actualizacionFoto.php",
             object : com.android.volley.Response.Listener<String?> {
                 override fun onResponse(s: String?) {
                     //Descartar el diálogo de progreso
                     loading.dismiss()
                     //Mostrando el mensaje de la respuesta
                     //Toast.makeText(this@SolicitarServicio, s, Toast.LENGTH_LONG).show()
-                   // System.out.println("error aqui 1 $s")
+                    // System.out.println("error aqui 1 $s")
                 }
             },
             object : com.android.volley.Response.ErrorListener {
@@ -464,7 +473,7 @@ class SolicitarServicio : AppCompatActivity() {
 
                     //Showing toast
                     //Toast.makeText(this@SolicitarServicio, volleyError.message.toString(), Toast.LENGTH_LONG).show()
-                    System.out.println("error aqui 2 ${volleyError.message}")
+                    //   System.out.println("error aqui 2 ${volleyError.message}")
                 }
             }) {
             @Throws(AuthFailureError::class)
@@ -483,14 +492,12 @@ class SolicitarServicio : AppCompatActivity() {
                 return params
             }
         }
-
         //Creación de una cola de solicitudes
         val requestQueue = Volley.newRequestQueue(this)
-
         //Agregar solicitud a la cola
         requestQueue.add(stringRequest)
-
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, @Nullable data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
@@ -498,38 +505,48 @@ class SolicitarServicio : AppCompatActivity() {
             try {
                 //Cómo obtener el mapa de bits de la Galería
                 var bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
-                if (bitmap!!.width <= 500){
+                if (bitmap!!.width <= 500) {
                     //  Toast.makeText(this, "Es mejor que 500", Toast.LENGTH_SHORT).show()
-                    val imagen = getStringImagen( bitmap!!)!!
+                    val imagen = getStringImagen(bitmap!!)!!
                     // val imagen = getStringImagen(bitmap!!)!!
                     if (bitmap!!.width > bitmap.height) {
                         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.height, bitmap.height)
 
                     } else if (bitmap.width < bitmap.height) {
-                        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.width
+                        bitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0, bitmap.width, bitmap.width
                         )
                     }
                     //Configuración del mapa de bits en ImageView
-                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
+                    val roundedDrawable: RoundedBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(resources, bitmap)
                     roundedDrawable.cornerRadius = bitmap!!.getWidth().toFloat()
                     EnviarFotoPerfil(imagen, telefono, NombreF.toString())
                     fotoPerfil.setImageDrawable(roundedDrawable)
-                }else{
+                } else {
                     // Toast.makeText(this, "Es mayor que de 500", Toast.LENGTH_SHORT).show()
-                    val bmp= Bitmap.createScaledBitmap(bitmap, 500, 500,true)
+                    val bmp = Bitmap.createScaledBitmap(bitmap, 500, 500, true)
                     val imagen = getStringImagen(bmp!!)!!
                     var originalBitmap = bmp
 
                     // val imagen = getStringImagen(bitmap!!)!!
                     if (originalBitmap!!.width > originalBitmap.height) {
-                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.height, originalBitmap.height)
+                        originalBitmap = Bitmap.createBitmap(
+                            originalBitmap,
+                            0,
+                            0,
+                            originalBitmap.height,
+                            originalBitmap.height
+                        )
 
                     } else if (originalBitmap.width < originalBitmap.height) {
-                        originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
+                        originalBitmap = Bitmap.createBitmap(
+                            originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
                         )
                     }
                     //Configuración del mapa de bits en ImageView
-                    val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
+                    val roundedDrawable: RoundedBitmapDrawable =
+                        RoundedBitmapDrawableFactory.create(resources, originalBitmap)
                     roundedDrawable.cornerRadius = originalBitmap!!.getWidth().toFloat()
                     EnviarFotoPerfil(imagen, telefono, NombreF.toString())
                     fotoPerfil.setImageDrawable(roundedDrawable)
@@ -547,18 +564,21 @@ class SolicitarServicio : AppCompatActivity() {
             val interceptor = HttpLoggingInterceptor()
             interceptor.level = HttpLoggingInterceptor.Level.BODY
             val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-            val retrofit = Retrofit.Builder().baseUrl("$ROOT_URL/").client(client).addConverterFactory(GsonConverterFactory.create()).build()
+            val retrofit = Retrofit.Builder().baseUrl("$ROOT_URL/").client(client)
+                .addConverterFactory(GsonConverterFactory.create()).build()
             val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
             val call = presupuestoGET.getCliente(telefono)
             call?.enqueue(object : Callback<List<ClienteModelo?>?> {
                 override fun onResponse(
-                    call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
-                    val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
-                    if(postList.size == null){
+                    call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>
+                ) {
+                    val postList: ArrayList<ClienteModelo> =
+                        response.body() as ArrayList<ClienteModelo>
+                    if (postList.size == null) {
                         setProgressDialog.dialog.dismiss()
                         //carsModels = response.body() as ArrayList<presupuestok>
                         //    Log.d("Lista", postList[0].toString())
-                    }else{
+                    } else {
                         NombreF = postList[0].Nombre
                         val ap = postList[0].Apellido_Paterno
                         val am = postList[0].Apellido_Materno
@@ -566,29 +586,84 @@ class SolicitarServicio : AppCompatActivity() {
                         nombre = "$NombreF $ap $am"
                         correo = postList[0].Correo
 
-                        if (correo == currentUser!!.email){
-                            getJson()
-                           // Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
+                        if (correo == currentUser!!.email) {
                             nombreCompletoCliente = nombre as String
-                           txt_nombre.text = nombre
-                            txt_correo.text = correo
-                            if (foto ==null){
-                                //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
-                                //hay que poner una imagen por defecto
-                                photoUrl = currentUser!!.photoUrl.toString()
-                                val foto2 = photoUrl
-                              //  cargarImagen(foto2!!)
-                                setProgressDialog.dialog.dismiss()
-                            }else{
-                                cargarImagen(foto)
-                                setProgressDialog.dialog.dismiss()
-                            }
-                            setFragmentHome(nombre!!)
-                            obtenerDatosUsuario()
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w(
+                                        TAG,
+                                        "Fetching FCM registration token failed",
+                                        task.exception
+                                    )
+                                    return@OnCompleteListener
+                                }
+                                token = task.result
+                                referencia = Instancias()
+                                val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
+                                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                                val u = usuarios(telefono, currentUser!!.email.toString(), nombreCompletoCliente.toString(), currentUser!!.photoUrl.toString(), currentDateTimeString, token, currentUser!!.uid)
+                               dataRefe.setValue(u) { error, ref ->
+                                    setProgressDialog.dialog.dismiss()
+                                }
+                            })
+
+                            photoUrl = currentUser!!.photoUrl.toString()
+                            val telefono: Long = telefono.toLong()
+                            Glide.with(this@SolicitarServicio)
+                                .asBitmap()
+                                .load(photoUrl)
+                                .into(object : SimpleTarget<Bitmap>() {
+                                    override fun onResourceReady(
+                                        bitmap: Bitmap,
+                                        transition: Transition<in Bitmap>?
+                                    ) {
+                                        // Aquí tienes el objeto Bitmap de la foto
+                                        // Puedes continuar trabajando con el bitmap según tus necesidades
+                                        // Por ejemplo, puedes convertir el Bitmap en un ByteArray
+                                        val outputStream = ByteArrayOutputStream()
+                                        bitmap.compress(
+                                            Bitmap.CompressFormat.JPEG,
+                                            100,
+                                            outputStream
+                                        )
+                                        val photoByteArray = outputStream.toByteArray()
+                                        val usuarios: usuariosSqlite
+                                        usuarios = usuariosSqlite(currentUser!!.uid, telefono,
+                                            photoByteArray,
+                                            nombre!!,
+                                            ap,
+                                            am,
+                                            correo
+                                        )
+                                        dataManager.verificarSiElUsarioExiste(
+                                            this@SolicitarServicio,
+                                            fotoPerfil,
+                                            txt_nombre,
+                                            txt_correo,
+                                            photoByteArray,
+                                            usuarios,
+                                            telefono.toString(),
+                                            nombre.toString(),
+                                            ap,
+                                            am,
+                                            correo
+                                        )
+                                        getOficios()
+                                        setFragmentHome(telefono.toString())
+
+
+                                    }
+                                })
+                            //  cargarImagen(foto2!!)
+                            setProgressDialog.dialog.dismiss()
                             sesion(correo)
-                        }else{
+                        } else {
                             cerrarSesion()
-                            Toast.makeText(this@SolicitarServicio, "Este Correo ${currentUser!!.email} no pertenece a esta cuenta", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@SolicitarServicio,
+                                "Este Correo ${currentUser!!.email} no pertenece a esta cuenta",
+                                Toast.LENGTH_LONG
+                            ).show()
                             setProgressDialog.dialog.dismiss()
                         }
                     }
@@ -612,105 +687,62 @@ class SolicitarServicio : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         currentUser = mAuth!!.currentUser
-        if(currentUser != null){
-            val ROOT_URL = Url().url
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
-            val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-            val retrofit = Retrofit.Builder().baseUrl("$ROOT_URL/").client(client).addConverterFactory(GsonConverterFactory.create()).build()
-            val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
-            val call = presupuestoGET.getCliente(telefono)
-            call?.enqueue(object : Callback<List<ClienteModelo?>?> {
-                override fun onResponse(call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
-                    val postList: ArrayList<ClienteModelo> =
-                        response.body() as ArrayList<ClienteModelo>
+        if (currentUser != null) {
+           /* Glide.with(this@SolicitarServicio)
+                .asBitmap()
+                .load(currentUser!!.photoUrl)
+                .into(object : SimpleTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        bitmap: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        val outputStream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                        val photoByteArray = outputStream.toByteArray()
 
-                    if (postList.size == null) {
-                        System.out.println("no hay nada")
-                        setProgressDialog.dialog.dismiss()
-                        //carsModels = response.body() as ArrayList<presupuestok>
-                        //    Log.d("Lista", postList[0].toString())
-
-                    } else {
-                        NombreF = postList[0].Nombre
-                        val ap = postList[0].Apellido_Paterno
-                        val am = postList[0].Apellido_Materno
-                        val foto = postList[0].fotoPerfil
-                        nombre = "$NombreF $ap $am"
-                        correo = postList[0].Correo
-
-                        if (correo == currentUser!!.email) {
-                            getJson()
-                            //Toast.makeText(this@SolicitarServicio, "si es el correo", Toast.LENGTH_SHORT).show()
-                            nombreCompletoCliente = nombre as String
-                          //  txt_nombre.text = nombre
-                          //  txt_correo.text = correo
-                            if (foto == null) {
-                                //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
-                                //hay que poner una imagen por defecto
-                                photoUrl = currentUser!!.photoUrl.toString()
-                                val foto2 = photoUrl
-                                cargarImagen(foto2!!)
-                                setProgressDialog.dialog.dismiss()
-                            } else {
-                                cargarImagen(foto)
-                                setProgressDialog.dialog.dismiss()
-                            }
-                            //setFragmentHome(nombre!!)
-                            sesion(correo)
-                            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
-                            firebaseMessaging.addOnCompleteListener {
-                            //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
-                            }
-                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                                if (!task.isSuccessful) {
-                                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                                    return@OnCompleteListener
-                                }
-                                token = task.result
-                                val name = currentUser!!.displayName
-                                val email = currentUser!!.email
-                                photoUrl = currentUser!!.photoUrl.toString()
-                                val uid = currentUser!!.uid
-                                val foto = photoUrl.toString()
-                                val database = FirebaseDatabase.getInstance()
-                                val databaseReference = database.getReference("UsuariosR").child(telefono)
-                                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-                                val u = usuarios(telefono, email.toString(), name.toString(), foto, currentDateTimeString, token)
-                                databaseReference.child("MisDatos").setValue(u) { error, ref ->
-                                // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
-                                    obtenerDatosUsuario()
-                                    setProgressDialog.dialog.dismiss()
-                                }
-                            })
-
-                        } else {
-                            Toast.makeText(this@SolicitarServicio, "Este Correo ${currentUser!!.email} no pertenece a esta cuenta", Toast.LENGTH_LONG).show()
-                            cerrarSesion()
-                        }
                     }
+                })*/
+            dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
+            sesion(currentUser!!.email.toString())
+            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
+            firebaseMessaging.addOnCompleteListener {
+                //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+            }
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
                 }
-                override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Codigo de respuesta de error: $t",
-                        Toast.LENGTH_SHORT
-                    ).show();
+                token = task.result
+                val name = currentUser!!.displayName
+                val email = currentUser!!.email
+                photoUrl = currentUser!!.photoUrl.toString()
+                val uid = currentUser!!.uid
+                val foto = photoUrl.toString()
 
+                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                val u = usuarios(
+                    telefono,
+                    email.toString(),
+                    name.toString(),
+                    foto,
+                    currentDateTimeString,
+                    token,
+                    uid
+                )
+                referencia = Instancias()
+                val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
+                setFragmentHome(telefono)
+                dataRefe.setValue(u) { error, ref ->
+                    // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
                     setProgressDialog.dialog.dismiss()
+                    //dataManager.getAllOficios()
                 }
-
             })
-
-
         }else {
             muestraOpciones()
             setProgressDialog.dialog.dismiss()
-
         }
-
-
-
     }
     fun muestraOpciones() {
         startActivityForResult(
@@ -719,6 +751,7 @@ class SolicitarServicio : AppCompatActivity() {
                 .setAvailableProviders(providers!!)
                 .build(),MY_REQUEST_CODE
         )
+
     }
 
     fun metodoSalir() {
@@ -731,15 +764,15 @@ class SolicitarServicio : AppCompatActivity() {
                             + e.message, Toast.LENGTH_LONG
                 ).show()
             }
+        dataManager.deleteAllTablas()
+
         finish()
     }
     private fun getOficios () {
-
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
             .setLenient()
             .create()
-
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BODY
         val client: OkHttpClient = OkHttpClient.Builder().build()
@@ -768,7 +801,8 @@ class SolicitarServicio : AppCompatActivity() {
                   //  pal = pal+ oficio +"|"
                  //   println("oficio $oficio Palabras Claves: " + listaArrayOficios[i].PalabrasClaves)
                     oficios = MisOficios(i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
-                    dataManager.insertOrUpdateOficio(oficios, i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
+                    dataManager.insertOrUpdateOficio(oficios,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
+               setFragmentHome(telefono)
                 }
                 //expresion = "$inicio$pal"+"$final"
                // println("expresion armada $inicio"+pal+final)
@@ -790,47 +824,22 @@ class SolicitarServicio : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-   @SuppressLint("SuspiciousIndentation")
-   fun obtenerDatosUsuario(){
-     val datos = dataManager.DatosDelUsuario(this)
-       if (datos.size ==null) {
-           // println("datos ${datos.size}")
-          showToast("Base de datos vacia")
-       }else{
-           for (usuario in datos) {
-               val idTelefono = usuario.telefono
-               val fotoByteArray = usuario.foto
-               val nombre = usuario.nombre
-               val apellidoPa = usuario.apellidoPa
-               val apellidoMa = usuario.apellidoMa
-               val correo = usuario.correo
 
-               txt_nombre.text = "$nombre $apellidoPa $apellidoMa"
-               txt_correo.text = correo
-               val urlString: String =
-                   "data:image/jpeg;base64," + Base64.encodeToString(fotoByteArray, Base64.DEFAULT)
-               cargarImagen(urlString)
-           }
-       }
-    }
 
-    private fun cargarImagen(urlImagen: String) {
+    /*private fun cargarImagen(urlImagen: String) {
         val file: Uri
         file = Uri.parse(urlImagen)
         System.out.println("imagen aqui: "+ file)
-
         Picasso.get().load(urlImagen).into(object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            }
 
+            }
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
                 val multi = MultiTransformation<Bitmap>(RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
-
                 Glide.with(this@SolicitarServicio).load(file)
                     .apply(RequestOptions.bitmapTransform(multi))
                     .into(fotoPerfil)
                 setProgressDialog.dialog.dismiss()
-
             }
             override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
                 System.out.println("Respuesta error 3 "+ e.toString())
@@ -839,6 +848,7 @@ class SolicitarServicio : AppCompatActivity() {
             }
 
         })
-    }
+    }*/
+
 
 }
