@@ -15,7 +15,9 @@ import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
 import com.example.kerklyv5.interfaces.IngresarPresupuestoClienteInterface
 import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
+import com.example.kerklyv5.modelo.modeloSolicituUrgente
 import com.example.kerklyv5.modelo.serial.Kerkly
+import com.example.kerklyv5.modelo.serial.modeloSolicitudNormal
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
@@ -35,7 +37,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.text.DateFormat
 import java.util.ArrayList
+import java.util.Date
 
 class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
@@ -88,7 +92,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
      //   referencia = b.getString("Referencia").toString()
         pais = b.getString("Pais").toString()
         nombreCliente = b.getString("nombreCliente")!!
-        correoCliente =  b.getString("correoCliente")!!
+        correoCliente =  b.getString("correo")!!
         uid = b.getString("uid")!!
 
         recyclerview = findViewById(R.id.recycler_kerkly)
@@ -208,6 +212,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     }
 
     private fun enviarSolicitud() {
+        val fechaHora = DateFormat.getDateTimeInstance().format(Date())
+        insertarSolicitudFirebaseNormal("",problema,correoCliente, oficio,curp,false,fechaHora,latitud,longitud,false)
+        //println("uid ......_:: $uid" )
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
@@ -227,7 +234,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             num_ext,
             cp,
             correoCliente,
-        //    referencia,
+            uid,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null
@@ -259,5 +266,134 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                 }
             }
         )
+    }
+
+    fun insertarSolicitudFirebaseNormal(
+        pago_total: String,
+        problema: String,
+        correo: String,
+        TipoServicio: String,
+        idkerkly: String,
+        clienteAcepta: Boolean,
+        fechaHora: String,
+        latitud: Double,
+        longitud: Double,
+        trabajoTerminado: Boolean,
+    ) {
+        val reference = instancias.referenciaSolicitudNormal(uid)
+        val query = reference.orderByKey().limitToLast(1)
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val lastEntry = dataSnapshot.children.first()
+                    val lastId = lastEntry.key
+                    if (lastId != null) {
+                        // Utiliza el último ID aquí
+                        println("Último ID agregado: $lastId")
+                        val id= lastId.toInt()+1
+                        val modelo = modeloSolicitudNormal(
+                            id,
+                            pago_total,
+                            problema,
+                            correo,
+                            TipoServicio,
+                            idkerkly,
+                            clienteAcepta,
+                            fechaHora,
+                            latitud,
+                            longitud,
+                            trabajoTerminado
+                        )
+                        val countersRef2 = instancias.referenciaSolicitudNormal(uid).child(id.toString())
+                        countersRef2.setValue(modelo) { error, _ ->
+                            if (error == null) {
+                                showMessaje("Solicitud Enviada")
+                                val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                b.putBoolean("PresupuestoListo", true)
+                                intent.putExtras(b)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // Manejar el error en caso de que ocurra
+                                showMessaje("hubo un error ")
+                            }
+                        }
+
+                    } else {
+                        // Manejar el caso si lastId es null
+                        println("Último ID agregado: $lastId")
+                        val modelo = modeloSolicitudNormal(
+                            1,
+                            pago_total,
+                            problema,
+                            correo,
+                            TipoServicio,
+                            idkerkly,
+                            clienteAcepta,
+                            fechaHora,
+                            latitud,
+                            longitud,
+                            trabajoTerminado
+                        )
+                        val countersRef2 = instancias.referenciaSolicitudNormal(uid).child("1")
+                        countersRef2.setValue(modelo) { error, _ ->
+                            if (error == null) {
+                                showMessaje("Solicitud Enviada")
+                                val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                b.putBoolean("PresupuestoListo", true)
+                                intent.putExtras(b)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // Manejar el error en caso de que ocurra
+                                showMessaje("hubo un error ")
+                            }
+                        }
+
+                    }
+                } else {
+                    // Manejar el caso si no hay entradas en la referencia
+                    println(" no hay entradas en la referencia")
+                   // showMessaje("hubo un error ")
+                    val modelo = modeloSolicitudNormal(
+                        1,
+                        pago_total,
+                        problema,
+                        correo,
+                        TipoServicio,
+                        idkerkly,
+                        clienteAcepta,
+                        fechaHora,
+                        latitud,
+                        longitud,
+                        trabajoTerminado
+                    )
+                    val countersRef2 = instancias.referenciaSolicitudNormal(uid).child("1")
+                    countersRef2.setValue(modelo) { error, _ ->
+                        if (error == null) {
+                            showMessaje("Solicitud Enviada")
+                            val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                            b.putBoolean("PresupuestoListo", true)
+                            intent.putExtras(b)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            // Manejar el error en caso de que ocurra
+                            showMessaje("hubo un error ")
+                        }
+                    }
+
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Manejar el error si ocurre
+                showMessaje(databaseError.toString())
+            }
+        })
+
+    }
+    fun showMessaje(mensaje:String){
+        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show()
     }
 }

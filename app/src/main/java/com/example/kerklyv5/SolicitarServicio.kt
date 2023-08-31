@@ -112,7 +112,6 @@ class SolicitarServicio : AppCompatActivity() {
     private lateinit var nombreCompletoCliente: String
     val setProgressDialog = setProgressDialog()
     private lateinit var dataManager: DataManager
-
     lateinit var referencia : Instancias
 
     @SuppressLint("HardwareIds")
@@ -249,12 +248,11 @@ class SolicitarServicio : AppCompatActivity() {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
     }
-
     private fun setFragmentOrdenesPendientes() {
         val f = OrdenesPendientesFragment()
         val args = Bundle()
         args.putString("Telefono", telefono)
-        args!!.putString("nombreCompletoCliente", nombreCompletoCliente)
+        args!!.putString("nombreCompletoCliente", currentUser!!.displayName)
         f.arguments = args
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
@@ -289,8 +287,8 @@ class SolicitarServicio : AppCompatActivity() {
         b!!.putInt("IdContrato", 1)
         b!!.putString("telefonoCliente", telefono)
         b!!.putString("urlFotoCliente", photoUrl)
-        b!!.putString("nombreCompletoCliente", nombreCompletoCliente)
-        println("tamaño array $telefono")
+        b!!.putString("nombreCompletoCliente", currentUser!!.displayName)
+        b!!.putString("uid",currentUser!!.uid)
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
@@ -613,19 +611,12 @@ class SolicitarServicio : AppCompatActivity() {
                                 .asBitmap()
                                 .load(photoUrl)
                                 .into(object : SimpleTarget<Bitmap>() {
-                                    override fun onResourceReady(
-                                        bitmap: Bitmap,
-                                        transition: Transition<in Bitmap>?
-                                    ) {
+                                    override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
                                         // Aquí tienes el objeto Bitmap de la foto
                                         // Puedes continuar trabajando con el bitmap según tus necesidades
                                         // Por ejemplo, puedes convertir el Bitmap en un ByteArray
                                         val outputStream = ByteArrayOutputStream()
-                                        bitmap.compress(
-                                            Bitmap.CompressFormat.JPEG,
-                                            100,
-                                            outputStream
-                                        )
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                                         val photoByteArray = outputStream.toByteArray()
                                         val usuarios: usuariosSqlite
                                         usuarios = usuariosSqlite(currentUser!!.uid, telefono,
@@ -751,9 +742,7 @@ class SolicitarServicio : AppCompatActivity() {
                 .setAvailableProviders(providers!!)
                 .build(),MY_REQUEST_CODE
         )
-
     }
-
     fun metodoSalir() {
         AuthUI.getInstance()
             .signOut(applicationContext)

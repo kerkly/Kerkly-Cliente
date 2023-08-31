@@ -1,6 +1,6 @@
 package com.example.kerklyv5.modelo
 
-class modeloSolicituUrgente(idPresupuesto: Int, pago_total: String, problema:String, correo: String, TipoServicio:String, idKerklyAcepto: String, fechaHora: String, latitud: Double,longitud: Double) {
+class modeloSolicituUrgente(idPresupuesto: Int, pago_total: String, problema:String, correo: String, TipoServicio:String, idKerklyAcepto: String, fechaHora: String, latitud: Double,longitud: Double,trabajoTerminado:Boolean) {
     var idPresupuesto: Int = idPresupuesto
     var pago_total: String = pago_total
     var problema : String = problema
@@ -10,6 +10,7 @@ class modeloSolicituUrgente(idPresupuesto: Int, pago_total: String, problema:Str
     var fechaHora:String = fechaHora
     var latitud: Double = latitud
     var longitud:Double = longitud
+    var trabajoTerminado: Boolean = trabajoTerminado
 
-    constructor() :this (0,"","","","","","",0.0,0.0)
+    constructor() :this (0,"","","","","","",0.0,0.0,false)
 }

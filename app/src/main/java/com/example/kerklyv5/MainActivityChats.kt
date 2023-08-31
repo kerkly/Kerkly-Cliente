@@ -31,6 +31,7 @@ import com.example.kerklyv5.controlador.AdapterChat
 import com.example.kerklyv5.modelo.Mensaje
 import com.example.kerklyv5.modelo.MensajeCopia
 import com.example.kerklyv5.notificaciones.llamarTopico
+import com.example.kerklyv5.url.Instancias
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -49,11 +50,6 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var editText: EditText
     private lateinit var adapter: AdapterChat
-    private lateinit var firebaseDatabase: FirebaseDatabase
-    private lateinit var databaseReferenceCliente: DatabaseReference
-    private lateinit var databaseReferenceKerkly: DatabaseReference
-    private lateinit var databaseReferenceMensajeCliente: DatabaseReference
-    private lateinit var databaseReferenceMensajekerkly: DatabaseReference
     private lateinit var txt_nombreKerkly: TextView
     private lateinit var b: Bundle
     private lateinit var imageViewPerfil: ImageView
@@ -76,11 +72,15 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var pdfRenderer: PdfRenderer
      private var  REQUEST_CODE = 0
     private lateinit var PantallaCompletaPdf: PDFView
-
+    private lateinit var instancias: Instancias
+    private lateinit var idCliente: String
+    private lateinit var idkerkly:String
+    private lateinit var databaseReferenceCliente: DatabaseReference
+    private lateinit var databaseReferenceKerkly:DatabaseReference
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_chats)
-
+        instancias = Instancias()
         boton = findViewById(R.id.boton_chat)
         editText = findViewById(R.id.editTextChat)
         recyclerView = findViewById(R.id.recycler_chat)
@@ -98,6 +98,8 @@ class MainActivityChats : AppCompatActivity() {
          telefonoCliente = b!!.getString("telefonoCliente").toString()
         val url = b!!.getString("urlFotoKerkly")
         tokenKerkly = b!!.getString("tokenKerkly").toString()
+        idCliente = b!!.getString("idCliente").toString()
+        idkerkly = b!!.getString("idKerkly").toString()
 
         val photoUrl = Uri.parse(url)
         Picasso.get().load(photoUrl).into(object : com.squareup.picasso.Target {
@@ -122,9 +124,9 @@ class MainActivityChats : AppCompatActivity() {
 
         })
         txt_nombreKerkly.text = nombreKerkly
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReferenceCliente = firebaseDatabase.getReference("UsuariosR").child(telefonoCliente.toString()).child("chats")
-            .child("$telefonoCliente"+"_"+"$telefonoKerkly")
+        databaseReferenceCliente = instancias.referenciaChatscliente(idCliente,idkerkly)
+        databaseReferenceKerkly = instancias.referenciaChatsKerkly(idkerkly,idCliente)
+        //databaseReferenceCliente = firebaseDatabase.getReference("UsuariosR").child(telefonoCliente.toString()).child("chats").child("$telefonoCliente"+"_"+"$telefonoKerkly")
         adapter = AdapterChat(this)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -135,15 +137,12 @@ class MainActivityChats : AppCompatActivity() {
                 setScrollBar()
             }
         })
-        databaseReferenceKerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats")
-            .child("$telefonoKerkly"+"_"+"$telefonoCliente")
+        //databaseReferenceKerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente")
 
         boton.setOnClickListener {
           if (editText.text == null){
               Toast.makeText(this, "Escribe tu mensaje" , Toast.LENGTH_SHORT).show()
           }else{
-
-           //adapter.addMensaje(Mensaje(editText.text.toString(), "00:00"))
            databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
            databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
            llamartopico.llamartopico(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente)
@@ -319,10 +318,7 @@ class MainActivityChats : AppCompatActivity() {
                             PantallaCompletaPdf.visibility = View.VISIBLE
                             progressBar.visibility = View.VISIBLE
                             //descargar pdf
-                            val storage = FirebaseStorage.getInstance()
-                            val storageRef = storage.reference
-                            // Reemplaza "nombre_del_archivo.pdf" con el nombre del archivo PDF que deseas descargar
-                            val pdfRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(Nombrearchivo)
+                           val pdfRef = instancias.StorageReference(idkerkly,idCliente,Nombrearchivo)
                             val localFile = File.createTempFile("$Nombrearchivo", "pdf")
                             val ruta = getRuta(Nombrearchivo)
                             println("rutaa  $ruta")
@@ -372,10 +368,7 @@ class MainActivityChats : AppCompatActivity() {
                     //imagenCompleta.visibility = View.VISIBLE
                     progressBar.visibility = View.VISIBLE
                     //descargar pdf
-                    val storage = FirebaseStorage.getInstance()
-                    val storageRef = storage.reference
-                    // Reemplaza "nombre_del_archivo.pdf" con el nombre del archivo PDF que deseas descargar
-                    val pdfRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(Nombrearchivo)
+                  val pdfRef = instancias.StorageReference(idkerkly,idCliente,Nombrearchivo)
                     val localFile = File.createTempFile("$Nombrearchivo", "pdf")
                     val ruta = getRuta(Nombrearchivo)
                     println("ruta $ruta")
@@ -436,14 +429,15 @@ class MainActivityChats : AppCompatActivity() {
                     // Acción para "Descargar imagen"
                     progressBar.visibility = View.VISIBLE
                     //descargar la imagen
-                    val storage = FirebaseStorage.getInstance()
-                    val storageRef = storage.reference
+                    //val storage = FirebaseStorage.getInstance()
+                   // val storageRef = storage.reference
                     // Reemplaza "nombre_del_archivo.jpg" con el nombre del archivo de imagen que deseas descargar
-                    val imageRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(archivo)
-                   // crea un archivo temporal con un nombre único en el sistema de archivos local, utilizando el valor de la variable archivo como prefijo y la extensión ".jpg".
+                   // val imageRef = storageRef.child("UsuariosR").child(telefonoKerkly).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente").child(archivo)
+                   val imageRef = instancias.StorageReference(idkerkly,idCliente,archivo)
+                    // crea un archivo temporal con un nombre único en el sistema de archivos local, utilizando el valor de la variable archivo como prefijo y la extensión ".jpg".
                     val localFile = File.createTempFile("$archivo", "jpg")
                     val ruta = getRuta(archivo)
-                    val uploadTask = storageRef.getFile(ruta!!)
+                    val uploadTask = instancias.storageRef.getFile(ruta!!)
                     // Registra un Listener para obtener la URL del archivo una vez cargado
                     uploadTask.addOnProgressListener {taskSnapshot ->
                         // Calcula el progreso en porcentaje
@@ -528,17 +522,17 @@ class MainActivityChats : AppCompatActivity() {
     }
 
     private fun mensajeVistoKerkly(key: String) {
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReferenceMensajekerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats")
-            .child("$telefonoKerkly"+"_"+"$telefonoCliente").child(key)
+       // firebaseDatabase = FirebaseDatabase.getInstance()
+       // databaseReferenceMensajekerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats") .child("$telefonoKerkly"+"_"+"$telefonoCliente").child(key)
+        val databaseReferenceMensajekerkly = instancias.referenciaChatsKerkly(idkerkly,idCliente).child(key)
         val map = mapOf("mensajeLeido" to "Visto")
         databaseReferenceMensajekerkly.updateChildren(map)
     }
 
     private fun mensajeVistoCliente(key: String) {
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReferenceMensajeCliente = firebaseDatabase.getReference("UsuariosR").child(telefonoCliente.toString()).child("chats")
-            .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(key)
+       // firebaseDatabase = FirebaseDatabase.getInstance()
+       // databaseReferenceMensajeCliente = firebaseDatabase.getReference("UsuariosR").child(telefonoCliente.toString()).child("chats") .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(key)
+        val databaseReferenceMensajeCliente = instancias.referenciaChatscliente(idCliente,idkerkly).child(key)
         val map = mapOf("mensajeLeido" to "Visto")
         databaseReferenceMensajeCliente.updateChildren(map)
     }
@@ -605,7 +599,7 @@ class MainActivityChats : AppCompatActivity() {
                         EnviarArchivo(uriArchivo, "pdf")
                     }else{
                         EnviarArchivo(uriArchivo, "imagen")
-                        println("otro archivo")
+                        println("otro archivo ${uriArchivo.toString()}")
                     }
                 }
 
@@ -623,8 +617,9 @@ class MainActivityChats : AppCompatActivity() {
         val storageRef = FirebaseStorage.getInstance().reference
         // Crea un nombre de archivo único para evitar conflictos
         val filename = nombreArchivo
-        val fileRef = storageRef.child("UsuariosR").child(telefonoCliente.toString()).child("chats")
-            .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(filename)
+      /*  val fileRef = storageRef.child("UsuariosR").child(telefonoCliente.toString()).child("chats")
+            .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(filename)*/
+        val fileRef = instancias.EnviarArchivoStorageReference(idCliente,idkerkly,filename)
 
         if (tipoArchivo == "pdf"){
             println("nombre del archivo " + nombreArchivo)

@@ -25,6 +25,7 @@ interface IngresarPresupuestoClienteInterface {
         @Field("No_Exterior") No_Exterior: String,
         @Field("Codigo_Postal") Codigo_Postal: String,
         @Field("correoCliente") correoCliente: String,
+        @Field("uidCliente") uidCliente: String,
         callback: Callback<Response?>
     )
 

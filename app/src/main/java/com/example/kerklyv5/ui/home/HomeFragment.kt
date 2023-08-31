@@ -73,6 +73,7 @@ class HomeFragment : Fragment(){
         boton_servicioUrgente.setOnClickListener {
             telefono = arguments?.getString("Telefono")!!
             oficio = spinner.getSelectedItem().toString()
+           showMessage(oficio)
             problema = textProblem.text.toString()
             if (problema.isEmpty()) {
                layoutProblem.error = getString(R.string.campo_requerido)
@@ -93,6 +94,7 @@ class HomeFragment : Fragment(){
                 b.putString("Oficio", oficio)
                 b.putString("Telefono", telefono)
                b.putString("Nombre", currentUser!!.displayName)
+                b.putString("correo", currentUser!!.email)
                 b.putString("Problema", problema)
                 b.putString("uid",currentUser!!.uid)
                i.putExtras(b)
@@ -196,6 +198,7 @@ class HomeFragment : Fragment(){
         b.putString("Telefono", telefono)
         problema = textProblem.text.toString()
         b.putString("Problema", problema)
+        b.putString("correo", currentUser!!.email)
 
         if (problema.isEmpty()) {
             layoutProblem.error = getString(R.string.campo_requerido)
@@ -203,7 +206,6 @@ class HomeFragment : Fragment(){
             layoutProblem.error = null
                 val i = Intent(context, MapsActivity::class.java)
                 b.putBoolean("Express", false)
-                b.putString("correoCliente", currentUser!!.email)
                 b.putString("Nombre", currentUser!!.displayName)
                 b.putString("uid", currentUser!!.uid)
                 i.putExtras(b)

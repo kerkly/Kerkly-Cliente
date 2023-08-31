@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.kerklyv5.BaseDatosEspacial.conexionPostgreSQL
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.controlador.setProgressDialog
@@ -50,11 +51,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, CalcularTiempoDistancia.Geo {
-
     private lateinit var mMap: GoogleMap
     private lateinit var marcador: Marker
     private var latitud: Double = 0.0
@@ -103,20 +104,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         instancias = Instancias()
         arrayListTiempo = ArrayList<modelokerklyCercanos>()
         arraylistUsuarios = ArrayList<usuarios>()
-        /* curp = b.getString("Curp Kerkly").toString()
-         problema = b.getString("Problema").toString()
-         telefono = b.getString("Telefono").toString()
-         oficio = b.getString("Oficio").toString()*/
+
 
         band = b.getBoolean("Express")
         nombreCliente = b.getString("Nombre")!!
         uid = b.getString("uid")!!
+        correoCliente = b.getString("correo")!!
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         // val bandK = b.getBoolean("Ker")
-            getLocalizacion()
+        getLocalizacion()
         telefono = b.get("Telefono").toString()
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
@@ -145,11 +144,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //setProgress.dialog.dismiss()
             getLocalizacion()
         }else {
-            setLocation(latitud, longitud)
+           /* setLocation(latitud, longitud)
             if (!band) {
                 val i = Intent(applicationContext, KerklyListActivity::class.java)
-                correoCliente =  b.get("correoCliente").toString()
-                b.putString("correoCliente",correoCliente)
+                correoCliente =  b.getString("correo").toString()
+                b.putString("correo",correoCliente)
                 b.putString("Calle", calle)
                     b.putString("Colonia", colonia)
                     b.putString("Código Postal", cp)
@@ -177,11 +176,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 // System.out.println("el token del kerkly " + u2!!.token[i])
                 // llamartopico.llamartopico(context, token, "(Servicio Normal) $problema", "Usuario Nuevo-> $nombreCliente")
 
-            }
+            }*/
+        }
 
         }
-        }
     }
+
+    private fun showMessage(s: String) {
+        Toast.makeText(this,s,Toast.LENGTH_SHORT).show()
+    }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -214,17 +218,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     marcador = googleMap.addMarker(
                         MarkerOptions().position(miUbicacion).draggable(true)
                             .title(nombreCliente.toString()).icon(
-                            BitmapDescriptorFactory.fromResource(
-                                R.drawable.miubicacion4
+                                BitmapDescriptorFactory.fromResource(
+                                    R.drawable.miubicacion4
+                                )
                             )
-                        )
                     )!!
 
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))
                     latitud = location.latitude
                     longitud = location.longitude
-                   // setProgress.dialog.dismiss()
-                    getKerklys()
+                    val miConexion = conexionPostgreSQL()
+                    val conexion = miConexion.obtenerConexion(applicationContext)
+                    if (conexion != null) {
+                        val idSeccion = miConexion.ObtenerSeccionCoordenadas(longitud, latitud)
+                        if (idSeccion == 0) {
+                            showMessage("no se encuentra dentro de una seccion conocida")
+                        } else {
+                            showMessage("seccion $idSeccion")
+                            miConexion.cerrarConexion()
+                        }
+                    }
+                    // setProgress.dialog.dismiss()
+                    //  getKerklys()
 
                 }
                 override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
@@ -320,8 +335,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
         return false
     }
-
-    private fun ingresarPresupuesto() {
+    /*private fun ingresarPresupuesto2() {
+        val fechaHora = DateFormat.getDateTimeInstance().format(Date())
+        insertarSolicitudFirebaseUrgente("",problema,correoCliente,oficio,"",fechaHora,latitud,longitud)
             val ROOT_URL = Url().url
             val adapter = RestAdapter.Builder()
                 .setEndpoint(ROOT_URL)
@@ -339,6 +355,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 colonia,
                 num_ext,
                 cp,
+                uid,
                 object : Callback<Response?> {
                     override fun success(t: Response?, response: Response?) {
                         var salida: BufferedReader? = null
@@ -349,19 +366,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-
                         //Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
-
                         // Toast.makeText(applicationContext, entrada, Toast.LENGTH_LONG).show()
-
                         val cadena = "1"
                         if (cadena.equals(entrada)) {
-                            Toast.makeText(applicationContext, "Peticion enviada, por favor espere un momento.....", Toast.LENGTH_LONG) .show()
-                            val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                            b.putBoolean("PresupuestoListo", true)
-                            intent.putExtras(b)
-                            startActivity(intent)
-                            finish()
+                            //Toast.makeText(applicationContext, "Peticion enviada, por favor espere un momento.....", Toast.LENGTH_LONG) .show()
 
                         }else{
                             Toast.makeText(applicationContext, "Peticion no  enviada, $entrada-->", Toast.LENGTH_LONG) .show()
@@ -373,8 +382,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }
                 }
             )
-
-    }
+    }*/
 
 
     override fun onMarkerDragEnd(p0: Marker) {
@@ -401,7 +409,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             latitud = p0.position.latitude
             longitud = p0.position.longitude
             //setLocation(latitud, longitud)
-
         }
     }
 
@@ -441,7 +448,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
 
-    private fun getKerklys () {
+    /*private fun getKerklys () {
         val ROOT_URL = Url().url
         val gson = GsonBuilder().setLenient().create()
         val interceptor = HttpLoggingInterceptor()
@@ -489,7 +496,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
 
         })
-    }
+    }*/
 
     override fun setDouble(min: String?) {
         val res = min!!.split(",").toTypedArray()
@@ -517,7 +524,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    fun recorrerLista (){
+  /* fun recorrerLista (){
         if(postlist!!.size == 0){
           //  print("____> vacio")
         }else{
@@ -541,14 +548,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                                         val llamarTopico = llamarTopico()
                                         llamarTopico.llamartopico(this@MapsActivity, arraylistUsuarios[i].token, "(Servicio Urgente) $problema", "Usuario Nuevo-> $nombreCliente")
                                     }
-                                    ingresarPresupuesto()
+                                   // ingresarPresupuesto()
+
                                 }else{
                                     System.out.println("-------------> Sin token")
                                 }
                             }
                         }else{
                             System.out.println("-------------> Sin datos")
-                            ingresarPresupuesto()
+                            //ingresarPresupuesto()
                         }
 
 
@@ -560,17 +568,140 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
                 })
             } //setProgress.dialog.dismiss()
+            ingresarPresupuesto2()
         }
-    }
+    }*/
 
-    fun insertarSolicitudFirebaseUrgente(idPresupuesto: Int, pago_total: String, problema:String, correo: String, TipoServicio:String, idKerklyAcepto: String, fechaHora: String, latitud: Double,longitud: Double){
+    /*fun insertarSolicitudFirebaseUrgente(idPresupuesto: Int, pago_total: String, problema:String, correo: String, TipoServicio:String, idKerklyAcepto: String, fechaHora: String, latitud: Double,longitud: Double){
         val reference = instancias.referenciaSolicitudUrgente(uid)
         val modelo: modeloSolicituUrgente
         modelo = modeloSolicituUrgente(idPresupuesto,pago_total,problema,correo,TipoServicio,idKerklyAcepto,fechaHora,latitud,longitud)
         reference.setValue(modelo) { error, ref ->
-
-
+            showMessaje("Solicitud Enviada")
         }
+    }*/
+    fun insertarSolicitudFirebaseUrgente(
+        pago_total: String,
+        problema: String,
+        correo: String,
+        TipoServicio: String,
+        idKerklyAcepto: String,
+        fechaHora: String,
+        latitud: Double,
+        longitud: Double
+    ) {
+        val reference = instancias.referenciaSolicitudUrgente(uid)
+        val query = reference.orderByKey().limitToLast(1)
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val lastEntry = dataSnapshot.children.first()
+                    val lastId = lastEntry.key
+                    if (lastId != null) {
+                        // Utiliza el último ID aquí
+                        println("Último ID agregado: $lastId")
+                        val id= lastId.toInt()+1
+                         val modelo = modeloSolicituUrgente(
+                                               id,
+                                               pago_total,
+                                               problema,
+                                               correo,
+                                               TipoServicio,
+                                               idKerklyAcepto,
+                                               fechaHora,
+                                               latitud,
+                                               longitud,false
+                                           )
+                        val countersRef2 = instancias.referenciaSolicitudUrgente(uid).child(id.toString())
+                        countersRef2.setValue(modelo) { error, _ ->
+                                               if (error == null) {
+                                                   showMessaje("Solicitud Enviada")
+                                                   val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                                   b.putBoolean("PresupuestoListo", true)
+                                                   intent.putExtras(b)
+                                                   startActivity(intent)
+                                                   finish()
+                                               } else {
+                                                   // Manejar el error en caso de que ocurra
+                                                   showMessaje("hubo un error ")
+                                               }
+                                           }
+
+                    } else {
+                        // Manejar el caso si lastId es null
+                        println("Último ID agregado: $lastId")
+                        val modelo = modeloSolicituUrgente(
+                            1,
+                            pago_total,
+                            problema,
+                            correo,
+                            TipoServicio,
+                            idKerklyAcepto,
+                            fechaHora,
+                            latitud,
+                            longitud,
+                            false
+                        )
+                        val countersRef2 = instancias.referenciaSolicitudUrgente(uid).child("1")
+                        countersRef2.setValue(modelo) { error, _ ->
+                            if (error == null) {
+                                showMessaje("Solicitud Enviada")
+                                val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                b.putBoolean("PresupuestoListo", true)
+                                intent.putExtras(b)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // Manejar el error en caso de que ocurra
+                                showMessaje("hubo un error ")
+                            }
+                        }
+
+                    }
+                } else {
+                    // Manejar el caso si no hay entradas en la referencia
+                    println(" no hay entradas en la referencia")
+                   // showMessaje("hubo un error ")
+                    val modelo = modeloSolicituUrgente(
+                        1,
+                        pago_total,
+                        problema,
+                        correo,
+                        TipoServicio,
+                        idKerklyAcepto,
+                        fechaHora,
+                        latitud,
+                        longitud,
+                        false
+                    )
+                    val countersRef2 = instancias.referenciaSolicitudUrgente(uid).child("1")
+                    countersRef2.setValue(modelo) { error, _ ->
+                        if (error == null) {
+                            showMessaje("Solicitud Enviada")
+                            val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                            b.putBoolean("PresupuestoListo", true)
+                            intent.putExtras(b)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            // Manejar el error en caso de que ocurra
+                            showMessaje("hubo un error ")
+                        }
+                    }
+
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Manejar el error si ocurre
+                showMessaje(databaseError.toString())
+            }
+        })
+
     }
 
+
+    fun showMessaje(mensaje:String){
+        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show()
+    }
 }

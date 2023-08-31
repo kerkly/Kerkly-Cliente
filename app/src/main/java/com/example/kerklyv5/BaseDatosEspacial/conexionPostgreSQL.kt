@@ -21,8 +21,8 @@ class conexionPostgreSQL {
         StrictMode.setThreadPolicy(threadPolicy)
         try {
             Class.forName("org.postgresql.Driver") // Cargar el driver JDBC
-            val host = "4.tcp.ngrok.io"
-            val port = "16212"
+            val host = "6.tcp.ngrok.io"
+            val port = "10123"
             val databaseName = "kerkly"
             val username = "luis_admin"
             val password = "Lu0599@"
@@ -38,6 +38,24 @@ class conexionPostgreSQL {
     }
     fun cerrarConexion(){
         conexion!!.close()
+    }
+
+    fun ObtenerSeccionCoordenadas(longitud: Double, latitud: Double): Int{
+        var idSeccion:Int=0
+        conexion!!.createStatement().use { stmt ->
+            val query = "SELECT * FROM \"poligonoChilpo\" WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint($longitud,$latitud), 4326))"
+            stmt.executeQuery(query).use { rs ->
+                while (rs.next()) {
+                    idSeccion = rs.getInt("id_0")
+                    // idSeccion = rs.getString("st_astext")
+                    println(idSeccion)
+                    //  println(idpoligono)
+                    //  textView.text = "idSeccion: $idpoligono \n $geom "
+                    return idSeccion.toInt()
+                }
+            }
+        }
+        return idSeccion
     }
 
 

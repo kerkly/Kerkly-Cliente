@@ -1,11 +1,13 @@
 package com.example.kerklyv5.vista.fragmentos
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +17,7 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.modelo.adapterUsuarios
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.url.Instancias
 import com.google.firebase.database.*
 
 
@@ -25,7 +28,6 @@ private const val ARG_PARAM2 = "param2"
 class ContactosFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
-
     private var id: String? = null
     private var correo: String? = null
     var fechaHora: String? = null
@@ -35,18 +37,16 @@ class ContactosFragment : Fragment() {
     private lateinit var arrayListdatos: ArrayList<usuarios>
     private lateinit var token: String
 
-
     private var b: Bundle? = null
     private lateinit var reciclerView: RecyclerView
     private lateinit var Miadapter: adapterUsuarios
-    private lateinit var firebaseDatabaseUsu: FirebaseDatabase
-    private lateinit var databaseUsu: DatabaseReference
     var usu: usuarios? = usuarios()
     var cont: Int =0
     lateinit var  telefonoCliente: String
     lateinit var fotourl: String
     val setprogressDialog = setProgressDialog()
-
+    private lateinit var instancias: Instancias
+    private lateinit var uid:String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,8 +63,9 @@ class ContactosFragment : Fragment() {
         reciclerView = v.findViewById(R.id.recycler_Usuarios)
         //setprogressDialog.setProgressDialog(requireContext())
         b = requireArguments()
+        instancias = Instancias()
          telefonoCliente = b!!.getString("telefonoCliente")!!
-        println("contactos----> $telefonoCliente")
+        uid = b!!.getString("uid")!!
         //fotourl = b!!.getString("urlFotoCliente")!!
 //        nombreCompletoCliente = b!!.getString("nombreCompletoCliente")!!
 
@@ -81,20 +82,12 @@ class ContactosFragment : Fragment() {
             }
         })
 
-
-        //Primero Obtendremos la lista de numeros de telefonos
-        var firebaseDatabaseLista: FirebaseDatabase
-        var databaseReference: DatabaseReference
-       // var databaseReferenceLista: Task<DataSnapshot>
-       // firebaseDatabaseLista = FirebaseDatabase.getInstance()
         array = ArrayList<String>()
-        firebaseDatabaseLista = FirebaseDatabase.getInstance()
-        databaseReference = firebaseDatabaseLista.getReference("UsuariosR").child(telefonoCliente)
-         .child("Lista de Usuarios")
-    //  val  firebaseDatabaseusu = firebaseDatabaseLista.getReference("UsuariosR").child("7471503418")
-           // .child("Lista de Usuarios")
+
+        val databaseReference = instancias.referenciaListaDeUsuarios(uid)
         databaseReference.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                println("id usuario ${snapshot.value}")
              mostrarUsuarios(snapshot)
 
             }
@@ -123,6 +116,7 @@ class ContactosFragment : Fragment() {
         b = Bundle()
 
 
+
         return v
     }
 
@@ -132,12 +126,13 @@ class ContactosFragment : Fragment() {
        // println("entro 217 "+ {Miadapter.itemCount-1 })
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun mostrarUsuarios (snapshot: DataSnapshot){
-        println(" tel: " + snapshot.value)
         array = arrayListOf(snapshot.value.toString())
-        firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-        databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(snapshot.child("telefono").value.toString()).child("MisDatos")
-
+       // println("lista de usu ${snapshot.child("uid").value}")
+        val idkerkly = snapshot.child("uid").value.toString()
+      val databaseUsu = instancias.referenciaInformacionDelKerkly(snapshot.child("uid").value.toString())
+      //val  databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child("kerkly").child(snapshot.child("uid").value.toString()).child("MisDatos")
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
               //println("aqui 139 " + snapshot.value)
@@ -148,7 +143,6 @@ class ContactosFragment : Fragment() {
                 }else{
                     Miadapter.agregarUsuario(u2!!)
                 }
-
                 val mGestureDetector = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
                     GestureDetector(requireContext(), object : SimpleOnGestureListener() {
                         override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -181,6 +175,9 @@ class ContactosFragment : Fragment() {
                                 b!!.putString("nombreCompletoCliente", nombre)
                               //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()
                                 b!!.putString("urlFotoKerkly",urlfoto)
+                                b!!.putString("idCliente",uid)
+                                b!!.putString("idKerkly",idkerkly)
+
                                 intent.putExtras(b!!)
                                 startActivity(intent)
                                 return true
