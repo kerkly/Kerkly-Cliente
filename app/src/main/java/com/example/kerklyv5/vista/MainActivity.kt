@@ -243,12 +243,12 @@ class MainActivity : AppCompatActivity() {
         override fun doInBackground(vararg params: String?): String? {
             //controlador.getNombreNoR(usuario)
             controlador.pruebaRegistrarNumero(usuario,
-                this@MainActivity, layoutTelefono)
+                this@MainActivity, layoutTelefono,epicDialog2)
             return null
         }
 
         override fun onPostExecute(result: String?) {
-           // barra.dismiss()
+          epicDialog2.dismiss()
         }
 
     }

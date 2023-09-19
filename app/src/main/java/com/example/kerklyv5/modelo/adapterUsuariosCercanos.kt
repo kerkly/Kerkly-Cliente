@@ -18,22 +18,23 @@ import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 
 
-class adapterUsuarios(c: Context): RecyclerView.Adapter<adapterUsuarios.ViewHolder>() {
-    var lista = ArrayList<usuarios>()
+class adapterUsuariosCercanos(c: Context): RecyclerView.Adapter<adapterUsuariosCercanos.ViewHolder>() {
+    var lista = ArrayList<usuariosCercanosPerfil>()
     private var context = c
 
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
        val Correo = view.findViewById<TextView>(R.id.textViewCorreo)
        val nombre = view.findViewById<TextView>(R.id.textViewNombre)
-       val activo = view.findViewById<TextView>(R.id.txtactivo)
+       val activo = view.findViewById<TextView>(R.id.txtDistancia)
        val imageViewFoto = view.findViewById<ImageView>(R.id.imageViewUsuarios)
+
         // System.out.println("adapter " + use.getNombre())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_view_usuarios, parent, false)
+            .inflate(R.layout.card_view_usuarioscercanos, parent, false)
         return ViewHolder(view)
     }
 
@@ -45,10 +46,10 @@ class adapterUsuarios(c: Context): RecyclerView.Adapter<adapterUsuarios.ViewHold
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.Correo.text = lista[position].correo.trim()
         holder.nombre.text = lista[position].nombre.trim()
-        holder.activo.text = lista[position].fechaHora.trim()
+        holder.activo.text = lista[position].hora
+     //   holder.datoPrueba.text = "prueba 12:30"
 
         val photoUrl = Uri.parse(lista[position].foto.trim())
-        println("nombre45 ${lista[position].nombre.trim()}")
 
         Picasso.get().load(photoUrl).into(object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
@@ -61,21 +62,14 @@ class adapterUsuarios(c: Context): RecyclerView.Adapter<adapterUsuarios.ViewHold
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
                 val multi = MultiTransformation<Bitmap>(RoundedCornersTransformation(128, 0, RoundedCornersTransformation.CornerType.ALL))
-
                 Glide.with(context).load(photoUrl)
                     .apply(RequestOptions.bitmapTransform(multi))
                     .into(holder.imageViewFoto)
-
             }
-
-
         })
-
-
     }
 
-
-    fun agregarUsuario(usuarios: usuarios){
+    fun agregarUsuario(usuarios: usuariosCercanosPerfil){
         lista.add(usuarios)
         println("tamaño de la lista: ${lista.size}")
         notifyItemInserted(lista.size)

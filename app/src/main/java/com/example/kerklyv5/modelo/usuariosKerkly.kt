@@ -1,6 +1,6 @@
 package com.example.kerklyv5.modelo
 
-class usuarios(telefono: String, email: String, name: String, foto: String, currentDateTimeString: String, token: String,uid: String) {
+class usuariosKerkly(telefono: String, email: String, name: String, foto: String, currentDateTimeString: String, token: String, uid: String, curp:String) {
     var telefono: String = telefono
 
     var correo: String = email
@@ -13,6 +13,7 @@ class usuarios(telefono: String, email: String, name: String, foto: String, curr
 
     var token: String = token
     var uid: String = uid
-    constructor() : this("","","","","", "","")
+    var curp: String = curp
+    constructor() : this("","","","","", "","","")
 
 }

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView

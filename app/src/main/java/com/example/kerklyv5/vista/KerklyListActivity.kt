@@ -1,39 +1,38 @@
 package com.example.kerklyv5.vista
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kerklyv5.BaseDatosEspacial.Kerkly
+import com.example.kerklyv5.BaseDatosEspacial.conexionPostgreSQL
+import com.example.kerklyv5.BaseDatosEspacial.geom
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
-import com.example.kerklyv5.controlador.AdapterKerkly
 import com.example.kerklyv5.controlador.setProgressDialog
 import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
 import com.example.kerklyv5.interfaces.IngresarPresupuestoClienteInterface
-import com.example.kerklyv5.interfaces.ObtenerKerklyInterface
-import com.example.kerklyv5.modelo.modeloSolicituUrgente
-import com.example.kerklyv5.modelo.serial.Kerkly
+import com.example.kerklyv5.modelo.adapterUsuariosCercanos
 import com.example.kerklyv5.modelo.serial.modeloSolicitudNormal
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.modelo.usuariosCercanosPerfil
+import com.example.kerklyv5.modelo.usuariosKerkly
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.google.firebase.database.*
-import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
 import retrofit.client.Response
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -42,13 +41,13 @@ import java.util.ArrayList
 import java.util.Date
 
 class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
-
     private lateinit var oficio: String
     private lateinit var problema: String
-    private lateinit var curp: String
-    private lateinit var telefono: String
+  //  private lateinit var curp: String
+   private lateinit var telefono: String
     private lateinit var recyclerview: RecyclerView
-    private lateinit var adapter: AdapterKerkly
+   // private lateinit var adapter: AdapterKerkly
+   private lateinit var Miadapter: adapterUsuariosCercanos
     private lateinit var b: Bundle
     private var latitud = 0.0
     private var longitud = 0.0
@@ -69,7 +68,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private val obtenerToken = obtenerKerklys_y_tokens()
     private lateinit var correoCliente:String
     private lateinit var instancias: Instancias
-    private lateinit var uid:String
+    private lateinit var uidCliente:String
+    private lateinit var conexionPostgreSQL: conexionPostgreSQL
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +80,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
         context = this
         instancias = Instancias()
-
+        conexionPostgreSQL = conexionPostgreSQL()
+        postlist = ArrayList<Kerkly>()
         latitud = b.getDouble("Latitud")
         longitud = b.getDouble("Longitud")
         ciudad = b.getString("Ciudad").toString()
@@ -93,20 +94,35 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         pais = b.getString("Pais").toString()
         nombreCliente = b.getString("nombreCliente")!!
         correoCliente =  b.getString("correo")!!
-        uid = b.getString("uid")!!
-
-        recyclerview = findViewById(R.id.recycler_kerkly)
+        uidCliente = b.getString("uid")!!
+        Miadapter = adapterUsuariosCercanos(this)
+        recyclerview = findViewById(R.id.recycler_UsuariosPerfil)
         recyclerview.setHasFixedSize(true)
-        recyclerview.layoutManager= LinearLayoutManager(applicationContext)
+        recyclerview.layoutManager = LinearLayoutManager(context)
+        recyclerview.adapter = Miadapter
+
+        Miadapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                setScrollBar()
+            }
+        })
 
         telefono = b.get("Telefono").toString()
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
-        getKerklysCercanos()
+        //modificacion
+       // getKerklysCercanos()
+        //metodo para obtener a los kerklys mas cercanos usando la base de datos espacial
+        ObtenerKerklyMasCercanos()
+    }
+    private fun setScrollBar() {
+        recyclerview.scrollToPosition(Miadapter.itemCount-1)
+        // println("entro 217 "+ {Miadapter.itemCount-1 })
     }
 
-    private fun getKerklysCercanos () {
+   /* private fun getKerklysCercanos () {
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
             .setLenient()
@@ -171,50 +187,182 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                 Toast.makeText(applicationContext, t.toString(), Toast.LENGTH_LONG).show()
             }
         })
-    }
+    }*/
 
 
+    @SuppressLint("SuspiciousIndentation")
     override fun setDouble(min: String?) {
         val res = min!!.split(",").toTypedArray()
         val min = res[0].toDouble() / 60
         val dist = res[1].toInt() / 1000
-
-        i2 = i2!! +1
-
-        val e = i2!!-1
+        i2 = i2!! + 1
+        val e = i2!! - 1
         System.out.println("valor de e : $e")
+       // postlist!![e].hora = (min / 60).toInt().toString()
+       // postlist!![e].minuto = (min % 60).toInt().toString()
+        var hora = (min / 60).toInt().toString()
+        var minuto = (min % 60).toInt().toString()
+        if (hora.toInt() == 0){
+            System.out.println("Kerkly a $minuto minutos de distancia $dist")
+            postlist!![e].distancia = "Kerkly a $minuto minutos de distancia"
 
+        }else{
+            System.out.println("Kerkly a $hora hora  y $minuto minutos de distancia $dist")
+            postlist!![e].distancia = "Kerkly a $hora hora  y $minuto minutos de distancia"
 
-        postlist!![e].hora = (min / 60).toInt()
-        postlist!![e].minutos = (min % 60).toInt()
-        postlist!![e].horaMin = postlist!![e].hora + postlist!![e].minutos
-
-
-        if (e == (postlist!!.size-1)) {
-            postlist!!.sortBy {
-                it.horaMin
-            }
-            //System.out.println("Kerkly $e ${postlist!![e].horaMin}")
-            recorrerLista()
         }
+
+
+      if (e == (postlist!!.size - 1)) {
+           /* postlist!!.sortBy {
+                it.distancia
+            }*/
+          recorrerLista()
+        }
+        //System.out.println("Kerkly $e ${postlist!![e].distancia}")
 
     }
-
     fun recorrerLista (){
         for(i in 0 until postlist!!.size){
-            System.out.println(postlist!![i].Nombre)
-            System.out.println("hora " + postlist!!.get(i).hora + ":" + postlist!!.get(i).minutos)
-
+            System.out.println(postlist!!.get(i).uidKerkly)
+            System.out.println("hora ${postlist!!.get(i).uidKerkly} ${postlist!!.get(i).latitud} ${postlist!!.get(i).longitud}  " + postlist!!.get(i).distancia)
+            obtenerInfoKerkly(postlist!![i].uidKerkly,  postlist!!.get(i).distancia)
         }
 
-        recyclerview.adapter = adapter
+        recyclerview.adapter = Miadapter
         setProgress.dialog.dismiss()
     }
 
-    private fun enviarSolicitud() {
+    private fun ObtenerKerklyMasCercanos(){
+            // Muestra un ProgressDialog para indicar que se está cargando
+            var arrayListPoligonoColindantes: ArrayList<geom> = ArrayList()
+            //conexionPostgreSQL = conexionPostgreSQL()
+            val conexion = conexionPostgreSQL.obtenerConexion(this)
+            if (conexion != null) {
+                // Llamada al método poligonoCircular con el callback
+                val secciones=  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0, )
+                val kerklysCercanos =  conexionPostgreSQL.Los5KerklyMasCercanos(secciones,longitud,latitud,oficio)
+                // Ahora kerklysCercanos contiene la lista de los 5 Kerklys más cercanos
+                if (kerklysCercanos.isEmpty()){
+                    showMessaje("Lo sentimos pero en esta área no se encuentran kerklys cercanos")
+                    setProgress.dialog.dismiss()
+                    val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                    b.putBoolean("PresupuestoListo", true)
+                    intent.putExtras(b)
+                    startActivity(intent)
+                    finish()
+                }else {
+                    postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
+                   // var cont = 0
+                    for (kerkly in kerklysCercanos.reversed()) {
+                       // println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
+                        //println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
+                        conexionPostgreSQL.cerrarConexion()
+                       //  latitud = 17.520514
+                         //longitud = -99.463207
+                        val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
+                        CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
+                      //  cont++
+                        // MandarNoti(kerkly.uidKerkly, problema, nombreCliente)
+                    }
+
+                    //   insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
+                    //ingresarPresupuesto()
+                 //   setProgress.dialog.dismiss()
+
+                }
+
+            }else {
+                // Maneja el caso en el que la conexión no se pudo establecer
+                showMessaje("problemas de conexión  ")
+                setProgress.dialog.dismiss()
+            }
+
+
+    }
+
+    private fun obtenerInfoKerkly(uid:String,hora:String){
+        val databaseUsu = instancias.referenciaInformacionDelKerkly(uid)
+        databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                //println(" datos101: " + snapshot.getValue())
+                val u2 = snapshot.getValue(usuariosKerkly::class.java)
+                if (u2 ==null){
+                    //Toast.makeText(requireContext(), "No Tienes Ningun Cotacto", Toast.LENGTH_SHORT).show()
+                   // showMessaje("todo mal")
+                }else{
+                   // showMessaje("entro todo bien ${u2.nombre}")
+                    var usuarios: usuariosCercanosPerfil
+                    usuarios = usuariosCercanosPerfil()
+                    usuarios.telefono= u2.telefono
+                    usuarios.correo = u2.correo
+                    usuarios.fechaHora = u2.fechaHora
+                    usuarios.nombre = u2.nombre
+                    usuarios.token = u2.token
+                    usuarios.foto = u2.foto
+                     usuarios.hora = hora
+                    usuarios.curp = u2.curp
+
+                    Miadapter.agregarUsuario(usuarios)
+                }
+                val mGestureDetector = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
+                    GestureDetector(this@KerklyListActivity, object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent): Boolean {
+                            return true
+                        }
+                    })
+                } else {
+                    TODO("VERSION.SDK_INT < CUPCAKE")
+                }
+                recyclerview.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+                    override fun onRequestDisallowInterceptTouchEvent(b: Boolean) {}
+                    override fun onInterceptTouchEvent(
+                        recyclerView: RecyclerView, motionEvent: MotionEvent
+                    ): Boolean {
+                        try {
+                            val child = recyclerView.findChildViewUnder(motionEvent.x, motionEvent.y)
+                            if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
+                                val position = recyclerView.getChildAdapterPosition(child)
+                                val correo = Miadapter.lista[position].correo
+                                val nombre = Miadapter.lista[position].nombre
+                                val telefono = Miadapter.lista[position].telefono
+                                val urlfoto = Miadapter.lista[position].foto
+                                val token =Miadapter.lista[position].token
+                                val uid = Miadapter.lista[position].uid
+                                val curp = Miadapter.lista[position].curp
+                            //    showMessaje("clik en $nombre")
+                                enviarSolicitud(curp,token)
+                             /*   val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                b.putBoolean("PresupuestoListo", true)
+                                intent.putExtras(b)
+                                startActivity(intent)
+                                finish()*/
+                                return true
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                        return false
+                    }
+                    override fun onTouchEvent(
+                        recyclerView: RecyclerView,
+                        motionEvent: MotionEvent
+                    ) {
+                    }
+                })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                System.out.println("Firebase: $error")
+            }
+
+
+        })
+    }
+
+
+    private fun enviarSolicitud(curp:String,tokenKerkly:String) {
         val fechaHora = DateFormat.getDateTimeInstance().format(Date())
-        insertarSolicitudFirebaseNormal("",problema,correoCliente, oficio,curp,false,fechaHora,latitud,longitud,false)
-        //println("uid ......_:: $uid" )
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
@@ -234,7 +382,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             num_ext,
             cp,
             correoCliente,
-            uid,
+            uidCliente,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null
@@ -246,17 +394,12 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                         e.printStackTrace()
                     }
                    // Toast.makeText(applicationContext, "Entre por aqui", Toast.LENGTH_LONG).show()
-                    val cadena = "Datos enviados"
+                    val cadena = "error"
                     if (cadena.equals(entrada)){
-                        setProgress.dialog.dismiss()
-                        intent = Intent(applicationContext, SolicitarServicio::class.java)
-                        b.putBoolean("PresupuestoListo", true)
-                        intent.putExtras(b)
-                        startActivity(intent)
-                        Toast.makeText(applicationContext,"Solicitud en proceso", Toast.LENGTH_LONG).show()
-                    }else{
-                        setProgress.dialog.dismiss()
+                       // setProgress.dialog.dismiss()
                         Toast.makeText(applicationContext,"$entrada", Toast.LENGTH_LONG).show()
+                    }else{
+                        insertarSolicitudFirebaseNormal(entrada.toInt(),"",problema,correoCliente, oficio,curp,false,fechaHora,latitud,longitud,false,tokenKerkly)
                     }
                 }
 
@@ -268,7 +411,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         )
     }
 
-    fun insertarSolicitudFirebaseNormal(
+    fun insertarSolicitudFirebaseNormal(idGenerados: Int,
         pago_total: String,
         problema: String,
         correo: String,
@@ -278,21 +421,10 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         fechaHora: String,
         latitud: Double,
         longitud: Double,
-        trabajoTerminado: Boolean,
-    ) {
-        val reference = instancias.referenciaSolicitudNormal(uid)
-        val query = reference.orderByKey().limitToLast(1)
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val lastEntry = dataSnapshot.children.first()
-                    val lastId = lastEntry.key
-                    if (lastId != null) {
-                        // Utiliza el último ID aquí
-                        println("Último ID agregado: $lastId")
-                        val id= lastId.toInt()+1
+        trabajoTerminado: Boolean, tokenKerkly:String) {
+
                         val modelo = modeloSolicitudNormal(
-                            id,
+                            idGenerados,
                             pago_total,
                             problema,
                             correo,
@@ -304,7 +436,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                             longitud,
                             trabajoTerminado
                         )
-                        val countersRef2 = instancias.referenciaSolicitudNormal(uid).child(id.toString())
+                        val countersRef2 = instancias.referenciaSolicitudNormal(uidCliente).child(idGenerados.toString())
                         countersRef2.setValue(modelo) { error, _ ->
                             if (error == null) {
                                 showMessaje("Solicitud Enviada")
@@ -312,85 +444,14 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                                 b.putBoolean("PresupuestoListo", true)
                                 intent.putExtras(b)
                                 startActivity(intent)
+                                val llamartopico = llamarTopico()
+                                llamartopico.llamartopico(context, tokenKerkly,  "$problema", "Tienes una Solicitud de $nombreCliente")
                                 finish()
                             } else {
                                 // Manejar el error en caso de que ocurra
                                 showMessaje("hubo un error ")
                             }
                         }
-
-                    } else {
-                        // Manejar el caso si lastId es null
-                        println("Último ID agregado: $lastId")
-                        val modelo = modeloSolicitudNormal(
-                            1,
-                            pago_total,
-                            problema,
-                            correo,
-                            TipoServicio,
-                            idkerkly,
-                            clienteAcepta,
-                            fechaHora,
-                            latitud,
-                            longitud,
-                            trabajoTerminado
-                        )
-                        val countersRef2 = instancias.referenciaSolicitudNormal(uid).child("1")
-                        countersRef2.setValue(modelo) { error, _ ->
-                            if (error == null) {
-                                showMessaje("Solicitud Enviada")
-                                val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                                b.putBoolean("PresupuestoListo", true)
-                                intent.putExtras(b)
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                // Manejar el error en caso de que ocurra
-                                showMessaje("hubo un error ")
-                            }
-                        }
-
-                    }
-                } else {
-                    // Manejar el caso si no hay entradas en la referencia
-                    println(" no hay entradas en la referencia")
-                   // showMessaje("hubo un error ")
-                    val modelo = modeloSolicitudNormal(
-                        1,
-                        pago_total,
-                        problema,
-                        correo,
-                        TipoServicio,
-                        idkerkly,
-                        clienteAcepta,
-                        fechaHora,
-                        latitud,
-                        longitud,
-                        trabajoTerminado
-                    )
-                    val countersRef2 = instancias.referenciaSolicitudNormal(uid).child("1")
-                    countersRef2.setValue(modelo) { error, _ ->
-                        if (error == null) {
-                            showMessaje("Solicitud Enviada")
-                            val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                            b.putBoolean("PresupuestoListo", true)
-                            intent.putExtras(b)
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            // Manejar el error en caso de que ocurra
-                            showMessaje("hubo un error ")
-                        }
-                    }
-
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Manejar el error si ocurre
-                showMessaje(databaseError.toString())
-            }
-        })
 
     }
     fun showMessaje(mensaje:String){

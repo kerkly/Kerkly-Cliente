@@ -247,12 +247,9 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     b.putInt("Intentos", intentos)
                 }
             }
-
             override fun onFailure(call: Call<List<NombreNoR?>?>, t: Throwable) {
-
                 Log.d("error del retrofit", t.toString())
             }
-
         })
     }
 
@@ -276,7 +273,6 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         dialog.dismiss()
         //ObetenerCoordenadas()
         confirmarDireccionBD()
-
     }
 
     fun mensajes() {

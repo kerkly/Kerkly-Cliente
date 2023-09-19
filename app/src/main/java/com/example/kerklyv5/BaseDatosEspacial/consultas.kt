@@ -43,32 +43,19 @@ class consultas {
         }
         return geom
     }
-    fun ObtenerSeccionCoordenadas(textView: TextView, longitud: Double, latitud: Double): String{
+    fun ObtenerSeccionCoordenadas(longitud: Double, latitud: Double): Int{
         conexionPostgreSQL = conexionPostgreSQL()
-        var idSeccion:String = ""
+        var idSeccion:Int=0
         conexionPostgreSQL.conexion!!.createStatement().use { stmt ->
-            //  val query = "SELECT * FROM public.kerkly"
-            /*ST_Contains es una función utilizada en sistemas de bases de datos geoespaciales
-             para determinar si una geometría (como un polígono) contiene completamente otra geometría
-             (como un punto, una línea o un polígono más pequeño) en su interior. En otras palabras,
-              verifica si todos los puntos de la geometría contenida están dentro
-               de la geometría contenedora.
-             */
-            /*ST_SetSRID es una función utilizada en sistemas de bases de datos geoespaciales, como
-             PostGIS en PostgreSQL, para asignar o cambiar el sistema de referencia espacial
-              (SRID) de una geometría. El SRID es un identificador numérico que define cómo se
-               relacionan las coordenadas de una geometría con la Tierra, especificando el sistema
-                de coordenadas y la proyección utilizada.
-             */
             val query = "SELECT * FROM \"poligonoChilpo\" WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint($longitud,$latitud), 4326))"
             stmt.executeQuery(query).use { rs ->
                 while (rs.next()) {
-                    idSeccion = rs.getInt("id_0").toString()
+                    idSeccion = rs.getInt("id_0")
                     // idSeccion = rs.getString("st_astext")
                     println(idSeccion)
                     //  println(idpoligono)
                     //  textView.text = "idSeccion: $idpoligono \n $geom "
-                    return idSeccion
+                    return idSeccion.toInt()
                 }
             }
         }
@@ -133,7 +120,7 @@ class consultas {
             val query = "Select id_0, geom from \"poligonoChilpo\" where ST_Intersects(geom, ST_Buffer(ST_MakePoint($longitud,$latitud)::geography,$radio))"
             stmt.executeQuery(query).use { rs ->
                 while (rs.next()) {
-                    var id_0 = rs.getString("id_0")
+                    var id_0 = rs.getInt("id_0")
                     var geom = rs.getString("geom")
                     var wktGeometry = geom
                     var pgObject = PGobject()

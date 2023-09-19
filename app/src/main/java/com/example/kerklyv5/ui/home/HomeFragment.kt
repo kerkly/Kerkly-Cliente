@@ -1,8 +1,11 @@
 package com.example.kerklyv5.ui.home
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,6 +15,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -49,6 +53,7 @@ class HomeFragment : Fragment(){
 
     private var mAuth: FirebaseAuth? = null
     private var currentUser: FirebaseUser? = null
+    private var locationManager: LocationManager? = null
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,6 +65,7 @@ class HomeFragment : Fragment(){
         layoutProblem = root.findViewById(R.id.layoutProblematica)
         mAuth = FirebaseAuth.getInstance()
         currentUser = mAuth!!.currentUser
+        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         //botonDireccion = root.findViewById(R.id.button_dir)
         botonPresupuesto = root.findViewById(R.id.button_presupuesto)
         boton_servicioUrgente = root.findViewById(R.id.boton_servicio_urgente)
@@ -67,38 +73,50 @@ class HomeFragment : Fragment(){
        // btnfiltro = root.findViewById(R.id.filtrohome)
         obtenerOficiosDB()
         botonPresupuesto.setOnClickListener {
-            seleccionarKerkly()
+            val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            if (!gpsEnabled) {
+                val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(settingsIntent)
+            }else {
+                seleccionarKerkly()
+            }
         }
         //click servicio Urgente
         boton_servicioUrgente.setOnClickListener {
-            telefono = arguments?.getString("Telefono")!!
-            oficio = spinner.getSelectedItem().toString()
-           showMessage(oficio)
-            problema = textProblem.text.toString()
-            if (problema.isEmpty()) {
-               layoutProblem.error = getString(R.string.campo_requerido)
-           } else {
-               layoutProblem.error = null
-             //   val diccionarioPath = "https://firebasestorage.googleapis.com/v0/b/hybrid-saga-346617.appspot.com/o/0_palabras_todas_no_conjugaciones.txt?alt=media&token=eb2a8142-d979-4a45-834f-ec1953e4b48b"
-               // val diccionario = File(diccionarioPath).readLines().toSet()
+            val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            if (!gpsEnabled) {
+                val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(settingsIntent)
+            }else {
+                telefono = arguments?.getString("Telefono")!!
+                oficio = spinner.getSelectedItem().toString()
+                showMessage(oficio)
+                problema = textProblem.text.toString()
+                if (problema.isEmpty()) {
+                    layoutProblem.error = getString(R.string.campo_requerido)
+                } else {
+                    layoutProblem.error = null
+                    //   val diccionarioPath = "https://firebasestorage.googleapis.com/v0/b/hybrid-saga-346617.appspot.com/o/0_palabras_todas_no_conjugaciones.txt?alt=media&token=eb2a8142-d979-4a45-834f-ec1953e4b48b"
+                    // val diccionario = File(diccionarioPath).readLines().toSet()
 
-              //  if (problema in diccionario) {
-                //    println("La palabra existe en el diccionario")
-              //      Toast.makeText(requireContext(),"La palabra existe en el diccionario",Toast.LENGTH_SHORT).show()
-              //  } else {
-                //    println("La palabra no existe en el diccionario")
-                //    Toast.makeText(requireContext(),"La palabra no existe en el diccionario",Toast.LENGTH_SHORT).show()
-               // }
-               val i = Intent(context, MapsActivity::class.java)
-                b.putBoolean("Express", true)
-                b.putString("Oficio", oficio)
-                b.putString("Telefono", telefono)
-               b.putString("Nombre", currentUser!!.displayName)
-                b.putString("correo", currentUser!!.email)
-                b.putString("Problema", problema)
-                b.putString("uid",currentUser!!.uid)
-               i.putExtras(b)
-                startActivity(i)
+                    //  if (problema in diccionario) {
+                    //    println("La palabra existe en el diccionario")
+                    //      Toast.makeText(requireContext(),"La palabra existe en el diccionario",Toast.LENGTH_SHORT).show()
+                    //  } else {
+                    //    println("La palabra no existe en el diccionario")
+                    //    Toast.makeText(requireContext(),"La palabra no existe en el diccionario",Toast.LENGTH_SHORT).show()
+                    // }
+                    val i = Intent(context, MapsActivity::class.java)
+                    b.putBoolean("Express", true)
+                    b.putString("Oficio", oficio)
+                    b.putString("Telefono", telefono)
+                    b.putString("Nombre", currentUser!!.displayName)
+                    b.putString("correo", currentUser!!.email)
+                    b.putString("Problema", problema)
+                    b.putString("uid", currentUser!!.uid)
+                    i.putExtras(b)
+                    startActivity(i)
+                }
             }
         }
         listaTextos = ArrayList()

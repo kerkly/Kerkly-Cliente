@@ -14,7 +14,7 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class CalcularTiempoDistancia (var mContext: Context) : AsyncTask<String?, Void?, String?>()  {
+class CalcularTiempoDistancia (val mContext: Context) : AsyncTask<String?, Void?, String?>()  {
     var progressDialog: ProgressDialog? = null
     var geo1: Geo
 

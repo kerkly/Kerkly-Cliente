@@ -121,7 +121,7 @@
     <string name="numero_ext">Número exterior</string>
     <string name="codigoPostal">Código Postal</string>
     <string name="confirmar">Confirmar</string>
-    <string name="numeroRegistrado_error">El número telefónico ya se encuentro registrado</string>
+    <string name="numeroRegistrado_error">El número telefónico ya se encuentra registrado</string>
     <string name="actualizar">Actualizar</string>
     <string name="referencia">Referencia</string>
     <string name="titulo_notificacionPresupuesto">Presupuesto</string>
@@ -197,4 +197,5 @@
     <string name="Contactos">Contactos</string>
     <string name="Continuar">Continuar</string>
     <string name="btn_masOficios">Otros oficios</string>
+    <string name="SeAcabaronLasPruebas">Se acabaron las Pruebas Sin Registro</string>
 </resources>

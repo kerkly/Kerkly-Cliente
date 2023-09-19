@@ -12,5 +12,4 @@ interface ObtenerKerklyInterface {
     @GET("ObtenerKerklys.php")
     open fun kerklys(@Query("nombreO") nombreO: String):
             Call<List<Kerkly?>?>?
-
 }

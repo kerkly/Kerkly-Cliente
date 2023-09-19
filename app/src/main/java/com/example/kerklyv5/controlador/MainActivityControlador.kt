@@ -3,6 +3,8 @@ package com.example.kerklyv5.controlador
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -97,7 +99,7 @@ class MainActivityControlador {
     }
 
 
-    fun pruebaRegistrarNumero(usuario: Cliente, contexto: Activity, layoutTelefono: TextInputLayout) {
+    fun pruebaRegistrarNumero(usuario: Cliente, contexto: Activity, layoutTelefono: TextInputLayout,progress: Dialog) {
         //verificamos primero si el usuario ya se encuentra registrado
       //  Toast.makeText(, " entroo ", Toast.LENGTH_SHORT).show()
         val ROOT_URL = Url().url
@@ -147,7 +149,7 @@ class MainActivityControlador {
                                         //  Toast.makeText(contexto, "Bienvenido $nom  intentos = $intentos1", Toast.LENGTH_LONG).show()
                                         val intentos2: Int = intentos1
                                         if(intentos1 == 3){
-                                            Toast.makeText(contexto, " Se acabaron las Pruebas Sin Registro", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(contexto, "${R.string.SeAcabaronLasPruebas}", Toast.LENGTH_LONG).show()
 
                                             val intent  = Intent(contexto, PedirServicioExpress::class.java)
                                             b.putString("Teléfono No Registrado", usuario.getTelefonoNoR())
@@ -155,6 +157,7 @@ class MainActivityControlador {
                                             intent.putExtras(b)
                                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             contexto.startActivity(intent)
+                                            progress.dismiss()
                                         }else{
                                             layoutTelefono.error = null
                                             val i = Intent(contexto, PedirServicioExpress::class.java)
@@ -163,11 +166,13 @@ class MainActivityControlador {
                                             i.putExtras(b)
                                             i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             contexto.startActivity(i)
+                                            progress.dismiss()
                                         }
                                 }
                                 override fun onFailure(call: Call<List<ModeloIntentos?>?>, t: Throwable) {
-                                    //   Toast.makeText(contexto, "Codigo de respuesta de error: $t", Toast.LENGTH_SHORT).show()
+                                       Toast.makeText(contexto, " ${t.toString()}", Toast.LENGTH_SHORT).show()
                                     Log.d("error del retrofit", t.toString())
+                                    progress.dismiss()
                                 }
 
                             })
@@ -175,7 +180,6 @@ class MainActivityControlador {
 
                         }else{
                             //usuario Nuevo Agreado
-                            println("-----> $entrada")
                             //verificarNumero
                             val i = Intent(contexto, MainActivityVerificarSMS::class.java)
                             b.putString("clave", "sinRegistro")
@@ -183,6 +187,7 @@ class MainActivityControlador {
                             i.putExtras(b)
                             i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             contexto.startActivity(i)
+                            progress.dismiss()
 
                         }
                     }
@@ -190,12 +195,16 @@ class MainActivityControlador {
 
                 override fun failure(error: RetrofitError?) {
                     println("error $error")
+                    showMensaje(error.toString(),contexto)
 
                 }
 
             })
     }
 
+    private fun showMensaje(mensaje:String,context: Context){
+        Toast.makeText(context,mensaje,Toast.LENGTH_SHORT).show()
+    }
 
     fun verificarSesion(id: String, contexto: AppCompatActivity) {
         val ROOT_URL = Url().url
