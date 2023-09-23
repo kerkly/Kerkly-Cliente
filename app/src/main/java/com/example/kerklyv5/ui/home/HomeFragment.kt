@@ -15,7 +15,6 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -23,10 +22,8 @@ import androidx.lifecycle.ViewModel
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SQLite.DataManager
 import com.example.kerklyv5.SQLite.MisOficios
-import com.example.kerklyv5.controlador.AdapterSpinner
 import com.example.kerklyv5.controlador.AdapterSpinnercopia
 import com.example.kerklyv5.controlador.setProgressDialog
-import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.vista.MapsActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout

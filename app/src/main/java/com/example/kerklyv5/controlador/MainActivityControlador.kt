@@ -90,7 +90,7 @@ class MainActivityControlador {
                 }
 
                 override fun failure(error: RetrofitError) {
-
+                    showMensaje(error.toString(), contexto)
                 //    Toast.makeText(contexto, "error $error" , Toast.LENGTH_SHORT).show()
                 }
 
@@ -147,7 +147,7 @@ class MainActivityControlador {
                                       //  val nom =  postList.get(0).nombre_noR
                                         val intentos1 = postList.get(0).numIntentos
                                         //  Toast.makeText(contexto, "Bienvenido $nom  intentos = $intentos1", Toast.LENGTH_LONG).show()
-                                        val intentos2: Int = intentos1
+
                                         if(intentos1 == 3){
                                             Toast.makeText(contexto, "${R.string.SeAcabaronLasPruebas}", Toast.LENGTH_LONG).show()
 
@@ -170,7 +170,7 @@ class MainActivityControlador {
                                         }
                                 }
                                 override fun onFailure(call: Call<List<ModeloIntentos?>?>, t: Throwable) {
-                                       Toast.makeText(contexto, " ${t.toString()}", Toast.LENGTH_SHORT).show()
+                                    //   Toast.makeText(contexto, " ${t.toString()}", Toast.LENGTH_SHORT).show()
                                     Log.d("error del retrofit", t.toString())
                                     progress.dismiss()
                                 }
