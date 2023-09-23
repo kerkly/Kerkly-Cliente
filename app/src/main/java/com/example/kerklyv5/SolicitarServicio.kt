@@ -299,6 +299,7 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
     private fun sesion(correo: String) {
+        println("correo: $correo  id : $id")
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)

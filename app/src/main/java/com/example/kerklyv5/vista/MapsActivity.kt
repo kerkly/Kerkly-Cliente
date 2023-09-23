@@ -700,7 +700,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val conexion = conexionPostgreSQL.obtenerConexion(this)
         if (conexion != null) {
             // Llamada al método poligonoCircular con el callback
-          val secciones=  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0, )
+          val secciones=  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0 )
             val kerklysCercanos =  conexionPostgreSQL.Los5KerklyMasCercanos(secciones,longitud,latitud,oficio)
             // Ahora kerklysCercanos contiene la lista de los 5 Kerklys más cercanos
             if (kerklysCercanos.isEmpty()){

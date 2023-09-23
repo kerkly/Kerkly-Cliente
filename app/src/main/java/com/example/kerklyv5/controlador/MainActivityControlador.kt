@@ -174,10 +174,7 @@ class MainActivityControlador {
                                     Log.d("error del retrofit", t.toString())
                                     progress.dismiss()
                                 }
-
                             })
-
-
                         }else{
                             //usuario Nuevo Agreado
                             //verificarNumero
@@ -230,7 +227,6 @@ class MainActivityControlador {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-
                         if (output.equals("0")) {
                             System.out.println("entro en linea 233")
                             val intent = Intent(contexto, MainActivity::class.java)
