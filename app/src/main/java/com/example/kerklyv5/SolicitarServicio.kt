@@ -617,7 +617,7 @@ class SolicitarServicio : AppCompatActivity() {
                                         // Puedes continuar trabajando con el bitmap según tus necesidades
                                         // Por ejemplo, puedes convertir el Bitmap en un ByteArray
                                         val outputStream = ByteArrayOutputStream()
-                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
                                         val photoByteArray = outputStream.toByteArray()
                                         val usuarios: usuariosSqlite
                                         usuarios = usuariosSqlite(currentUser!!.uid, telefono,

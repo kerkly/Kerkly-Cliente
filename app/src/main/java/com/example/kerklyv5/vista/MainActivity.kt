@@ -193,6 +193,8 @@ class MainActivity : AppCompatActivity() {
 
                 override fun failure(error: RetrofitError?) {
                     print(error.toString())
+                    showMensaje(error.toString())
+
                 }
 
             }
@@ -200,7 +202,9 @@ class MainActivity : AppCompatActivity() {
         Log.d("respuesta", enteroBandera.toString())
 
     }
-
+ private fun showMensaje(mensaje:String){
+     Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+ }
     fun click (view: View) {
         val usuario = editUsuario.text.toString()
 

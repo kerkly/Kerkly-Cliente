@@ -156,7 +156,7 @@
                     android:backgroundTint="@color/colorBoton"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    android:onClick="direccionExpress"
+                    android:onClick="getNombreNoR"
                     android:text="Enviar Solicitud"
                     android:textColor="@color/black"
                     app:icon="@drawable/ic_baseline_location_on_24"

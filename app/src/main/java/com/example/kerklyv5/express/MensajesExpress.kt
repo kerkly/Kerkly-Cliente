@@ -121,7 +121,7 @@ class MensajesExpress : AppCompatActivity() {
             header.add("Item")
             header.add("Concepto")
             header.add("Pago")
-            println("foliooo ---> " +  "$calle $colonia $ext $cp $ref")
+            //println("foliooo ---> " +  "$calle $colonia $ext $cp $ref")
             databaseReferenceNR = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
             databaseReferenceNR.addValueEventListener(postListener)
         }

@@ -217,11 +217,11 @@ class MainActivityChats : AppCompatActivity() {
                     }
 
                     override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-                        TODO("Not yet implemented")
+
                     }
 
                     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-                        TODO("Not yet implemented")
+
                     }
 
                 })
@@ -237,10 +237,10 @@ class MainActivityChats : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+
             }
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+
             }
 
         })
@@ -259,15 +259,15 @@ class MainActivityChats : AppCompatActivity() {
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
+
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+
             }
 
         })
@@ -321,7 +321,7 @@ class MainActivityChats : AppCompatActivity() {
                            val pdfRef = instancias.StorageReference(idkerkly,idCliente,Nombrearchivo)
                             val localFile = File.createTempFile("$Nombrearchivo", "pdf")
                             val ruta = getRuta(Nombrearchivo)
-                            println("rutaa  $ruta")
+
                             val uploadTask = pdfRef.getFile(ruta!!)
                             // Registra un Listener para obtener la URL del archivo una vez cargado
                             uploadTask.addOnProgressListener {taskSnapshot ->
