@@ -181,6 +181,7 @@ class Registro : AppCompatActivity() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
              filePath = data.data!!
             try {
+
                 //Cómo obtener el mapa de bits de la Galería
                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
                 //escalamos la imagen para que no pese tanto
@@ -195,7 +196,6 @@ class Registro : AppCompatActivity() {
                     originalBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.width
                     )
                 }
-
                 //Configuración del mapa de bits en ImageView
                 val roundedDrawable: RoundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, originalBitmap)
 
@@ -209,18 +209,42 @@ class Registro : AppCompatActivity() {
             }
 
         }
-
+        currentUser = mAuth!!.currentUser
         if (requestCode == MY_REQUEST_CODE) {
-            val response = IdpResponse.fromResultIntent(data)
-            if (requestCode == RESULT_OK) {
-                val user = FirebaseAuth.getInstance().currentUser
+           // showMensaje("entrooo en onActivityResult")
             //    Toast.makeText(this, "saludos" + user!!.email, Toast.LENGTH_SHORT).show()
-                correo = currentUser!!.getEmail()!!
                 //verficar numero
+                val database = FirebaseDatabase.getInstance()
+                val databaseReference = database.getReference("UsuariosR").child(telefono)
+                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                //val usuario = usuarios()
 
-            }
+            val Nombre =  "$nombre $apellidoP $apellidoM"
 
+                //val u = usuarios(uid, email, name, foto, currentDateTimeString)
+                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(),
+                    currentUser!!.email.toString(), Nombre, currentUser!!.photoUrl.toString(), currentDateTimeString.toString(),"",
+                    currentUser!!.uid),) { error, ref -> //txtprueba.setText(uid + "latitud " + latitud + " longitud " + longitud);
+                    //  Toast.makeText(this@Registro, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
+                    println("eror: ${error.toString()}")
+                }
 
+                correo = currentUser!!.email!!
+                bundle.putString("fotoperfil", filePath.toString())
+                bundle.putString("clave", "registrar")
+                bundle.putString("nombre", nombre)
+                bundle.putString("apellidoP", apellidoP)
+                bundle.putString("apellidoM", apellidoM)
+                bundle.putString("telefono", telefono)
+                bundle.putString("g", genero)
+                bundle.putString("correo", correo)
+                bundle.putString("id", id)
+                bundle.putString("contra1", contra1)
+
+                val intent = Intent(this, MainActivityVerificarSMS::class.java)
+                intent.putExtras(bundle)
+                startActivity(intent)
+            finish()
         }
     }
  /*   fun getStringImagen(bmp: Bitmap): String? {
@@ -231,6 +255,9 @@ class Registro : AppCompatActivity() {
     }*/
 
 
+    private  fun showMensaje(mensaje:String){
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+    }
     fun clickContinuarRegistro (view: View) {
         var band = false
         nombre = editNombre.text.toString()
@@ -302,30 +329,9 @@ class Registro : AppCompatActivity() {
         if (contra1 == contra2){
             if (band== true) {
                 if (validarContra()) {
+                    muestraOpciones()
                     //Toast.makeText(this, "entro ", Toast.LENGTH_SHORT).show()
                   //  currentUser = mAuth!!.currentUser
-                    val user = FirebaseAuth.getInstance().currentUser
-                    correo = user!!.email!!
-                    //Toast.makeText(this, "entro : $correo ", Toast.LENGTH_SHORT).show()
-
-                    // correo = currentUser!!.getEmail()!!
-                    bundle.putString("fotoperfil", filePath.toString())
-                    bundle.putString("clave", "registrar")
-                    bundle.putString("nombre", nombre)
-                    bundle.putString("apellidoP", apellidoP)
-                    bundle.putString("apellidoM", apellidoM)
-                    bundle.putString("telefono", telefono)
-                    bundle.putString("g", genero)
-                    bundle.putString("correo", correo)
-                    bundle.putString("id", id)
-                    bundle.putString("contra1", contra1)
-                   // muestraOpciones()
-
-                    val intent = Intent(this, MainActivityVerificarSMS::class.java)
-                    intent.putExtras(bundle)
-                    startActivity(intent)
-                   finish()
-
 
                 }else{
                     contra1_contendor.error = getString(R.string.contra_invalida)
@@ -367,9 +373,9 @@ class Registro : AppCompatActivity() {
 
         if (networkInfo != null && networkInfo.isConnected) {
             if (currentUser != null) {
-
+                showMensaje("entrooo en onStart")
                 correo = currentUser!!.email!!
-                val name = currentUser!!.displayName
+               // val name = currentUser!!.displayName
                 val email = currentUser!!.email
                 val photoUrl = currentUser!!.photoUrl
                 val uid = currentUser!!.uid
@@ -379,30 +385,40 @@ class Registro : AppCompatActivity() {
                 val databaseReference = database.getReference("UsuariosR").child(telefono)
                 val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
                 //val usuario = usuarios()
+                val Nombre =  "$nombre $apellidoP $apellidoM"
+
 
                 //val u = usuarios(uid, email, name, foto, currentDateTimeString)
-                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(), email.toString(), name.toString(), foto.toString(), currentDateTimeString.toString(),"",
+                databaseReference.child("MisDatos").setValue(usuarios(telefono.toString(), email.toString(), Nombre, foto.toString(), currentDateTimeString.toString(),"",
                     currentUser!!.uid),) { error, ref -> //txtprueba.setText(uid + "latitud " + latitud + " longitud " + longitud);
                   //  Toast.makeText(this@Registro, "Bienvenido $name", Toast.LENGTH_SHORT) .show()
                 }
 
+                val user = FirebaseAuth.getInstance().currentUser
+                correo = user!!.email!!
+                bundle.putString("fotoperfil", filePath.toString())
+                bundle.putString("clave", "registrar")
+                bundle.putString("nombre", nombre)
+                bundle.putString("apellidoP", apellidoP)
+                bundle.putString("apellidoM", apellidoM)
+                bundle.putString("telefono", telefono)
+                bundle.putString("g", genero)
+                bundle.putString("correo", correo)
+                bundle.putString("id", id)
+                bundle.putString("contra1", contra1)
 
-            }else{
+                val intent = Intent(this, MainActivityVerificarSMS::class.java)
+                intent.putExtras(bundle)
+                startActivity(intent)
+                finish()
+
+            }/*else{
                 muestraOpciones()
-            }
-
-
+            }*/
 
         } else {
             Toast.makeText(this@Registro, "No hay conexion a Internet", Toast.LENGTH_LONG)
                 .show()
         }
-
-
-
-
-
     }
-
-
 }

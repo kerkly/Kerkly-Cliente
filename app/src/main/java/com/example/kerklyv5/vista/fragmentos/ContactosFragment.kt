@@ -110,11 +110,7 @@ class ContactosFragment : Fragment() {
             }
 
         })
-
-
         b = Bundle()
-
-
 
         return v
     }

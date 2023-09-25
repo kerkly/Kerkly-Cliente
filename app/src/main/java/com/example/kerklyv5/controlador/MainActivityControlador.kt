@@ -77,6 +77,7 @@ class MainActivityControlador {
 
                   var Res = "Bienvenido"
                     if (Res.equals(Respuesta)){
+                        //Toast.makeText(contexto, "$Respuesta", Toast.LENGTH_SHORT).show()
                         val  intent = Intent(contexto, SolicitarServicio::class.java)
                         intent.putExtra("Telefono", usuario.getUsuario())
                         intent.putExtra("PresupuestoListo", false)
@@ -218,6 +219,7 @@ class MainActivityControlador {
                     t: retrofit.client.Response?,
                     response2: retrofit.client.Response?
                 ) {
+                    println("id $id")
                     var reader: BufferedReader? = null
                     var output = ""
                     try {
@@ -226,15 +228,15 @@ class MainActivityControlador {
                         output = reader.readLine()
                         //  System.out.println("id $id pantalla inicio $output")
 
-
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
+                    println("resp $output")
 
                         if (output.equals("0")) {
-                            System.out.println("entro en linea 233")
+                            //System.out.println("entro en linea 233")
                             val intent = Intent(contexto, MainActivity::class.java)
-                            intent.putExtra("Telefono", output)
+                           // intent.putExtra("Telefono", output)
                             contexto.startActivity(intent)
                             contexto.finish()
                         } else {

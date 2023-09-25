@@ -143,14 +143,14 @@ class MainActivityVerificarSMS : AppCompatActivity() {
                 numeroNoregistrado = intent1.getStringExtra("Teléfono No Registrado")!!
                 numeroSMS = area+numeroNoregistrado
                 sms(numeroSMS)
-                Toast.makeText(this, "numero no registrado", Toast.LENGTH_LONG).show()
+               // Toast.makeText(this, "numero no registrado", Toast.LENGTH_LONG).show()
             }else{
                 if (clave.equals(claveRe)){
                     val intent1 = getIntent()
                     numeroRegistar = intent1.getStringExtra("telefono")!!
                     numeroSMS = area+numeroRegistar
                     sms(numeroSMS)
-                    Toast.makeText(this, "numero por registrar", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this, "numero por registrar", Toast.LENGTH_LONG).show()
                 }
             }
         }

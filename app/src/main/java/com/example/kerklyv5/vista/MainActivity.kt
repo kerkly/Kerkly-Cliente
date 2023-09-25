@@ -66,14 +66,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editTelefono: TextInputEditText
     private lateinit var layoutTelefono: TextInputLayout
     private lateinit var dialog: Dialog
-    private lateinit var barra: ProgressDialog
     private lateinit var controlador: MainActivityControlador
-    private lateinit var layout_nombre: TextInputLayout
-    private lateinit var layout_ap: TextInputLayout
-    private lateinit var layout_am: TextInputLayout
-    private lateinit var edit_nombre: TextInputEditText
-    private lateinit var edit_ap: TextInputEditText
-    private lateinit var edit_am: TextInputEditText
     private lateinit var id: String
     //video fondo
     protected lateinit var vv_fondo: VideoView
@@ -86,11 +79,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var animation4: Animation
     private lateinit var boton: Button
     private lateinit var epicDialog2: Dialog
-    private lateinit var seguir: Button
     private lateinit var buttonclosed: ImageButton
     private lateinit var btn_pruebaSinRegistro: MaterialButton
-
-
 
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {

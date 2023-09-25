@@ -58,6 +58,7 @@
                 app:backgroundTint="@color/colorBoton"
                 android:background="@drawable/fondo_boton"
                 android:layout_margin="25dp"
+                android:visibility="gone"
                 />
 
             <TextView

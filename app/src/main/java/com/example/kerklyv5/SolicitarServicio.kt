@@ -8,6 +8,7 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -37,6 +38,8 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.kerklyv5.SQLite.DataManager
@@ -63,6 +66,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.GsonBuilder
+import com.squareup.picasso.Picasso
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.RestAdapter
@@ -136,7 +141,7 @@ class SolicitarServicio : AppCompatActivity() {
         txt_correo = view.findViewById(R.id.correo_txt)
         fotoPerfil = view.findViewById(R.id.ImagenDePerfil)
         fotoPerfil.setOnClickListener {
-            SeleecionarFoto()
+           // SeleecionarFoto()
         }
 
         appBarConfiguration = AppBarConfiguration(
@@ -298,7 +303,7 @@ class SolicitarServicio : AppCompatActivity() {
 
     }
 
-    private fun sesion(correo: String) {
+    private fun sesionAbierta(correo: String) {
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
@@ -315,7 +320,7 @@ class SolicitarServicio : AppCompatActivity() {
                     try {
                         reader = BufferedReader(InputStreamReader(t?.body?.`in`()))
                         output = reader.readLine()
-                        // Toast.makeText(this@SolicitarServicio,output,Toast.LENGTH_SHORT).show()
+                         //Toast.makeText(this@SolicitarServicio,"sesion abierta"+ output,Toast.LENGTH_SHORT).show()
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
@@ -621,7 +626,7 @@ class SolicitarServicio : AppCompatActivity() {
                                         val usuarios: usuariosSqlite
                                         usuarios = usuariosSqlite(currentUser!!.uid, telefono,
                                             photoByteArray,
-                                            nombre!!,
+                                            nombreCompletoCliente,
                                             ap,
                                             am,
                                             correo
@@ -647,7 +652,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 })
                             //  cargarImagen(foto2!!)
                             setProgressDialog.dialog.dismiss()
-                            sesion(correo)
+                            sesionAbierta(correo)
                         } else {
                             cerrarSesion()
                             Toast.makeText(
@@ -694,7 +699,7 @@ class SolicitarServicio : AppCompatActivity() {
                     }
                 })*/
             dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
-            sesion(currentUser!!.email.toString())
+          //  sesionAbierta(currentUser!!.email.toString())
             var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
             firebaseMessaging.addOnCompleteListener {
                 //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
@@ -730,6 +735,9 @@ class SolicitarServicio : AppCompatActivity() {
                     //dataManager.getAllOficios()
                 }
             })
+            cargarImagen(currentUser!!.photoUrl.toString())
+            txt_nombre.text = currentUser!!.displayName.toString()
+            txt_correo.text = currentUser!!.email.toString()
         }else {
             muestraOpciones()
             setProgressDialog.dialog.dismiss()
@@ -815,7 +823,7 @@ class SolicitarServicio : AppCompatActivity() {
     }
 
 
-    /*private fun cargarImagen(urlImagen: String) {
+    private fun cargarImagen(urlImagen: String) {
         val file: Uri
         file = Uri.parse(urlImagen)
         System.out.println("imagen aqui: "+ file)
@@ -837,7 +845,7 @@ class SolicitarServicio : AppCompatActivity() {
             }
 
         })
-    }*/
+    }
 
 
 }

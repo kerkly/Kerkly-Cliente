@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/white"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
@@ -15,28 +15,31 @@
         android:textSize="25sp"
         android:layout_margin="10dp"/>
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_ordenesPendientes"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp"/>
-
-
-    <ImageView
-        android:id="@+id/img_ordenesPendientes"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:src="@drawable/imagen_lista_vacia" />
-
-    <TextView
-        android:id="@+id/txt_ordenesPendientes"
-        android:layout_width="300dp"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonSolicitudNormal"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lista_vacia_ordenesPendientes"
-        android:textColor="@color/black"
-        android:gravity="center"
         android:layout_gravity="center"
-        android:lines="2"
-        android:textSize="20sp"/>
+        android:background="@drawable/fondo_boton"
+        android:text="Solicitudes Normales"
+        android:textColor="@color/black"
+        android:layout_marginTop="100dp"
+        app:backgroundTint="@color/colorBoton"
+         />
+
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonSolicitudUrgente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/fondo_boton"
+        android:text="Solicitudes Urgente"
+        android:textColor="@color/black"
+        android:layout_marginTop="30dp"
+        app:backgroundTint="@color/colorBoton"
+        />
+
+
 </LinearLayout>

@@ -22,8 +22,8 @@ class conexionPostgreSQL {
         StrictMode.setThreadPolicy(threadPolicy)
         try {
             Class.forName("org.postgresql.Driver") // Cargar el driver JDBC
-            val host = "0.tcp.ngrok.io"
-            val port = "17484"
+            val host = "2.tcp.ngrok.io"
+            val port = "10014"
             val databaseName = "Kerkly"
             val username = "luis_admin"
             val password = "Lu0599@"
