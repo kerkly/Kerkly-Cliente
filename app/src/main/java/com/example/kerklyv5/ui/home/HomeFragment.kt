@@ -87,7 +87,7 @@ class HomeFragment : Fragment(){
             }else {
                 telefono = arguments?.getString("Telefono")!!
                 oficio = spinner.getSelectedItem().toString()
-                showMessage(oficio)
+               // showMessage(oficio)
                 problema = textProblem.text.toString()
                 if (problema.isEmpty()) {
                     layoutProblem.error = getString(R.string.campo_requerido)

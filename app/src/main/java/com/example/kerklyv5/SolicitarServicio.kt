@@ -303,7 +303,8 @@ class SolicitarServicio : AppCompatActivity() {
 
     }
 
-    private fun sesionAbierta(correo: String) {
+    private fun sesion(correo: String) {
+        println("correo: $correo  id : $id")
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
             .setEndpoint(ROOT_URL)
@@ -652,7 +653,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 })
                             //  cargarImagen(foto2!!)
                             setProgressDialog.dialog.dismiss()
-                            sesionAbierta(correo)
+                            sesion(correo)
                         } else {
                             cerrarSesion()
                             Toast.makeText(
