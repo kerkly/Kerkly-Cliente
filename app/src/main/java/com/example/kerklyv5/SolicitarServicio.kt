@@ -258,6 +258,7 @@ class SolicitarServicio : AppCompatActivity() {
         val args = Bundle()
         args.putString("Telefono", telefono)
         args!!.putString("nombreCompletoCliente", currentUser!!.displayName)
+        args!!.putString("uid",currentUser!!.uid)
         f.arguments = args
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
@@ -699,6 +700,8 @@ class SolicitarServicio : AppCompatActivity() {
 
                     }
                 })*/
+            sesion(currentUser!!.email.toString())
+
             dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
           //  sesionAbierta(currentUser!!.email.toString())
             var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")

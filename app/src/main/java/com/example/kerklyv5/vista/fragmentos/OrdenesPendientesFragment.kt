@@ -41,6 +41,7 @@ class OrdenesPendientesFragment : Fragment() {
     private lateinit var telefono: String
     private lateinit var b: Bundle
     private lateinit var nombreCompletoCliente: String
+    private lateinit var uidCliente:String
   //  private  var header: ArrayList<String> = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,11 +62,13 @@ class OrdenesPendientesFragment : Fragment() {
 
         telefono = b.getString("Telefono").toString()
         nombreCompletoCliente = b.getString("nombreCompletoCliente")!!
+        uidCliente =  b.getString("uid").toString()
 
         val btnSolicitudNormal = v.findViewById<MaterialButton>(R.id.buttonSolicitudNormal)
         btnSolicitudNormal.setOnClickListener {
             val intent = Intent(requireContext(), MainActivityMostrarSolicitudes::class.java)
             b!!.putString("TipoDeSolicitud","normal")
+            b!!.putString("uidCliente", uidCliente)
             intent.putExtras(b!!)
             startActivity(intent)
         }
@@ -74,6 +77,7 @@ class OrdenesPendientesFragment : Fragment() {
         btnSolicitudUrgente.setOnClickListener {
             val intent = Intent(requireContext(), MainActivityMostrarSolicitudes::class.java)
             b!!.putString("TipoDeSolicitud","urgente")
+            b!!.putString("uidCliente", uidCliente)
             intent.putExtras(b!!)
             startActivity(intent)
         }

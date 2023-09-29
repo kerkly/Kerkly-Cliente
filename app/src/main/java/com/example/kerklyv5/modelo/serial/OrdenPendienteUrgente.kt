@@ -9,79 +9,45 @@ class OrdenPendienteUrgente {
     @Expose
     var nombreO: String = ""
 
-    @SerializedName("idPresupuesto")
-    @Expose
-    var idContrato: Int = 1
-
-    @SerializedName("Fecha_Inicio")
-    @Expose
-    var Fecha_Inicio: String = ""
-
-    @SerializedName("cliente_nombre")
+    @SerializedName("Nombre")
     @Expose
     var Nombre: String = ""
 
-    @SerializedName("cliente_ap")
+    @SerializedName("Apellido_Paterno")
     @Expose
     var Apellido_Paterno: String = ""
 
-    @SerializedName("cliente_am")
+    @SerializedName("ApellidoMaterno")
     @Expose
     var Apellido_Materno: String = ""
 
-    @SerializedName("Nombre")
+    @SerializedName("idPresupuesto")
     @Expose
-    var NombreK: String = ""
+    var idPresupuesto: String = ""
 
-    @SerializedName("Apellido_Paterno")
-    @Expose
-    var Apellido_PaternoK: String = ""
-
-    @SerializedName("Apellido_Materno")
-    @Expose
-    var Apellido_MaternoK: String = ""
-
-    @SerializedName("correo_electronico")
-    @Expose
-    var correo_electronico: String = ""
-
-    @SerializedName("Telefono")
-    @Expose
-    var Telefono: String = ""
 
     @SerializedName("pago_total")
     @Expose
     var pago_total: Double = 0.0
 
-    @SerializedName("Pais")
-    @Expose
-    var Pais: String =  ""
-
-    @SerializedName("Ciudad")
-    @Expose
-    var Ciudad: String =  ""
-
-    @SerializedName("Colonia")
-    @Expose
-    var Colonia: String =  ""
-
-    @SerializedName("Calle")
-    @Expose
-    var Calle: String =  ""
-
     @SerializedName("problema")
     @Expose
-    var problema: String =  ""
+    var problema: String = ""
 
     @SerializedName("fechaP")
     @Expose
     var fechaP: String =  ""
 
-    @SerializedName("aceptoCliente")
+    @SerializedName("idKerklyAcepto")
     @Expose
-    var aceptoCliente: String =  ""
+    var idKerklyAcepto: String =  ""
+
 
     @SerializedName("uidCliente")
     @Expose
     var uidCliente: String =  ""
+
+    @SerializedName("uidKerkly")
+    @Expose
+    var uidKerkly: String =  ""
 }

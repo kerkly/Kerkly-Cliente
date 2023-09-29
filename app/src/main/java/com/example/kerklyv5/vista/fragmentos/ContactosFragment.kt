@@ -192,9 +192,8 @@ class ContactosFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 System.out.println("Firebase: $error")
+
             }
-
-
         })
 
     }
