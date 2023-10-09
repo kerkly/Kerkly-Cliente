@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.kerklyv5.R
@@ -20,26 +21,59 @@ class CheckoutActivity : AppCompatActivity() {
     lateinit var paymentSheet: PaymentSheet
     lateinit var customerConfig: PaymentSheet.CustomerConfiguration
     lateinit var paymentIntentClientSecret: String
-
+    val Publishablekey = "pk_test_51NxujVD0vuzqQPKcVE6nxzXd9rQGXe1ZaEMjdQpsqiKFL0BcKGaq5WWGKpruBc5aVPnc6mDEk3ck1kEj7zYtOywW00YMW0Kh1n"
+    val secretKey = "sk_test_51NxujVD0vuzqQPKcGUiZy6L8iaV08WtZ1GdUxodfKCemXYX0bJGC2JFICyOhI1zA4CCDfcXAHuMt0AIcKzmEMPCf00lKUMivr7"
+  var CustomerId: String = ""
+    var EphemeralKey:String = ""
+    var ClientSecret:String = ""
+    val monto = 10.00
+    var TipoMoneda = "mxn"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
-        // Hook up the pay button
-        paymentSheet = PaymentSheet(this, ::onPaymentSheetResult)
-        // Crear un objeto JSON con los datos que deseas enviar
-        val postData = JSONObject()
-        postData.put("name", "Luis Alfredo") // Reemplaza con el nombre deseado
-        postData.put("line1", "el carmen")    // Reemplaza con la dirección deseada
-        postData.put("postal_code", "7471503417") // Reemplaza con el código postal deseado
-        postData.put("city", "mexico")           // Reemplaza con la ciudad deseada
-        postData.put("state", "ny")               // Reemplaza con el estado deseado
-        postData.put("country", "mx")             // Reemplaza con el país deseado
-        postData.put("amount", 1099)              // Reemplaza con el monto deseado
-        postData.put("description", "android studio") // Reemplaza con la descripción deseada
 
-        // Realizar una solicitud HTTP POST al servidor
-        fetchApi(postData)
+        PaymentConfiguration.init(this, Publishablekey)
+        paymentSheet = PaymentSheet(this) { paymentSheetResult: PaymentSheetResult? ->
+            onPaymentSheetResult(paymentSheetResult)
+        }
+
+
+        val request = object : StringRequest(
+            Request.Method.POST,
+            "https://api.stripe.com/v1/customers",
+            Response.Listener<String> { response ->
+                try {
+                    val objeto = JSONObject(response)
+                    CustomerId = objeto.getString("id")
+                    obtenerKeyy()
+                    println("ID: $CustomerId")
+                    showToast("ID: $CustomerId")
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error ->
+                println("Error: ${error.message}")
+                showToast("Error: ${error.message}")
+            }
+        ) {
+            override fun getHeaders(): Map<String, String> {
+                // Aquí puedes configurar encabezados personalizados si es necesario
+                val miMapa: MutableMap<String, String> = mutableMapOf()
+                // Agregar elementos al mapa
+                miMapa["Autorization"] = "Bearer  $secretKey"
+
+                // Agregar más pares clave-valor según tus necesidades
+
+                return super.getHeaders()
+            }
+        }
+
+
+        val queue = Volley.newRequestQueue(this)
+        queue.add(request)
+
         val Button = findViewById<Button>(R.id.pay_button)
         Button.setOnClickListener {
             if (paymentIntentClientSecret != null){
@@ -54,7 +88,100 @@ class CheckoutActivity : AppCompatActivity() {
 
 
     }
-    private fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+
+    private fun obtenerKeyy() {
+        val request = object : StringRequest(
+            Request.Method.POST,
+            "https://api.stripe.com/v1/ephemeral_keys",
+            Response.Listener<String> { response ->
+                try {
+                    val objeto = JSONObject(response)
+                    EphemeralKey = objeto.getString("id")
+                    obtenerCliente(CustomerId, EphemeralKey)
+                    println("ID: $CustomerId")
+                    //showToast("ID: $CustomerId")
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error ->
+                println("Error: ${error.message}")
+                //showToast("Error: ${error.message}")
+            }
+        ) {
+            override fun getHeaders(): Map<String, String> {
+                // Aquí puedes configurar encabezados personalizados si es necesario
+                val miMapa: MutableMap<String, String> = mutableMapOf()
+                // Agregar elementos al mapa
+                miMapa["Autorization"] = "Bearer  $secretKey"
+                miMapa["Stripe-Version"] = "023-08-16"
+                // Agregar más pares clave-valor según tus necesidades
+
+                return miMapa
+            }
+
+            override fun getParams(): MutableMap<String, String>? {
+                val miMapa: MutableMap<String, String> = mutableMapOf()
+                miMapa["customer"] = CustomerId
+                miMapa["Stripe-Version"] = "023-08-16"
+                return miMapa
+            }
+        }
+
+
+        val queue = Volley.newRequestQueue(this)
+        queue.add(request)
+
+    }
+
+    private fun obtenerCliente(customerId: String, ephemeralKey: String) {
+        val request = object : StringRequest(
+            Request.Method.POST,
+            "https://api.stripe.com/v1/payment_intents",
+            Response.Listener<String> { response ->
+                try {
+                    val objeto = JSONObject(response)
+                    ClientSecret = objeto.getString("client_secret")
+                    println("cliente: $ClientSecret")
+                    showToast("cliente: $ClientSecret")
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error ->
+                println("Error: ${error.message}")
+                showToast("Error: ${error.message}")
+            }
+        ) {
+            override fun getHeaders(): Map<String, String> {
+                // Aquí puedes configurar encabezados personalizados si es necesario
+                val miMapa: MutableMap<String, String> = mutableMapOf()
+                // Agregar elementos al mapa
+                miMapa["Autorization"] = "Bearer  $secretKey"
+
+                // Agregar más pares clave-valor según tus necesidades
+
+                return miMapa
+            }
+
+            override fun getParams(): MutableMap<String, String>? {
+                val miMapa: MutableMap<String, String> = mutableMapOf()
+                miMapa["customer"] = CustomerId
+                miMapa["amount"] = "$monto"
+                miMapa["currency"] = TipoMoneda
+                miMapa["automatic_payment_methods[enabled]"] = "true"
+                return miMapa
+            }
+        }
+
+
+        val queue = Volley.newRequestQueue(this)
+        queue.add(request)
+
+    }
+
+
+    private fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult?) {
         when (paymentSheetResult) {
             is PaymentSheetResult.Completed -> {
                 // El pago se completó con éxito, puedes mostrar un mensaje de confirmación o realizar acciones adicionales.
@@ -69,6 +196,10 @@ class CheckoutActivity : AppCompatActivity() {
                 val error = paymentSheetResult.error
                 showToast("Payment failed " + error.localizedMessage)
             }
+
+            else -> {
+                print("nadad --->")
+            }
         }
     }
 
@@ -77,7 +208,7 @@ class CheckoutActivity : AppCompatActivity() {
     }
 
     fun fetchApi(postData: JSONObject) {
-        val baseUrl = "https://demo.codeseasy.com/apis/stripe/"
+        val baseUrl = "https://api.stripe.com/v1/customers/"
 
 
         // Crear una solicitud POST

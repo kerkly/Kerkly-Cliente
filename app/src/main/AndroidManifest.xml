@@ -31,7 +31,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KerklyV5">
+        android:theme="@style/Theme.KerklyV5"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".pasarelaPagos.CheckoutActivity"
             android:exported="false" />
