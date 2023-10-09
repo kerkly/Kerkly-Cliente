@@ -21,6 +21,7 @@ import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
 import com.example.kerklyv5.modelo.serial.OrdenPendiente
 import com.example.kerklyv5.modelo.serial.OrdenPendienteUrgente
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.google.firebase.database.DataSnapshot
@@ -72,11 +73,11 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
         nombreCompletoCliente =  b!!.getString("nombreCompletoCliente").toString()
         uidCliente = b!!.getString("uidCliente")!!
 
-        if (TipoSolicitud.equals("normal")){
+        if (TipoSolicitud == "normal"){
             getOrdenesNormal()
         }
 
-        if (TipoSolicitud.equals("urgente")){
+        if (TipoSolicitud == "urgente"){
            getOrdenesUrgente()
         }
     }
@@ -256,14 +257,17 @@ private  fun showMensaje(mensaje:String){
                                intent.putExtra("nombreCompletoCliente",nombreCliente)
                                intent.putExtra("telefonokerkly", telefonoKerkly)
                                startActivity(intent)*/
+
+                            val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
+                            startActivity(intent)
                         }else{
                             //Toast.makeText(requireContext(), "ya hay presupuesto", Toast.LENGTH_SHORT).show()
                             if (aceptoCliente == "1"){
                                 //Toast.makeText(requireContext(), "este presuepuesto ya sido aceptado", Toast.LENGTH_SHORT).show()
-                                val intent  = Intent(this@MainActivityMostrarSolicitudes, FormaPagoExrpess::class.java)
+                               /* val intent  = Intent(this@MainActivityMostrarSolicitudes, FormaPagoExrpess::class.java)
                                 b.putBoolean("Normal", true)
                                 intent.putExtras(b)
-                                startActivity(intent)
+                                startActivity(intent)*/
                             }else {
                                 val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
                                 b.putString("NombreCliente", nombreCliente)

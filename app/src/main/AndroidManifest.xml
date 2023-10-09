@@ -33,6 +33,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KerklyV5">
         <activity
+            android:name=".pasarelaPagos.CheckoutActivity"
+            android:exported="false" />
+        <activity
             android:name=".vista.fragmentos.MainActivityMostrarSolicitudes"
             android:exported="false" />
         <activity
