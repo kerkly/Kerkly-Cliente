@@ -1,5 +1,6 @@
 package com.example.kerklyv5.vista.fragmentos
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
@@ -24,6 +26,8 @@ import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -53,6 +57,8 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
     private lateinit var b: Bundle
     private lateinit var instancias: Instancias
     private lateinit var  uidCliente:String
+    //private var mAuth: FirebaseAuth? = null
+  //  private var currentUser: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +71,8 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
         txt = findViewById(R.id.txt_ordenesPendientes)
         firebaseDatabase = FirebaseDatabase.getInstance()
         instancias = Instancias()
+      //  mAuth = FirebaseAuth.getInstance()
+      //  currentUser = mAuth!!.currentUser
 
 
         b = intent.extras!!
@@ -202,6 +210,7 @@ private  fun showMensaje(mensaje:String){
 
         call?.enqueue(object : retrofit2.Callback<List<OrdenPendiente?>?> {
 
+            @SuppressLint("SuspiciousIndentation")
             override fun onResponse(
                 call: Call<List<OrdenPendiente?>?>,
                 response: retrofit2.Response<List<OrdenPendiente?>?>
@@ -246,7 +255,7 @@ private  fun showMensaje(mensaje:String){
                         var oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
 
 
-                        if (pagoTotal == 0.0){
+                      /*  if (pagoTotal == 0.0){
                             Toast.makeText(this@MainActivityMostrarSolicitudes, "Por favor espere, le notificaremos en un momento", Toast.LENGTH_SHORT).show()
                             /* val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
                                intent.putExtra("Nombre_Kerkly", nombre_kerkly)
@@ -260,7 +269,7 @@ private  fun showMensaje(mensaje:String){
 
                             val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
                             startActivity(intent)
-                        }else{
+                        }else{*/
                             //Toast.makeText(requireContext(), "ya hay presupuesto", Toast.LENGTH_SHORT).show()
                             if (aceptoCliente == "1"){
                                 //Toast.makeText(requireContext(), "este presuepuesto ya sido aceptado", Toast.LENGTH_SHORT).show()
@@ -268,8 +277,11 @@ private  fun showMensaje(mensaje:String){
                                 b.putBoolean("Normal", true)
                                 intent.putExtras(b)
                                 startActivity(intent)*/
+                                val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
+                                intent.putExtra("NombreCliente", nombreCompletoCliente)
+                                startActivity(intent)
                             }else {
-                                val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
+                               val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
                                 b.putString("NombreCliente", nombreCliente)
                                 b.putString("tipoServicio", "Registrado")
                                 b.putString("Telefono", telefonoCliente)
@@ -288,7 +300,7 @@ private  fun showMensaje(mensaje:String){
                         }
                     }
                     recyclerview.adapter = adapter
-                }
+               // }
             }
             override fun onFailure(call: Call<List<OrdenPendiente?>?>, t: Throwable) {
                 setProgress.dialog.dismiss()

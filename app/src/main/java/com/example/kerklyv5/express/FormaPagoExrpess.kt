@@ -8,6 +8,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.kerklyv5.R
 import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
 import com.example.kerklyv5.url.Url
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
@@ -19,10 +21,16 @@ class FormaPagoExrpess : AppCompatActivity() {
     private lateinit var b: Bundle
     private lateinit var constraint: ConstraintLayout
     private lateinit var constraint2: ConstraintLayout
+    private var mAuth: FirebaseAuth? = null
+    private var currentUser: FirebaseUser? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forma_pago_exrpess)
+
+        mAuth = FirebaseAuth.getInstance()
+        currentUser = mAuth!!.currentUser
 
         b = intent.extras!!
         constraint = findViewById(R.id.oxxo_constraint)

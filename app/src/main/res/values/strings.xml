@@ -58,8 +58,9 @@
     <string name="cuenta_creada">Tu cuenta ha sido creada con éxito</string>
     <string name="contrania_modificada">Su contraseña ha sido modificada</string>
     <string name="descargar_necesita_cuenta">Para descargar el recibo necesita crear una cuenta</string>
-    <string name="aceptar">Aceptar</string>
+    <string name="Descargar">Descargar</string>
     <string name="cancelar">Cancelar</string>
+    <string name="aceptar">Aceptar</string>
     <string name="visualizar_contrato">Para visualizar un contrato necesita crearse una cuenta</string>
     <string name="cerrar_sesionConfirmacion">¿Estás seguro que quieres cerrar sesión?</string>
     <string name="descarga_exito">Su descarga ha sido completada con éxito</string>
@@ -198,4 +199,5 @@
     <string name="Continuar">Continuar</string>
     <string name="btn_masOficios">Otros oficios</string>
     <string name="SeAcabaronLasPruebas">Se acabaron las Pruebas Sin Registro</string>
+    <string name="Descargando">Descargado</string>
 </resources>

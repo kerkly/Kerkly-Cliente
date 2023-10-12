@@ -3,18 +3,18 @@ package com.example.kerklyv5.express
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.R
 import com.example.kerklyv5.modelo.Pdf
+import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DataSnapshot
@@ -134,7 +134,6 @@ class MensajesExpress : AppCompatActivity() {
             txt_dest.text = "De: $nombreCompletoKerkly"
             folio = b.getInt("Folio")
             cliente = nombre
-
             total = b.getDouble("Pago total")
             header.add("Item")
             header.add("Concepto")
@@ -144,14 +143,18 @@ class MensajesExpress : AppCompatActivity() {
         }
         btnContinuar.setOnClickListener {
             if (tipoUsuario =="NoRegistrado"){
-                finish()
-                val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+               // finish()
+               /* val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+                b.putBoolean("Express", true)
+                intent.putExtras(b)
+                startActivity(intent)*/
+                val intent  = Intent(applicationContext, CheckoutActivity::class.java)
                 b.putBoolean("Express", true)
                 intent.putExtras(b)
                 startActivity(intent)
             }
             if (tipoUsuario == "Registrado"){
-                finish()
+               // finish()
                 val intent = Intent(this, MainActivityAceptarServicio::class.java)
                 //intent.putExtra("Ap_Kerkly", ap_kerkly)
                 intent.putExtra("Nombre_completo_Kerkly", nombreCompletoKerkly)
@@ -217,8 +220,17 @@ class MensajesExpress : AppCompatActivity() {
         p.total = total
         p.lista = lista
         p.generarPdf()
-        Toast.makeText(this, "Se descargo el archivo pdf", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Descargado", Toast.LENGTH_SHORT).show()
         dialog.dismiss()
+
+    }
+
+    override fun onBackPressed() {
+        if (imageViewPDF.visibility == View.VISIBLE){
+            imageViewPDF.visibility = View.GONE
+        }else{
+            super.onBackPressed()
+        }
 
     }
 
