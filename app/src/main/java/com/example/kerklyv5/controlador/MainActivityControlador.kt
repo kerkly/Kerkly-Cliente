@@ -119,12 +119,13 @@ class MainActivityControlador {
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-
+                  // showMensaje(" $entrada", contexto)
                     var cadena: String = "El numero ya existe"
                     if (cadena == entrada) {
                         layoutTelefono.error = contexto.getText(R.string.numeroRegistrado_error)
                         return
                     } else {
+
                         //si entrada es igual al numero ingresado, significa que el numero ya esta registrado en las tablas de cliente no registrado
                         if (entrada == usuario.getTelefonoNoR()){
                             //verificar intentos
@@ -151,7 +152,7 @@ class MainActivityControlador {
 
                                         if(intentos1 == 3){
                                             Toast.makeText(contexto, "${R.string.SeAcabaronLasPruebas}", Toast.LENGTH_LONG).show()
-
+                                            layoutTelefono.error = null
                                             val intent  = Intent(contexto, PedirServicioExpress::class.java)
                                             b.putString("Teléfono No Registrado", usuario.getTelefonoNoR())
                                             b.putString("numIntentos", intentos1.toString())

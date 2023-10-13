@@ -321,8 +321,9 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         dialog.dismiss()
         //ObetenerCoordenadas()
         ///confirmarDireccionBD()
-
-        oficio = spinner.getSelectedItem().toString()
+        val selectedItem = spinner.selectedItem
+        oficio = if (selectedItem != null) selectedItem.toString() else ""
+      //  oficio = spinner.getSelectedItem().toString()
        // ShowMensaje("$latitud, $longitud $oficio")
         confirmarDireccionBD()
     }
@@ -647,7 +648,9 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     @SuppressLint("SetTextI18n")
     fun direccionExpress() {
         problematica = editProblematica.text.toString()
-        servicio = spinner.selectedItem.toString()
+        val selectedItem = spinner.selectedItem
+         servicio = if (selectedItem != null) selectedItem.toString() else ""
+
         var band = false
         if (problematica.isEmpty()) {
             band = false
