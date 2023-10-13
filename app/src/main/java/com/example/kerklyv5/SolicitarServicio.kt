@@ -311,7 +311,7 @@ class SolicitarServicio : AppCompatActivity() {
             .setEndpoint(ROOT_URL)
             .build()
         val api = adapter.create(SesionAbiertaInterface::class.java)
-        api.sesionAbierta(correo, id,
+        api.sesionAbierta(correo, id, currentUser!!.uid.toString(),
             object : retrofit.Callback<retrofit.client.Response?> {
                 override fun success(
                     t: retrofit.client.Response?,
@@ -592,7 +592,7 @@ class SolicitarServicio : AppCompatActivity() {
                         correo = postList[0].Correo
 
                         if (correo == currentUser!!.email) {
-                            nombreCompletoCliente = nombre as String
+                           // nombreCompletoCliente = nombre as String
                             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                                 if (!task.isSuccessful) {
                                     Log.w(
@@ -606,7 +606,7 @@ class SolicitarServicio : AppCompatActivity() {
                                 referencia = Instancias()
                                 val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
                                 val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-                                val u = usuarios(telefono, currentUser!!.email.toString(), nombreCompletoCliente.toString(), currentUser!!.photoUrl.toString(), currentDateTimeString, token, currentUser!!.uid)
+                                val u = usuarios(telefono, currentUser!!.email.toString(), nombre.toString(), currentUser!!.photoUrl.toString(), currentDateTimeString, token, currentUser!!.uid)
                                dataRefe.setValue(u) { error, ref ->
                                     setProgressDialog.dialog.dismiss()
                                 }
@@ -628,7 +628,7 @@ class SolicitarServicio : AppCompatActivity() {
                                         val usuarios: usuariosSqlite
                                         usuarios = usuariosSqlite(currentUser!!.uid, telefono,
                                             photoByteArray,
-                                            nombreCompletoCliente,
+                                            nombre.toString(),
                                             ap,
                                             am,
                                             correo

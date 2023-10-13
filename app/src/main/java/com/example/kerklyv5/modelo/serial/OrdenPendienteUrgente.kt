@@ -42,12 +42,4 @@ class OrdenPendienteUrgente {
     @Expose
     var idKerklyAcepto: String =  ""
 
-
-    @SerializedName("uidCliente")
-    @Expose
-    var uidCliente: String =  ""
-
-    @SerializedName("uidKerkly")
-    @Expose
-    var uidKerkly: String =  ""
 }

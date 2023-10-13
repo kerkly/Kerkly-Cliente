@@ -18,6 +18,8 @@ class Instancias() {
     private val SolicitudNormal ="SolicitudNormal"
     private val listaUsuarios = "Lista de Usuarios"
     private val chats = "chats"
+    private val presupuestoNR = "presupuestoNR"
+    private val presupuestoNormal = "Presupuestos Normal"
 
     fun referenciaInformacionDelUsuario(id: String): DatabaseReference{
         val databaseReferenceMisDatos = database.getReference(usuario).child(cliente).child(id).child(misDatos)
@@ -65,5 +67,15 @@ class Instancias() {
     fun EnviarArchivoStorageReference(idCliente: String,idKerkly:String,Nombrearchivo: String): StorageReference{
         val ref =  storageRef.child(usuario).child(cliente).child(idCliente).child(chats).child("$idCliente"+"_"+"$idKerkly").child(Nombrearchivo)
         return ref
+    }
+
+    fun ObtenerPresupuestoNormalNR(folio: String, uidKerkly:String) : DatabaseReference{
+        val ref = database.getReference(usuario).child(kerkly).child(uidKerkly).child(presupuestoNR).child("PresupuestoNR $folio")
+        return ref
+    }
+
+    fun ObtenerPresupuestoNormal(folio: String, uidKerkly:String): DatabaseReference{
+        val ref = database.getReference(usuario).child(kerkly).child(uidKerkly).child(presupuestoNormal).child("Presupuesto Normal $folio")
+    return ref
     }
 }

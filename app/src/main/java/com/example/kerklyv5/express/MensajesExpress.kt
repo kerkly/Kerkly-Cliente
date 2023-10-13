@@ -15,8 +15,11 @@ import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.R
 import com.example.kerklyv5.modelo.Pdf
 import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
+import com.example.kerklyv5.url.Instancias
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -24,12 +27,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class MensajesExpress : AppCompatActivity() {
-    private lateinit var txt_dest: TextView
-    private lateinit var txt_remi: TextView
-    private lateinit var txt_fecha: TextView
     private lateinit var dialog: Dialog
     private var total = 0.0
-    private lateinit var boton: MaterialButton
     private var problema = ""
     private var cliente = ""
     private var telefono = ""
@@ -52,24 +51,32 @@ class MensajesExpress : AppCompatActivity() {
     private lateinit var correoKerkly: String
     lateinit var txtPruebaSinR: TextView
     private lateinit var imageViewPDF: PDFView
+    private lateinit var instancias: Instancias
+    private var mAuth: FirebaseAuth? = null
+    private var currentUser: FirebaseUser? = null
+    private lateinit var uidKerkly:String
 
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mensajes_express)
-
+        //instancias
         firebaseDatabase = FirebaseDatabase.getInstance()
-        txt_dest = findViewById(R.id.txt_destinatario)
-        txt_remi = findViewById(R.id.txt_remitente)
-        txt_fecha = findViewById(R.id.txt_fechaMensaje)
+        instancias = Instancias()
+        dialog = Dialog(this)
+        b = intent.extras!!
+        mAuth = FirebaseAuth.getInstance()
+        currentUser = mAuth!!.currentUser
+
+      val  txt_dest = findViewById<TextView>(R.id.txt_destinatario)
+       val txt_remi = findViewById<TextView>(R.id.txt_remitente)
+        val txt_fecha = findViewById<TextView>(R.id.txt_fechaMensaje)
         mensaje_txt = findViewById(R.id.txt_cuerpoMensaje)
         txtPruebaSinR = findViewById(R.id.txtPruebaSinR)
         imageViewPDF = findViewById(R.id.pdfView)
 
-        dialog = Dialog(this)
 
-        b = intent.extras!!
         btnContinuar = findViewById(R.id.BtnSiguiente)
         tipoUsuario = b.getString("tipoServicio").toString()
         nombreCompletoKerkly = b.getString("nombreCompletoKerkly").toString()
@@ -79,7 +86,8 @@ class MensajesExpress : AppCompatActivity() {
         telefono = b.getString("Telefono").toString()
         problema = b.getString("Problema").toString()
 
-        pagoTotal = b.getString("Pago total").toString()
+
+        pagoTotal = b.getString("pagoTotal").toString()
         if (tipoUsuario =="NoRegistrado"){
             val nombre = b.get("NombreClienteNR").toString()
             txt_remi.text = "Para: $nombre"
@@ -122,13 +130,15 @@ class MensajesExpress : AppCompatActivity() {
             header.add("Concepto")
             header.add("Pago")
             //println("foliooo ---> " +  "$calle $colonia $ext $cp $ref")
-            databaseReferenceNR = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
-            databaseReferenceNR.addValueEventListener(postListener)
+            databaseReferenceNR = instancias.ObtenerPresupuestoNormalNR(folio.toString(), currentUser!!.uid)
+           //databaseReferenceNR = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
+           databaseReferenceNR.addValueEventListener(postListener)
         }
 
         if (tipoUsuario == "Registrado"){
             txtPruebaSinR.isInvisible = true
             val nombre = b.get("NombreCliente").toString()
+            uidKerkly = b.getString("uidKerkly").toString()
             txt_remi.text = "Para: $nombre"
             txt_fecha.text = b.get("Fecha").toString()
             txt_dest.text = "De: $nombreCompletoKerkly"
@@ -138,7 +148,9 @@ class MensajesExpress : AppCompatActivity() {
             header.add("Item")
             header.add("Concepto")
             header.add("Pago")
-            databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal 65")
+          //  databaseReference = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos Normal").child("Presupuesto Normal 65")
+           println("---->  "+folio.toString()+ currentUser!!.uid )
+           databaseReference = instancias.ObtenerPresupuestoNormal(folio.toString(), uidKerkly)
             databaseReference.addValueEventListener(postListener)
         }
         btnContinuar.setOnClickListener {
@@ -150,6 +162,7 @@ class MensajesExpress : AppCompatActivity() {
                 startActivity(intent)*/
                 val intent  = Intent(applicationContext, CheckoutActivity::class.java)
                 b.putBoolean("Express", true)
+               b.putString("pagoTotal", pagoTotal)
                 intent.putExtras(b)
                 startActivity(intent)
             }
@@ -163,6 +176,7 @@ class MensajesExpress : AppCompatActivity() {
                 intent.putExtra("nombreCompletoCliente",cliente)
                 intent.putExtra("telefonokerkly", telefonoKerkly)
                 intent.putExtra("tipoServicio", tipoUsuario)
+               intent.putExtra("pagoTotal", pagoTotal)
                 intent.putExtra("problema", problema)
                 startActivity(intent)
             }

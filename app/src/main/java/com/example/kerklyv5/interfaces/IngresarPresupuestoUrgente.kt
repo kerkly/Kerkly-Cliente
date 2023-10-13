@@ -22,7 +22,6 @@ interface IngresarPresupuestoUrgente {
         @Field("Colonia") Colonia: String,
         @Field("No_Exterior") No_Exterior: String,
         @Field("Codigo_Postal") Codigo_Postal: String,
-       @Field("uidCliente") uidCliente: String,
         callback: Callback<Response?>
     )
 }

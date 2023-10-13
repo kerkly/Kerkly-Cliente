@@ -17,18 +17,6 @@ class OrdenPendiente {
     @Expose
     var Fecha_Inicio: String = ""
 
-    @SerializedName("cliente_nombre")
-    @Expose
-    var Nombre: String = ""
-
-    @SerializedName("cliente_ap")
-    @Expose
-    var Apellido_Paterno: String = ""
-
-    @SerializedName("cliente_am")
-    @Expose
-    var Apellido_Materno: String = ""
-
     @SerializedName("Nombre")
     @Expose
     var NombreK: String = ""
@@ -81,7 +69,8 @@ class OrdenPendiente {
     @Expose
     var aceptoCliente: String =  ""
 
-    @SerializedName("uidCliente")
+
+    @SerializedName("uidKerkly")
     @Expose
-    var uidCliente: String =  ""
+    var uidKerkly: String =  ""
 }

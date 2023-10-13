@@ -382,7 +382,6 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             num_ext,
             cp,
             correoCliente,
-            uidCliente,
             object : Callback<Response?> {
                 override fun success(t: Response?, response: Response?) {
                     var salida: BufferedReader? = null

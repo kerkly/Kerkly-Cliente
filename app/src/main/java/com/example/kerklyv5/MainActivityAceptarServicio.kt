@@ -10,6 +10,7 @@ import com.example.kerklyv5.interfaces.AceptarPresupuestoInterface
 import com.example.kerklyv5.interfaces.AceptarPresupuestoNormalInterface
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
+import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
 import com.example.kerklyv5.url.Url
 import retrofit.Callback
 import retrofit.RestAdapter
@@ -28,6 +29,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
     private lateinit var problema: String
     private lateinit var nombreCliente: String
     var b: Bundle? = null
+    private lateinit var pagoTotal: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
         telefonoKerkly = b!!.getString("telefonokerkly").toString()
         nombreCliente = b!!.getString("nombreCompletoCliente").toString()
         problema = b!!.getString("problema").toString()
+        pagoTotal  =b!!.getString("pagoTotal").toString()
 
 
 
@@ -54,8 +57,10 @@ class MainActivityAceptarServicio : AppCompatActivity() {
                 //intent.putExtra("Telefono",telefono)
                 //startActivity(intent)
 
-                val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+                val intent  = Intent(applicationContext, CheckoutActivity::class.java)
                 b!!.putBoolean("Express", true)
+                b!!.putString("nombreCliente", nombreCliente)
+                b!!.putString("pagoTotal", pagoTotal)
                 intent.putExtras(b!!)
                 startActivity(intent)
             }

@@ -1,6 +1,7 @@
 package com.example.kerklyv5.pasarelaPagos
 
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -53,7 +54,6 @@ class CheckoutActivity : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private lateinit var imagen: ImageView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
@@ -87,7 +87,6 @@ class CheckoutActivity : AppCompatActivity() {
                         "Codes Easy",
                         PaymentSheet.CustomerConfiguration(CustomerId, EphemeralKey)
                     )
-
                     paymentSheet.presentWithPaymentIntent(ClientSecret, configuration)
                 } else {
                     showToast("Cargando...")
@@ -96,8 +95,6 @@ class CheckoutActivity : AppCompatActivity() {
                 // Muestra un mensaje de error si el nombre o el correo electrónico están vacíos
                 showToast("Por favor, completa el nombre y el correo electrónico.")
             }
-
-
         }
 
         val oxxo = findViewById<Button>(R.id.button_oxxo)
@@ -111,19 +108,15 @@ class CheckoutActivity : AppCompatActivity() {
                 intent.putExtra("ClientSecret", ClientSecret)
                 intent.putExtra("name" , name)
                 intent.putExtra("email" , email)
+                intent.putExtra("secretKey", secretKey)
                 //intent.putExtra("parametro2", valor2)
                 startActivity(intent)
             } else {
                 // Muestra un mensaje de error si el nombre o el correo electrónico están vacíos
                 showToast("Por favor, completa el nombre y el correo electrónico.")
             }
-
-
         }
-
     }
-
-
 
     private fun RealizarPago(){
         val request = object : StringRequest(Request.Method.POST,
@@ -159,32 +152,26 @@ class CheckoutActivity : AppCompatActivity() {
                 // Agregar elementos al mapa
                 //  miMapa["Autorization"] = "Bearer  $secretKey"
                 miMapa["Authorization"] = "Bearer $secretKey"
-
                 // Agregar más pares clave-valor según tus necesidades
-
                 return miMapa
             }
         }
-
-
         val queue = Volley.newRequestQueue(this)
         queue.add(request)
-
     }
 
 
 
     private fun obtenerKeyy() {
-        val request = object : StringRequest(
+        val request = @SuppressLint("SuspiciousIndentation")
+        object : StringRequest(
             Request.Method.POST,
             "https://api.stripe.com/v1/ephemeral_keys",
             Response.Listener<String> { response ->
                 try {
                     val objeto = JSONObject(response)
                     EphemeralKey = objeto.getString("id")
-
                         obtenerCliente(CustomerId)
-
                     println("ID: $EphemeralKey")
                     //showToast("ID: $CustomerId")
                 } catch (e: JSONException) {

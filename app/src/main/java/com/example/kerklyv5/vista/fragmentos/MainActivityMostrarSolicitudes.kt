@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
+import com.example.kerklyv5.SQLite.DataManager
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
 import com.example.kerklyv5.controlador.AdapterOrdenPendienteUrgente
 import com.example.kerklyv5.controlador.setProgressDialog
@@ -137,8 +139,8 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
                             Toast.makeText(this@MainActivityMostrarSolicitudes, "Por favor espere, le notificaremos en un momento", Toast.LENGTH_SHORT).show()
                         }else{
                            val curp = postList[recyclerview.getChildAdapterPosition(it)].idKerklyAcepto
-                            val uidKerkly = postList[recyclerview.getChildAdapterPosition(it)].uidKerkly
-                            obtenerKerkly(uidKerkly, curp)
+                            //val uidKerkly = postList[recyclerview.getChildAdapterPosition(it)].uidKerkly
+                          //  obtenerKerkly(uidKerkly, curp)
                           //  val intent = Intent(this@MainActivityMostrarSolicitudes, MainActivityChats::class.java)
                            // startActivity(intent)
                         }
@@ -190,6 +192,9 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
 
     }
 
+
+
+
 private  fun showMensaje(mensaje:String){
     Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 }
@@ -235,11 +240,11 @@ private  fun showMensaje(mensaje:String){
                         val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
                         val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
                         val ap_kerkly_M = postList[recyclerview.getChildAdapterPosition(it)].Apellido_MaternoK.trim()
+
                         val id = postList[recyclerview.getChildAdapterPosition(it)].idContrato
                         val problema = postList[recyclerview.getChildAdapterPosition(it)].problema
                         val fecha = postList[recyclerview.getChildAdapterPosition(it)].fechaP
                         val aceptoCliente = postList[recyclerview.getChildAdapterPosition(it)].aceptoCliente
-
                         val telefonoKerkly = postList[recyclerview.getChildAdapterPosition(it)].Telefono
                         val correoKerkly = postList[recyclerview.getChildAdapterPosition(it)].correo_electronico
 
@@ -250,12 +255,11 @@ private  fun showMensaje(mensaje:String){
 
                         val nombre_completo_kerkly = "$nombre_kerkly $ap_kerkly $ap_kerkly_M"
                         val direccionKerkly = "$pais $ciudad $colonia $calle"
-                        val nombreCliente = nombreCompletoCliente
-                        var pagoTotal = postList[recyclerview.getChildAdapterPosition(it)].pago_total
-                        var oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
+                        val pagoTotal = postList[recyclerview.getChildAdapterPosition(it)].pago_total
+                        val oficio = postList[recyclerview.getChildAdapterPosition(it)].nombreO
+                        val uidKerkly = postList[recyclerview.getChildAdapterPosition(it)].uidKerkly
 
-
-                      /*  if (pagoTotal == 0.0){
+                        if (pagoTotal == 0.0){
                             Toast.makeText(this@MainActivityMostrarSolicitudes, "Por favor espere, le notificaremos en un momento", Toast.LENGTH_SHORT).show()
                             /* val intent = Intent(requireContext(), MainActivityAceptarServicio::class.java)
                                intent.putExtra("Nombre_Kerkly", nombre_kerkly)
@@ -267,9 +271,9 @@ private  fun showMensaje(mensaje:String){
                                intent.putExtra("telefonokerkly", telefonoKerkly)
                                startActivity(intent)*/
 
-                            val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
-                            startActivity(intent)
-                        }else{*/
+                            //val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
+                           // startActivity(intent)
+                        }else{
                             //Toast.makeText(requireContext(), "ya hay presupuesto", Toast.LENGTH_SHORT).show()
                             if (aceptoCliente == "1"){
                                 //Toast.makeText(requireContext(), "este presuepuesto ya sido aceptado", Toast.LENGTH_SHORT).show()
@@ -281,26 +285,29 @@ private  fun showMensaje(mensaje:String){
                                 intent.putExtra("NombreCliente", nombreCompletoCliente)
                                 startActivity(intent)
                             }else {
+                               val pagoTotal2 = pagoTotal * 1.16
                                val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
-                                b.putString("NombreCliente", nombreCliente)
+                                b.putString("NombreCliente", nombreCompletoCliente)
                                 b.putString("tipoServicio", "Registrado")
                                 b.putString("Telefono", telefonoCliente)
                                 b.putString("Fecha", fecha)
                                 b.putString("Problema", problema)
                                 b.putInt("Folio", id)
-                                b.putDouble("Pago total", pagoTotal)
+                                b.putDouble("pagoTotal", pagoTotal2)
                                 b.putString("Oficio", oficio)
                                 b.putString("telefonoKerkly", telefonoKerkly)
                                 b.putString("nombreCompletoKerkly", nombre_completo_kerkly)
                                 b.putString("direccionKerkly", direccionKerkly)
                                 b.putString("correoKerkly", correoKerkly)
+                                b.putString("uidKerkly", uidKerkly)
+
                                 i.putExtras(b)
                                 startActivity(i)
                             }
                         }
                     }
                     recyclerview.adapter = adapter
-               // }
+                }
             }
             override fun onFailure(call: Call<List<OrdenPendiente?>?>, t: Throwable) {
                 setProgress.dialog.dismiss()
@@ -339,4 +346,6 @@ private  fun showMensaje(mensaje:String){
         })
 
     }*/
+
+
 }

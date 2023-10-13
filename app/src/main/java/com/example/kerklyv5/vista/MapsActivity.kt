@@ -336,7 +336,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 colonia,
                 num_ext,
                 cp,
-                uid,
                 object : Callback<Response?> {
                     override fun success(t: Response?, response: Response?) {
                         var salida: BufferedReader? = null

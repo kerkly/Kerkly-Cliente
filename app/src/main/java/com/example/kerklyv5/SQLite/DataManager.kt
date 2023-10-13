@@ -118,7 +118,7 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
             val cursor = db.rawQuery(query, arrayOf(usuario.uid.toString()))
             if (cursor.moveToFirst()) {
                 println("el usuario si se encuentra")
-                val datos = DatosDelUsuario(context)
+                val datos = DatosDelUsuario()
                 for (usuario in datos) {
                     txt_nombre.text = "${usuario.nombre}. ${usuario.apellidoPa} ${usuario.apellidoMa}"
                     txt_correo.text = correo
@@ -128,7 +128,7 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
 
             } else {
                 InsertarDatosDelUsuario(telefono,fotoByteArray,nombre,apellidoPa,apellidoMa,correo)
-                val datos = DatosDelUsuario(context)
+                val datos = DatosDelUsuario()
                 for (usuario in datos) {
                     txt_nombre.text = "${usuario.nombre}. ${usuario.apellidoPa} ${usuario.apellidoMa}"
                     txt_correo.text = correo
@@ -165,7 +165,7 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
     }
 
     fun mostrarInformacion(context: Context, imageView: ImageView,txt_nombre: TextView,txt_correo: TextView){
-        val datos = DatosDelUsuario(context)
+        val datos = DatosDelUsuario()
         println("informacion ${datos.size}")
         for (usuario in datos) {
             txt_nombre.text = "${usuario.nombre}. ${usuario.apellidoPa} ${usuario.apellidoMa}"
@@ -175,7 +175,7 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
         }
     }
     @SuppressLint("Range", "SuspiciousIndentation")
-    fun DatosDelUsuario(context: Context): ArrayList<usuariosSqlite> {
+    fun DatosDelUsuario(): ArrayList<usuariosSqlite> {
         val db = databaseHelper.readableDatabase
         val datosUsuario = mutableListOf<usuariosSqlite>()
         val query = "SELECT * FROM ${DatabaseHelper.TABLE_NAME_USUARIOS}"
