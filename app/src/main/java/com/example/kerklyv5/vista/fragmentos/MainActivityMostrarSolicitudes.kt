@@ -143,6 +143,9 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
                           //  obtenerKerkly(uidKerkly, curp)
                           //  val intent = Intent(this@MainActivityMostrarSolicitudes, MainActivityChats::class.java)
                            // startActivity(intent)
+                            val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
+                            intent.putExtra("NombreCliente", nombreCompletoCliente)
+                            startActivity(intent)
                         }
 
                     }
@@ -285,7 +288,7 @@ private  fun showMensaje(mensaje:String){
                                 intent.putExtra("NombreCliente", nombreCompletoCliente)
                                 startActivity(intent)
                             }else {
-                               val pagoTotal2 = pagoTotal * 1.16
+                             //  val pagoTotal2 = pagoTotal * 1.16
                                val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
                                 b.putString("NombreCliente", nombreCompletoCliente)
                                 b.putString("tipoServicio", "Registrado")
@@ -293,7 +296,7 @@ private  fun showMensaje(mensaje:String){
                                 b.putString("Fecha", fecha)
                                 b.putString("Problema", problema)
                                 b.putInt("Folio", id)
-                                b.putDouble("pagoTotal", pagoTotal2)
+                                b.putDouble("pagoTotal", pagoTotal)
                                 b.putString("Oficio", oficio)
                                 b.putString("telefonoKerkly", telefonoKerkly)
                                 b.putString("nombreCompletoKerkly", nombre_completo_kerkly)

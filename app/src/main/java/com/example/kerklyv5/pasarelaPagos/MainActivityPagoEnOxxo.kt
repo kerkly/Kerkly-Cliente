@@ -91,59 +91,5 @@ class MainActivityPagoEnOxxo : AppCompatActivity() {
     }
 
 
-  /*  private fun Server(){
-        Stripe.apiKey = secretKey
 
-        // This is your Stripe CLI webhook secret for testing your endpoint locally.
-
-        // This is your Stripe CLI webhook secret for testing your endpoint locally.
-        val endpointSecret = "whsec_03edc7bb48c4ce645ff92651d4554e2a934532afa6fe4833cdec3aa9dfba29cf"
-        port(4242)
-
-        post("/webhook") { request, response ->
-            val payload: String = request.body()
-            val sigHeader: String = request.headers("Stripe-Signature")
-            var event: Event? = null
-            event = try {
-                Webhook.constructEvent(
-                    payload, sigHeader, endpointSecret
-                )
-            } catch (e: JsonSyntaxException) {
-                // Invalid payload
-                response.status(400)
-                return@post ""
-            } catch (e: SignatureVerificationException) {
-                // Invalid signature
-                response.status(400)
-                return@post ""
-            }
-
-            // Deserialize the nested object inside the event
-            val dataObjectDeserializer: EventDataObjectDeserializer =
-                event.getDataObjectDeserializer()
-            var stripeObject: StripeObject? = null
-            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    dataObjectDeserializer.getObject().isPresent
-                } else {
-                    TODO("VERSION.SDK_INT < N")
-                }
-            ) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    stripeObject = dataObjectDeserializer.getObject().get()
-                }
-            } else {
-                // Deserialization failed, probably due to an API version mismatch.
-                // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
-                // instructions on how to handle this case, or return an error here.
-            }
-            when (event!!.getType()) {
-                "payment_intent.succeeded" -> {}
-                else -> System.out.println("Unhandled event type: " + event.getType())
-            }
-            response.status(200)
-            ""
-        }
-
-    }
-*/
 }

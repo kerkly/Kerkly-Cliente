@@ -88,6 +88,7 @@ android:orientation="vertical"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_marginRight="40dp"
                 android:layout_marginLeft="40dp"
+                app:counterMaxLength="10"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -95,6 +96,7 @@ android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="phone"
+                    android:maxLength="10"
                     android:hint="@string/introduce_telefono"/>
 
             </com.google.android.material.textfield.TextInputLayout>

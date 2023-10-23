@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
@@ -68,16 +69,15 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var layoutProblematica: TextInputLayout
     private lateinit var spinner: Spinner
     private var problematica: String = ""
-    private var servicio: String =""
     private var latitud: Double = 0.0
     private var longitud: Double = 0.0
     private lateinit var ciudad: String
     private lateinit var estado: String
     private lateinit var pais: String
-    var codigoPostal = ""
-    var calle  =""
-    var colonia =""
-    var numExterior =""
+    private var codigoPostal = ""
+    private var calle  =""
+    private var colonia =""
+    private var numExterior =""
     private lateinit var oficio: String
     private lateinit var telefonoR: String
     private lateinit var dialog: Dialog
@@ -287,6 +287,8 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     apellidoM = postList[0].apellidoM_noR
                     intentos = postList[0].numIntentos
                     b.putInt("Intentos", intentos)
+                    oficio = spinner.getSelectedItem().toString()
+                    println("oficio --- $oficio")
                     direccionExpress()
                 }
             }
@@ -317,14 +319,8 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     }
 
     fun aceptarDireccion() {
-        referencia = edit_referecia.text.toString()
         dialog.dismiss()
-        //ObetenerCoordenadas()
-        ///confirmarDireccionBD()
-        val selectedItem = spinner.selectedItem
-        oficio = if (selectedItem != null) selectedItem.toString() else ""
-      //  oficio = spinner.getSelectedItem().toString()
-       // ShowMensaje("$latitud, $longitud $oficio")
+        oficio = spinner.getSelectedItem().toString()
         confirmarDireccionBD()
     }
 
@@ -337,66 +333,72 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
     fun confirmarDireccionBD () {
         ShowMensaje("Por favor espere un momento...")
-        val inten: Int = numIntentos.toInt() +1
-        val ROOT_URL = Url().url
-        val adapter = RestAdapter.Builder()
-            .setEndpoint(ROOT_URL)
-            .build()
-        val api: direccionCoordenadasInterface = adapter.create(direccionCoordenadasInterface::class.java)
+        println("oficio --- $oficio, $problematica, $latitud, $longitud, ${calle_edit.text.toString()}, ${colonia_edit.text.toString()}")
+        println("argumrntos ---${numero_extEdit.text.toString()}, $ciudad, $estado, $pais, ${edit_cp.text.toString()}, $referencia, $telefonoR, $nombre, $apellidoP, $apellidoM")
+            val intentos: Int = numIntentos.toInt() + 1
+            val ROOT_URL = Url().url
+            val adapter = RestAdapter.Builder()
+                .setEndpoint(ROOT_URL)
+                .build()
+            val api: direccionCoordenadasInterface =
+                adapter.create(direccionCoordenadasInterface::class.java)
 
-        api.sinRegistro(
-            oficio,
-            problematica,
-            latitud.toString(),
-            longitud.toString(),
-            calle_edit.text.toString(),
-            colonia_edit.text.toString(),
-            "S/N",
-            numero_extEdit.text.toString(),
-            ciudad,
-            estado,
-            pais,
-            edit_cp.text.toString(),
-            referencia,
-            telefonoR,
-            nombre,
-            apellidoP,
-            apellidoM,
-            inten.toString(),
-            object : Callback<Response?> {
-                override fun success(t: Response?, response: Response?) {
-                    var salida: BufferedReader? = null
-                    var entrada = ""
-                    try {
-                        salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
-                        entrada = salida.readLine()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                    val R = "Solicitud Enviada";
-                    if(entrada == R){
-                        Toast.makeText(applicationContext,"$entrada", Toast.LENGTH_LONG).show()
-                     //   ObetenerCoordenadas()
-
-                    }else{
-                        val r = "Se acabo las pruebas sin registro"
-                        if (entrada == r) {
-                            val intent = Intent(this@PedirServicioExpress, Registro::class.java)
-                            startActivity(intent)
-                            finish()
-                            Toast.makeText(applicationContext, "$entrada", Toast.LENGTH_LONG).show()
-                        }else{
-                            KerklyCercanos(latitud, longitud, oficio)
+            api.sinRegistro(
+                oficio.toString(),
+                problematica.toString(),
+                latitud.toString(),
+                longitud.toString(),
+                calle_edit.text.toString(),
+                colonia_edit.text.toString(),
+                "S/N",
+                numero_extEdit.text.toString(),
+                ciudad,
+                estado,
+                pais,
+                edit_cp.text.toString(),
+                referencia,
+                telefonoR,
+                nombre,
+                apellidoP,
+                apellidoM,
+                intentos.toString(),
+                object : Callback<Response?> {
+                    override fun success(t: Response?, response: Response?) {
+                        var salida: BufferedReader? = null
+                        var entrada = ""
+                        try {
+                            salida = BufferedReader(InputStreamReader(t?.body?.`in`()))
+                            entrada = salida.readLine()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
+                        val R = "Solicitud Enviada";
+                        if (entrada == R) {
+                            Toast.makeText(applicationContext, "$entrada", Toast.LENGTH_LONG).show()
+                            //   ObetenerCoordenadas()
 
+                        } else {
+                            val r = "Se acabo las pruebas sin registro"
+                            if (entrada == r) {
+                                val intent = Intent(this@PedirServicioExpress, Registro::class.java)
+                                startActivity(intent)
+                                finish()
+                                Toast.makeText(applicationContext, "$entrada", Toast.LENGTH_LONG)
+                                    .show()
+                            } else {
+                                KerklyCercanos(latitud, longitud, oficio)
+                            }
+
+                        }
+                    }
+
+                    override fun failure(error: RetrofitError?) {
+                        println("error 395 ${error!!.message}")
+                        ShowMensaje("error 395" + error.toString())
                     }
                 }
-                override fun failure(error: RetrofitError?) {
-                    println("error$error")
-                    ShowMensaje(error.toString())
-                }
-            }
-        )
+            )
+
     }
 
     private fun KerklyCercanos(latitud: Double, longitud: Double, oficio: String){
@@ -450,134 +452,11 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         })
     }
 
-    /*  private fun ObetenerCoordenadas(){
-          val ofi =  spinner.selectedItem.toString()
-          val ROOT_URL = Url().url
-          val retrofit = Retrofit.Builder()
-              .baseUrl(ROOT_URL+"/")
-              .addConverterFactory(GsonConverterFactory.create())
-              .build()
-          val get = retrofit.create(InterfaceMejorRuta::class.java)
-          val call = get.ObtenerC(ofi)
-          call?.enqueue(object : retrofit2.Callback<List<ModeloRutas?>?> {
-              override fun onResponse(call: Call<List<ModeloRutas?>?>,
-                                      response: retrofit2.Response<List<ModeloRutas?>?>) {
-
-                   poslist = response.body() as ArrayList<ModeloRutas>
-                  if (poslist.size != 0) {
-
-                      for (i in 0 until poslist!!.size) {
-                          val latA = latitud.toDouble()
-                          val lngA = altitud.toDouble()
-                          var latitudFinal = poslist!![i].latitud
-                          var longitudFinal = poslist!![i].longitud
-                          //primero Mandamos la solicitud a un kerkly
-                          val telefoK =  poslist!![i].Telefono
-
-                          val url2 = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=$latA,$lngA&destinations=$latitudFinal,$longitudFinal&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyAp-2jznuGLfRJ_en09y1sp6A-467zrXm0"
-                          CalcularTiempoDistancia(this@PedirServicioExpress).execute(url2)
-                          System.out.println("el telefo del kerkly $telefoK")
-                          System.out.println("latitutinicial: $latA longitudinicial $lngA latitudFinal $latitudFinal longitudFinal $longitudFinal")
-
-                      }
-                      recorrerLista()
-
-                      /*
-                      //16.944851, -98.238820
-                      val locationA = Location("punto De origen")
-                      val latA = latitud.toDouble()
-                      val lngA = altitud.toDouble()
-                     // locationA.latitude = latA
-                      //locationA.longitude = lngA
-
-                      locationA.latitude = 16.944851
-                      locationA.longitude = -98.238820
-
-                      val locationB = Location("punto destino")
-                      Curp = poslist.get(0).Curp
-                      telefonokerkly = poslist.get(0).Telefono
-                      ciudadk = poslist.get(0).Ciudad
-                      locationB.latitude = poslist.get(0).latitud
-                      locationB.longitude = poslist.get(0).longitud
-                      var menorDistancia = locationA.distanceTo(locationB).toDouble()/1000
-                     Log.e(" 373", "ciudad $ciudadk Telefono: $telefonokerkly Curp $Curp  Distancia $menorDistancia km")
-
-                      for(i in 1 until poslist.size){
-                          val locationC = Location("punto c")
-                          Curp = poslist.get(i).Curp
-                          ciudadk = poslist.get(i).Ciudad
-                          telefonokerkly = poslist.get(i).Telefono
-                          locationC.latitude = poslist.get(i).latitud
-                          locationC.longitude = poslist.get(i).longitud
-                          var distance = locationA.distanceTo(locationC).toDouble()/1000
-
-                          Log.e(" ","ciudad $ciudadk telefono: $telefonokerkly Curp $Curp distancia $i  distancia $distance")
-                          if (distance < menorDistancia){
-                             // menorDistancia = distance
-                              Curp = poslist.get(i-1).Curp
-                              ciudadk = poslist.get(i-1).Ciudad
-                              telefonokerkly = poslist.get(i-1).Telefono
-                              println("-------->$i menor distancia 385 ciudad $ciudadk  Telefono: $telefonokerkly Curp $Curp  $menorDistancia")
-                              //txtKcercano.setText("Curp $Curp menor distancia $menorDistancia" )
-                          }else{
-                              var lamejorRuta =0.0
-                              if(menorDistancia < distance) {
-                                  lamejorRuta = distance
-                              }
-                              if (distance > lamejorRuta){
-                                  lamejorRuta = distance
-                              }
-                              Curp = poslist.get(i-1).Curp
-                              ciudadk = poslist.get(i-1).Ciudad
-                              telefonokerkly = poslist.get(i-1).Telefono
-                              println("-------->menor distancia 394 ciudad $ciudadk  Telefono: $telefonokerkly Curp $Curp  $lamejorRuta")
-                          }
-                      }
-
-                       */
-                  } else {
-                      Toast.makeText(applicationContext, "No hay Kerklys disponibles", Toast.LENGTH_SHORT).show()
-                  }
-                  //txtKcercano.setText("Curp $Curp menor distancia $menorDistancia")
-                  // Log.e("Curp $Curp distancia ", "menor distancia $menorDistancia")
-              }
-
-              override fun onFailure(call: Call<List<ModeloRutas?>?>, t: Throwable) {
-                  Toast.makeText(applicationContext, t.toString(), Toast.LENGTH_LONG).show()
-                  System.out.println("el error es: ${t.toString()}")
-
-              }
-          })
-
-      }*/
 
     fun actualizar() {
         locationStart()
     }
 
-    /*fun ServicioExpressNR(view: View) {
-        problematica = editProblematica.text.toString()
-
-        if (latitud.isEmpty() && altitud.isEmpty()) {
-            Toast.makeText(this, "Ingrese su dirección", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (problematica.isEmpty()) {
-            layoutProblematica.error = getText(R.string.campo_requerido)
-        } else {
-            layoutProblematica.error = null
-        }
-
-        if (!(latitud.isEmpty() && altitud.isEmpty() && problematica.isEmpty())) {
-
-        } else {
-            Toast.makeText(this,
-                "",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }*/
 
     @SuppressLint("SuspiciousIndentation")
     fun aceptarNoR(view: View) {
@@ -648,9 +527,6 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     @SuppressLint("SetTextI18n")
     fun direccionExpress() {
         problematica = editProblematica.text.toString()
-        val selectedItem = spinner.selectedItem
-         servicio = if (selectedItem != null) selectedItem.toString() else ""
-
         var band = false
         if (problematica.isEmpty()) {
             band = false
@@ -679,9 +555,16 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                 numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
                 edit_referecia = dialog.findViewById(R.id.edit_referencia)
                 lyout_referencia = dialog.findViewById(R.id.layout_referencia)
+                referencia = edit_referecia.text.toString()
                 btn_direccion = dialog.findViewById(R.id.btn_direccion_exrpess)
                 btn_direccion.setOnClickListener {
-                    aceptarDireccion()
+                    if (referencia == "") {
+                        referencia = "SN"
+                        aceptarDireccion()
+                    } else {
+                        aceptarDireccion()
+                    }
+
                 }
                 boton.setOnClickListener {
                     actualizar()
@@ -880,41 +763,6 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             for(i in 0 until poslist!!.size){
                 System.out.println(poslist!![i].Telefono)
                 System.out.println("hora " + poslist!!.get(i).hora + ":" + poslist!!.get(i).minutos)
-                //obtenerTokenKerkly(postlist!![i].Telefonok!!)
-                /*firebaseDatabaseUsu = FirebaseDatabase.getInstance()
-                databaseUsu = firebaseDatabaseUsu.getReference("UsuariosR").child(poslist!![i].Telefono).child("MisDatos")
-                databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        //System.out.println("---->${snapshot.value}")
-                        if (snapshot.value != null){
-                            System.out.println("---->${snapshot.value}")
-                            val u2 = snapshot.getValue(usuarios::class.java)
-                            if (u2 != null) {
-                                arraylistUsuarios.add(u2)
-                                if (arraylistUsuarios.size != null){
-                                    System.out.println("------------->con token tamño ${arraylistUsuarios[0].token}")
-                                    for (i in 0 until arraylistUsuarios.size) {
-                                        System.out.println("------------->con token+ ${arraylistUsuarios[i].token}")
-                                       // ingresarPresupuesto()
-                                        val llamarTopico = llamarTopico()
-                                        llamarTopico.llamartopico(this@PedirServicioExpress, arraylistUsuarios[i].token, "(Servicio Urgente) $problematica", "Usuario Sin Registro-> $nombre " + apellidoP + " $apellidoM")
-                                        inputProblematicaExpres.text = null
-                                    }
-                                }else{
-                                    System.out.println("-------------> Sin token")
-                                }
-                            }
-                        }else{
-                            System.out.println("-------------> Sin datos")
-                          //  ingresarPresupuesto()
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        System.out.println("Firebase: $error")
-                    }
-
-                })*/
 
             } //setProgress.dialog.dismiss()
         }

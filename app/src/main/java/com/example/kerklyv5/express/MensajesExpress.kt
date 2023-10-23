@@ -125,7 +125,7 @@ class MensajesExpress : AppCompatActivity() {
                 ref = "S/N"
             }
 
-            total = b.getDouble("Pago total")
+            total = b.getDouble("pagoTotal")
             header.add("Item")
             header.add("Concepto")
             header.add("Pago")
@@ -144,7 +144,7 @@ class MensajesExpress : AppCompatActivity() {
             txt_dest.text = "De: $nombreCompletoKerkly"
             folio = b.getInt("Folio")
             cliente = nombre
-            total = b.getDouble("Pago total")
+            total = b.getDouble("pagoTotal")
             header.add("Item")
             header.add("Concepto")
             header.add("Pago")
@@ -173,7 +173,7 @@ class MensajesExpress : AppCompatActivity() {
                 intent.putExtra("Nombre_completo_Kerkly", nombreCompletoKerkly)
                 intent.putExtra("IdContrato", folio)
                 intent.putExtra("telefonoCliente", telefono)
-                intent.putExtra("nombreCompletoCliente",cliente)
+                intent.putExtra("NombreCliente",cliente)
                 intent.putExtra("telefonokerkly", telefonoKerkly)
                 intent.putExtra("tipoServicio", tipoUsuario)
                intent.putExtra("pagoTotal", pagoTotal)

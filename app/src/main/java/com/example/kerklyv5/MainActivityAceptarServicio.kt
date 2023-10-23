@@ -42,7 +42,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
         folio = b!!.getInt("IdContrato")
         tipoServicio = b!!.getString("tipoServicio").toString()
         telefonoKerkly = b!!.getString("telefonokerkly").toString()
-        nombreCliente = b!!.getString("nombreCompletoCliente").toString()
+        nombreCliente = b!!.getString("NombreCliente").toString()
         problema = b!!.getString("problema").toString()
         pagoTotal  =b!!.getString("pagoTotal").toString()
 
@@ -59,7 +59,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
 
                 val intent  = Intent(applicationContext, CheckoutActivity::class.java)
                 b!!.putBoolean("Express", true)
-                b!!.putString("nombreCliente", nombreCliente)
+                b!!.putString("NombreCliente", nombreCliente)
                 b!!.putString("pagoTotal", pagoTotal)
                 intent.putExtras(b!!)
                 startActivity(intent)
