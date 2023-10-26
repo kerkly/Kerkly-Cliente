@@ -108,7 +108,6 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
         val call = presupuestoGET.ordenUrgente(telefonoCliente)
 
         call?.enqueue(object : retrofit2.Callback<List<OrdenPendienteUrgente?>?> {
-
             override fun onResponse(
                 call: Call<List<OrdenPendienteUrgente?>?>,
                 response: retrofit2.Response<List<OrdenPendienteUrgente?>?>
@@ -183,21 +182,13 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
 
                 intent.putExtras(b!!)
                 startActivity(intent)
-
             }
-
             override fun onCancelled(error: DatabaseError) {
                 System.out.println("Firebase: $error")
                 showMensaje("Firebase: $error")
-
             }
         })
-
     }
-
-
-
-
 private  fun showMensaje(mensaje:String){
     Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
 }
@@ -231,7 +222,6 @@ private  fun showMensaje(mensaje:String){
                 if (postList.size == 0) {
                     recyclerview.visibility = View.GONE
                     setProgress.dialog.dismiss()
-
                 } else {
                     img.visibility = View.GONE
                     txt.visibility = View.GONE
@@ -239,7 +229,6 @@ private  fun showMensaje(mensaje:String){
                     setProgress.dialog.dismiss()
 
                     adapter.setOnClickListener {
-
                         val nombre_kerkly = postList[recyclerview.getChildAdapterPosition(it)].NombreK.trim()
                         val ap_kerkly = postList[recyclerview.getChildAdapterPosition(it)].Apellido_PaternoK.trim()
                         val ap_kerkly_M = postList[recyclerview.getChildAdapterPosition(it)].Apellido_MaternoK.trim()
