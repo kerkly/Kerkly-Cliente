@@ -30,11 +30,11 @@ class ContactosFragment : Fragment() {
     private var id: String? = null
     private var correo: String? = null
     var fechaHora: String? = null
-    lateinit var foto: String
+    lateinit var fotoCliente: String
     private var nombre: String? = null
     private lateinit var array: ArrayList<String>
     private lateinit var arrayListdatos: ArrayList<usuarios>
-    private lateinit var token: String
+    private lateinit var tokenCliente: String
 
     private var b: Bundle? = null
     private lateinit var reciclerView: RecyclerView
@@ -42,10 +42,10 @@ class ContactosFragment : Fragment() {
     var usu: usuarios? = usuarios()
     var cont: Int =0
     lateinit var  telefonoCliente: String
-    lateinit var fotourl: String
     val setprogressDialog = setProgressDialog()
     private lateinit var instancias: Instancias
-    private lateinit var uid:String
+    private lateinit var uidCliente:String
+    private lateinit var nombreCliente:String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,10 +64,10 @@ class ContactosFragment : Fragment() {
         b = requireArguments()
         instancias = Instancias()
          telefonoCliente = b!!.getString("telefonoCliente")!!
-        uid = b!!.getString("uid")!!
-        //fotourl = b!!.getString("urlFotoCliente")!!
-//        nombreCompletoCliente = b!!.getString("nombreCompletoCliente")!!
-
+        uidCliente = b!!.getString("uid")!!
+        fotoCliente = b!!.getString("fotoCliente")!!
+        tokenCliente = b!!.getString("tokenCliente")!!
+        nombreCliente = b!!.getString("nombreCompletoCliente")!!
         arrayListdatos = ArrayList()
         Miadapter = adapterUsuarios(requireContext())
         reciclerView.setHasFixedSize(true)
@@ -83,7 +83,7 @@ class ContactosFragment : Fragment() {
 
         array = ArrayList<String>()
 
-        val databaseReference = instancias.referenciaListaDeUsuarios(uid)
+        val databaseReference = instancias.referenciaListaDeUsuarios(uidCliente)
         databaseReference.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 println("id usuario ${snapshot.value}")
@@ -159,19 +159,22 @@ class ContactosFragment : Fragment() {
                                 val nombre = Miadapter.lista[position].nombre
                                 val telefono = Miadapter.lista[position].telefono
                                 val urlfoto = Miadapter.lista[position].foto
-                                 token =Miadapter.lista[position].token
+                                val tokenKerkly = Miadapter.lista[position].token
+                                val uidKerkly = Miadapter.lista[position].uid
+
 
                                 val intent = Intent(requireContext(), MainActivityChats::class.java)
                                 b!!.putString("nombreCompletoK", nombre)
-                                b!!.putString("correoK", correo)
+                              //  b!!.putString("correoK", correo)
                                 b!!.putString("telefonok",telefono)
                                 b!!.putString("telefonoCliente", telefonoCliente)
-                                b!!.putString("tokenKerkly", token)
-                                b!!.putString("nombreCompletoCliente", nombre)
+                                b!!.putString("tokenKerkly", tokenKerkly)
+                                b!!.putString("tokenCliente", tokenCliente)
+                                b!!.putString("nombreCompletoCliente", nombreCliente)
                               //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()
                                 b!!.putString("urlFotoKerkly",urlfoto)
-                                b!!.putString("idCliente",uid)
-                                b!!.putString("idKerkly",idkerkly)
+                                b!!.putString("idCliente",uidCliente)
+                                b!!.putString("idKerkly",uidKerkly)
 
                                 intent.putExtras(b!!)
                                 startActivity(intent)

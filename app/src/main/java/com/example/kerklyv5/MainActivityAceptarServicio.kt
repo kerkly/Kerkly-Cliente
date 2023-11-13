@@ -19,6 +19,7 @@ import retrofit.client.Response
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+
 class MainActivityAceptarServicio : AppCompatActivity() {
     lateinit var botonAceptar: Button
     lateinit var botonCancelar: Button

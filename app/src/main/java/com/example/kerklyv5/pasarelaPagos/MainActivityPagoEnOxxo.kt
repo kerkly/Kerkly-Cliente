@@ -1,11 +1,13 @@
 package com.example.kerklyv5.pasarelaPagos
 
 import android.R.attr.port
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.kerklyv5.R
+import com.example.kerklyv5.vista.PantallaInicio
 import com.google.gson.JsonSyntaxException
 import com.stripe.Stripe
 import com.stripe.android.PaymentConfiguration
@@ -72,16 +74,25 @@ class MainActivityPagoEnOxxo : AppCompatActivity() {
                 // The customer can now pay the OXXO voucher at the OXXO convenience store.
                // val oxxoVoucherCode = paymentResult.voucherCode
                 showToast("The OXXO voucher was displayed successfully.")
+                finish()
+                val intent = Intent(this,PantallaInicio::class.java)
+                startActivity(intent)
             }
             is PaymentResult.Canceled -> {
                 // handle cancel flow
                 showToast("cancelado")
+                finish()
+                val intent = Intent(this,PantallaInicio::class.java)
+                startActivity(intent)
             }
             is PaymentResult.Failed -> {
                 // handle failures
                 // (for example, the customer may need to choose a new payment
                 // method)
                 showToast("fallo: ")
+                finish()
+                val intent = Intent(this,PantallaInicio::class.java)
+                startActivity(intent)
             }
         }
     }

@@ -137,14 +137,20 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
                         if (idKerklyAcepto == null) {
                             Toast.makeText(this@MainActivityMostrarSolicitudes, "Por favor espere, le notificaremos en un momento", Toast.LENGTH_SHORT).show()
                         }else{
-                           val curp = postList[recyclerview.getChildAdapterPosition(it)].idKerklyAcepto
+                           val pago = postList[recyclerview.getChildAdapterPosition(it)].pago_total
+                            if (pago==0.0){
+                                showMensaje("ingresar Detalles del pago. pendiente")
+                            }else{
+                                val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
+                                intent.putExtra("NombreCliente", nombreCompletoCliente)
+                                intent.putExtra("pagoTotal", pago )
+                                startActivity(intent)
+                            }
                             //val uidKerkly = postList[recyclerview.getChildAdapterPosition(it)].uidKerkly
                           //  obtenerKerkly(uidKerkly, curp)
                           //  val intent = Intent(this@MainActivityMostrarSolicitudes, MainActivityChats::class.java)
                            // startActivity(intent)
-                            val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
-                            intent.putExtra("NombreCliente", nombreCompletoCliente)
-                            startActivity(intent)
+
                         }
 
                     }
@@ -273,8 +279,21 @@ private  fun showMensaje(mensaje:String){
                                 b.putBoolean("Normal", true)
                                 intent.putExtras(b)
                                 startActivity(intent)*/
+                                //showMensaje("pagooo ${pagoTotal.toString()}")
                                 val intent = Intent(this@MainActivityMostrarSolicitudes,CheckoutActivity::class.java)
                                 intent.putExtra("NombreCliente", nombreCompletoCliente)
+                                intent.putExtra("tipoServicio", "Registrado")
+                                intent.putExtra("Telefono", telefonoCliente)
+                                intent.putExtra("Fecha", fecha)
+                                intent.putExtra("Problema", problema)
+                                intent.putExtra("Folio", id)
+                                intent.putExtra("pagoTotal", pagoTotal.toString())
+                                intent.putExtra("Oficio", oficio)
+                                intent.putExtra("telefonoKerkly", telefonoKerkly)
+                                intent.putExtra("nombreCompletoKerkly", nombre_completo_kerkly)
+                                intent.putExtra("direccionKerkly", direccionKerkly)
+                                intent.putExtra("correoKerkly", correoKerkly)
+                                intent.putExtra("uidKerkly", uidKerkly)
                                 startActivity(intent)
                             }else {
                              //  val pagoTotal2 = pagoTotal * 1.16
@@ -285,7 +304,7 @@ private  fun showMensaje(mensaje:String){
                                 b.putString("Fecha", fecha)
                                 b.putString("Problema", problema)
                                 b.putInt("Folio", id)
-                                b.putDouble("pagoTotal", pagoTotal)
+                                b.putString("pagoTotal", pagoTotal.toString())
                                 b.putString("Oficio", oficio)
                                 b.putString("telefonoKerkly", telefonoKerkly)
                                 b.putString("nombreCompletoKerkly", nombre_completo_kerkly)

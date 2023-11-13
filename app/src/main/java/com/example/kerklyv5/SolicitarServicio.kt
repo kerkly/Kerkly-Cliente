@@ -113,7 +113,7 @@ class SolicitarServicio : AppCompatActivity() {
     var filePath: Uri? = null
     lateinit var array: ArrayList<String>
     var photoUrl: String? = null
-    private lateinit var token: String
+    private lateinit var tokenCliente: String
     private lateinit var nombreCompletoCliente: String
     val setProgressDialog = setProgressDialog()
     private lateinit var dataManager: DataManager
@@ -185,7 +185,7 @@ class SolicitarServicio : AppCompatActivity() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            setFragmentHome(telefono)
+           // setFragmentHome(telefono)
         }
     }
 
@@ -295,6 +295,8 @@ class SolicitarServicio : AppCompatActivity() {
         b!!.putString("urlFotoCliente", photoUrl)
         b!!.putString("nombreCompletoCliente", currentUser!!.displayName)
         b!!.putString("uid",currentUser!!.uid)
+        b!!.putString("fotoCliente", currentUser!!.photoUrl.toString())
+        b!!.putString("tokenCliente", tokenCliente)
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
@@ -602,11 +604,11 @@ class SolicitarServicio : AppCompatActivity() {
                                     )
                                     return@OnCompleteListener
                                 }
-                                token = task.result
+                                tokenCliente = task.result
                                 referencia = Instancias()
                                 val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
                                 val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-                                val u = usuarios(telefono, currentUser!!.email.toString(), nombre.toString(), currentUser!!.photoUrl.toString(), currentDateTimeString, token, currentUser!!.uid)
+                                val u = usuarios(telefono, currentUser!!.email.toString(), nombre.toString(), currentUser!!.photoUrl.toString(), currentDateTimeString, tokenCliente, currentUser!!.uid)
                                dataRefe.setValue(u) { error, ref ->
                                     setProgressDialog.dialog.dismiss()
                                 }
@@ -713,7 +715,7 @@ class SolicitarServicio : AppCompatActivity() {
                    // Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                     return@OnCompleteListener
                 }
-                token = task.result
+                tokenCliente = task.result
                 val name = currentUser!!.displayName
                 val email = currentUser!!.email
                 photoUrl = currentUser!!.photoUrl.toString()
@@ -727,7 +729,7 @@ class SolicitarServicio : AppCompatActivity() {
                     name.toString(),
                     foto,
                     currentDateTimeString,
-                    token,
+                    tokenCliente,
                     uid
                 )
                 referencia = Instancias()

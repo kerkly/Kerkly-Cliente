@@ -138,6 +138,7 @@
     <string name="elegir_formaPago">Elige alguna de las formas de pago para continuar.
     </string>
     <string name="oxxo">OXXO</string>
+    <string name="payPal">PayPal</string>
     <string name="transferencia_bancaria">Transferencia Bancaria</string>
     <string name="pagar_oxxo">Dirigete a una sucursal de OXXO y realiza el pago correspondiente.</string>
     <string name="a_nombre_De">A nombre de:</string>

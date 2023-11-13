@@ -15,6 +15,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.kerklyv5.R
+import com.example.kerklyv5.vista.PantallaInicio
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.stripe.android.PaymentConfiguration
@@ -41,8 +42,7 @@ class CheckoutActivity : AppCompatActivity() {
     private var currentUser: FirebaseUser? = null
     private lateinit var imagen: ImageView
     private lateinit var notificarServer: notificarServer
-    private lateinit var pago:String
-
+    private lateinit var pagoTotal:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
@@ -52,9 +52,14 @@ class CheckoutActivity : AppCompatActivity() {
         currentUser = mAuth!!.currentUser
         notificarServer = notificarServer(this)
         nombre = intent.getStringExtra("NombreCliente").toString()
-       // pago = intent.getStringExtra("pagoTotal").toString()
-         Publishablekey =  getString(R.string.Publishablekey)
-         secretKey = getString(R.string.secretKey)
+        pagoTotal = intent.getStringExtra("pagoTotal").toString()
+        val impuestos = (pagoTotal.toDouble() * 1.16)
+        val pago = (impuestos*100)
+         // println("cnetavos $pago")
+        monto = pago.toInt()
+        //showToast("pago $pagoTotal")
+        Publishablekey =  getString(R.string.Publishablekey)
+        secretKey = getString(R.string.secretKey)
       //  cargarImagen(currentUser!!.photoUrl.toString())
 
         PaymentConfiguration.init(this, Publishablekey)
@@ -88,10 +93,16 @@ class CheckoutActivity : AppCompatActivity() {
                     val errorMessage = String(error.networkResponse.data)
                     println("Error $statusCode: $errorMessage")
                     showToast("Error $statusCode: $errorMessage")
+                    finish()
+                    val intent = Intent(this,PantallaInicio::class.java)
+                    startActivity(intent)
                 } else {
                     // Si no hay información detallada disponible, imprimir un mensaje genérico
                     println("Error desconocido")
                     showToast("Error desconocido")
+                    finish()
+                    val intent = Intent(this, PantallaInicio::class.java)
+                    startActivity(intent)
                 }
             }
         ) {
@@ -179,6 +190,7 @@ class CheckoutActivity : AppCompatActivity() {
                     val errorMessage = String(error.networkResponse.data)
                     println("Error $statusCode: $errorMessage")
                     showToast("Error $statusCode: $errorMessage")
+                    finish()
                 } else {
                     // Si no hay información detallada disponible, imprimir un mensaje genérico
                     println("Error desconocido")
@@ -236,6 +248,7 @@ class CheckoutActivity : AppCompatActivity() {
                     // Si no hay información detallada disponible, imprimir un mensaje genérico
                     println("Error desconocido 181")
                     showToast("Error desconocido 182")
+                    finish()
                 }//
             }
         ) {
@@ -249,6 +262,7 @@ class CheckoutActivity : AppCompatActivity() {
 
             override fun getParams(): MutableMap<String, String>? {
                 val miMapa: MutableMap<String, String> = mutableMapOf()
+
                 miMapa["customer"] = customerId
                 miMapa["amount"] = "$monto"
                 miMapa["currency"] = TipoMoneda
@@ -260,8 +274,6 @@ class CheckoutActivity : AppCompatActivity() {
                 return miMapa
             }
         }
-
-
         val queue = Volley.newRequestQueue(this)
         queue.add(request)
 
@@ -280,11 +292,17 @@ class CheckoutActivity : AppCompatActivity() {
             is PaymentSheetResult.Canceled -> {
                 // El usuario ha cancelado el proceso de pago, puedes mostrar un mensaje de cancelación o realizar acciones adicionales según tus necesidades.
                 showToast("Payment canceled!")
+                finish()
+                val intent = Intent(this,PantallaInicio::class.java)
+                startActivity(intent)
             }
             is PaymentSheetResult.Failed -> {
                 // El pago falló, puedes mostrar un mensaje de error o realizar acciones adicionales según el motivo del fallo.
                 val error = paymentSheetResult.error
                 showToast("Payment failed " + error.localizedMessage)
+                finish()
+                val intent = Intent(this,PantallaInicio::class.java)
+                startActivity(intent)
             }
 
             else -> {
