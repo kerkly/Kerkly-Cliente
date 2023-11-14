@@ -107,6 +107,8 @@ class FirebaseNoti: FirebaseMessagingService() {
         nf.putExtra("tokenCliente", tokenCliente)
         nf.putExtra("uidCliente", uidCliente)
         nf.putExtra("uidKerkly", uidKerkly)
+        nf.putExtra("Noti", "Noti")
+
         nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         return PendingIntent.getActivity(this, 0, nf, flags)

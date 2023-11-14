@@ -44,8 +44,9 @@ class llamarTopico {
     }
 
     fun chats(context: Context, token: String, Mensaje: String, Titulo: String,
-              nombreKerkly: String,telefonoKerkly:String, fotoCliente:String, tokenCliente:String,
+              nombreKerkly: String,telefonoKerkly:String,telefonoCliente:String, fotoCliente:String, tokenCliente:String,
     uidCliente: String, uidKerkly:String) {
+        //println("mandando ---> $uidCliente")
         var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
         firebaseMessaging.addOnCompleteListener {
             //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
@@ -62,10 +63,12 @@ class llamarTopico {
             notificacion.put("nombreCompletoCliente", Titulo)
             notificacion.put("nombreCompletoKerkly", nombreKerkly)
             notificacion.put("telefonoKerkly", telefonoKerkly)
+            notificacion.put("telefonoCliente", telefonoCliente)
             notificacion.put("urlFotoCliente", fotoCliente)
             notificacion.put("tokenCliente", tokenCliente)
             notificacion.put("uidCliente", uidCliente)
             notificacion.put("uidKerkly", uidKerkly)
+           // notificacion.put("Noti", "Noti")
 
             //  notificacion.put("foto", url_foto)
             json.put("data", notificacion)

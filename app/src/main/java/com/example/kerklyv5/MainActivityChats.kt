@@ -77,6 +77,7 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var fotoCliente:String
     private lateinit var uidCliente:String
     private lateinit var uidKerkly:String
+    private lateinit var Noti:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_chats)
@@ -99,8 +100,10 @@ class MainActivityChats : AppCompatActivity() {
          fotoCliente = b!!.getString("urlFotoKerkly").toString()
         tokenKerkly = b!!.getString("tokenKerkly").toString()
         tokenCliente = b!!.getString("tokenCliente").toString()
-        uidCliente = b!!.getString("idCliente").toString()
+        uidCliente = b!!.getString("uidCliente").toString()
         uidKerkly = b!!.getString("uidKerkly").toString()
+        Noti = b.getString("Noti").toString()
+        println("uid Cliente $uidCliente uidKerkly $uidKerkly")
         println("aquii---> Nombre k $nombreKerkly Cliente $nombreCompletoCliente telek $telefonoKerkly")
         val photoUrl = Uri.parse(fotoCliente)
         Picasso.get().load(photoUrl).into(object : com.squareup.picasso.Target {
@@ -147,7 +150,7 @@ class MainActivityChats : AppCompatActivity() {
            databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
            databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
               llamartopico.chats(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente,
-                  nombreKerkly,telefonoKerkly,fotoCliente,tokenCliente, uidCliente,uidKerkly)
+                  nombreKerkly,telefonoKerkly,telefonoCliente,fotoCliente,tokenCliente, uidCliente,uidKerkly)
            editText.setText("")
           }
         }
@@ -645,7 +648,7 @@ class MainActivityChats : AppCompatActivity() {
                         databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.chats(this,tokenKerkly, nombreArchivo, nombreCompletoCliente,
-                        nombreKerkly,telefonoKerkly,fotoCliente,tokenCliente, uidCliente,uidKerkly)
+                        nombreKerkly,telefonoKerkly,telefonoCliente,fotoCliente,tokenCliente, uidCliente,uidKerkly)
                         Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
                         progressBar.visibility =View.GONE
                     }
@@ -671,7 +674,7 @@ class MainActivityChats : AppCompatActivity() {
                         databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.chats(this,tokenKerkly, nombreArchivo, nombreCompletoCliente,
-                            nombreKerkly,telefonoKerkly,fotoCliente,tokenCliente, uidCliente,uidKerkly)
+                            nombreKerkly,telefonoKerkly,telefonoCliente,fotoCliente,tokenCliente, uidCliente,uidKerkly)
                         Toast.makeText(applicationContext, "archivo enviado", Toast.LENGTH_SHORT).show()
                         progressBar.visibility =View.GONE
                     }
@@ -700,6 +703,12 @@ class MainActivityChats : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (Noti == "Noti"){
+            val intent = Intent(this, SolicitarServicio::class.java)
+            intent.putExtra("Telefono", telefonoCliente)
+            startActivity(intent)
+            finish()
+        }
         if ( imagenCompleta.visibility == View.VISIBLE){
             imagenCompleta.visibility = View.GONE
             // Liberar la referencia a la imagen en imageView

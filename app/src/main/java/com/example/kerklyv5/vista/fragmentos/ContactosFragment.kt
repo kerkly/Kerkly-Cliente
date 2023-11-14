@@ -173,8 +173,8 @@ class ContactosFragment : Fragment() {
                                 b!!.putString("nombreCompletoCliente", nombreCliente)
                               //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()
                                 b!!.putString("urlFotoKerkly",urlfoto)
-                                b!!.putString("idCliente",uidCliente)
-                                b!!.putString("idKerkly",uidKerkly)
+                                b!!.putString("uidCliente",uidCliente)
+                                b!!.putString("uidKerkly",uidKerkly)
 
                                 intent.putExtras(b!!)
                                 startActivity(intent)
