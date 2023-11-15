@@ -31,6 +31,8 @@ class MainActivityAceptarServicio : AppCompatActivity() {
     private lateinit var nombreCliente: String
     var b: Bundle? = null
     private lateinit var pagoTotal: String
+    private lateinit var nombreKerkly:String
+    private lateinit var uidKerkly:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +48,14 @@ class MainActivityAceptarServicio : AppCompatActivity() {
         nombreCliente = b!!.getString("NombreCliente").toString()
         problema = b!!.getString("problema").toString()
         pagoTotal  =b!!.getString("pagoTotal").toString()
-
-
+        nombreKerkly  =b!!.getString("nombreKerkly").toString()
+        uidKerkly = b!!.getString("uidKerkly").toString()
 
         botonAceptar.setOnClickListener {
             //Toast.makeText(this, "clik", Toast.LENGTH_SHORT).show()
             if (tipoServicio == "Registrado"){
                 AceptarServicioNormal(folio)
-                obtenerTokenKerkly(telefonoKerkly, problema,nombreCliente, folio.toString())
+                obtenerTokenKerkly(uidKerkly)
               //  val intent = Intent(this, SolicitarServicio::class.java)
                 //intent.putExtra("Telefono",telefono)
                 //startActivity(intent)
@@ -77,9 +79,9 @@ class MainActivityAceptarServicio : AppCompatActivity() {
         }
     }
 
-    private fun obtenerTokenKerkly(telefonoKerkly: String, problema: String, nombreCliente: String, folio:String) {
+    private fun obtenerTokenKerkly(uidKerkly: String) {
         val kerkly = obtenerKerklys_y_tokens()
-       kerkly.obtenerTokenKerkly(telefonoKerkly, problema, nombreCliente, folio,this)
+       kerkly.obtenerTokenKerkly(uidKerkly,problema,nombreCliente,folio.toString(),this,telefonoKerkly)
     }
 
     private fun AceptarServicioNormal(folio: Int) {
@@ -102,8 +104,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
                         e.printStackTrace()
                     }
                     Toast.makeText(applicationContext, Respuesta, Toast.LENGTH_SHORT).show()
-                  //  val llamarTopico = llamarTopico()
-                    ////llamarTopico.llamartopico(this@MainActivityAceptarServicio, token, )
+
                 }
 
                 override fun failure(error: RetrofitError?) {

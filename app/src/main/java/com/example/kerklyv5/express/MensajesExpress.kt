@@ -133,6 +133,21 @@ class MensajesExpress : AppCompatActivity() {
             databaseReferenceNR = instancias.ObtenerPresupuestoNormalNR(folio.toString(), currentUser!!.uid)
            //databaseReferenceNR = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly).child("Presupuestos NR").child("Presupuesto NR $folio")
            databaseReferenceNR.addValueEventListener(postListener)
+
+            btnContinuar.setOnClickListener {
+                if (tipoUsuario =="NoRegistrado"){
+                    // finish()
+                    /* val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
+                     b.putBoolean("Express", true)
+                     intent.putExtras(b)
+                     startActivity(intent)*/
+                    val intent  = Intent(applicationContext, CheckoutActivity::class.java)
+                    b.putBoolean("Express", true)
+                    b.putString("pagoTotal", pagoTotal)
+                    intent.putExtras(b)
+                    startActivity(intent)
+                }
+                }
         }
 
         if (tipoUsuario == "Registrado"){
@@ -154,23 +169,11 @@ class MensajesExpress : AppCompatActivity() {
             databaseReference.addValueEventListener(postListener)
         }
         btnContinuar.setOnClickListener {
-            if (tipoUsuario =="NoRegistrado"){
-               // finish()
-               /* val intent  = Intent(applicationContext, FormaPagoExrpess::class.java)
-                b.putBoolean("Express", true)
-                intent.putExtras(b)
-                startActivity(intent)*/
-                val intent  = Intent(applicationContext, CheckoutActivity::class.java)
-                b.putBoolean("Express", true)
-               b.putString("pagoTotal", pagoTotal)
-                intent.putExtras(b)
-                startActivity(intent)
-            }
             if (tipoUsuario == "Registrado"){
                // finish()
                 val intent = Intent(this, MainActivityAceptarServicio::class.java)
                 //intent.putExtra("Ap_Kerkly", ap_kerkly)
-                intent.putExtra("Nombre_completo_Kerkly", nombreCompletoKerkly)
+                intent.putExtra("nombreKerkly", nombreCompletoKerkly)
                 intent.putExtra("IdContrato", folio)
                 intent.putExtra("telefonoCliente", telefono)
                 intent.putExtra("NombreCliente",cliente)

@@ -11,8 +11,8 @@ class obtenerKerklys_y_tokens {
     private lateinit var tokenKerkly: String
     private lateinit var instancias: Instancias
 
-      fun obtenerTokenKerkly(uid: String, problema: String, nombreCliente: String, folio:String, context: Context){
-        val llamartopico = llamarTopico()
+      fun obtenerTokenKerkly(uid: String, problema: String, nombreCliente: String, folio:String, context: Context, telefonoKerkly:String){
+          val llamartopico = llamarTopico()
           instancias = Instancias()
           val databaseUsu = instancias.referenciaInformacionDelKerkly(uid)
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -23,7 +23,7 @@ class obtenerKerklys_y_tokens {
                     val u2 = snapshot.getValue(usuarios::class.java)
                     tokenKerkly = u2!!.token
                     System.out.println("el token del kerkly " +tokenKerkly)
-                   // llamartopico.llamarTopicoAceptarSolicitud(context, tokenKerkly, "(Solicitud $folio $problema", "Mensaje de $nombreCliente")
+                   llamartopico.llamarTopicoAceptarSolicitud(context, tokenKerkly, "(Presupuesto Aceptado, Solicitud num. $folio $problema", "$nombreCliente", folio, telefonoKerkly)
                 }
 
             }

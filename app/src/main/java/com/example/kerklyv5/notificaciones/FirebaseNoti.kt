@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.vista.PantallaInicio
+import com.example.kerklyv5.vista.fragmentos.MainActivityMostrarSolicitudes
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.io.IOException
@@ -32,7 +33,8 @@ class FirebaseNoti: FirebaseMessagingService() {
         if (message.getData().size > 0) {
             val titulo: String = message.getData().get("titulo")!!
             val detalle: String = message.getData().get("detalle")!!
-            val tipoNoti: String = message.data.get("tipoNoti")!!
+            val tipoNoti: String = message.getData().get("tipoNoti")!!
+            print("aquii---> $tipoNoti")
             if (tipoNoti == "chats"){
                 val nombreKerkly: String = message.getData().get("nombreCompletoK")!!
                 val nombreCliente: String = message.getData().get("nombreCompletoCliente")!!
@@ -47,9 +49,64 @@ class FirebaseNoti: FirebaseMessagingService() {
                 TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
                     ,fotoKerkly,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
             }
-
-
+            if (tipoNoti =="llamarTopicSolicitud"){
+                val tipoSolicitud = message.getData().get("TipoDeSolicitud")
+                val telefonoCliente = message.getData().get("Telefono")
+                val nombreCliente = message.getData().get("nombreCompletoCliente")
+                val uidCliente = message.getData().get("uidCliente")
+                TraerNotificacionSolicitudAceptada(titulo, detalle,tipoSolicitud,telefonoCliente,nombreCliente,uidCliente)
+            }
         }
+    }
+
+    private fun TraerNotificacionSolicitudAceptada(
+        titulo: String,
+        detalle: String,
+        tipoSolicitud: String?,
+        telefonoCliente: String?,
+        nombreCliente: String?,
+        uidCliente: String?
+    ) {
+        val id = tipoSolicitud
+        //val id2 = id.hashCode()
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val builder = NotificationCompat.Builder(this, id.toString())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nc = NotificationChannel(id, "nuevoCliente", NotificationManager.IMPORTANCE_HIGH)
+            nc.setShowBadge(true)
+            assert(nm != null)
+            nm!!.createNotificationChannel(nc)
+        }
+        try {
+            builder.setAutoCancel(true)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(titulo)
+                .setSmallIcon(R.drawable.archivos)
+                .setContentText(detalle)
+                .setContentIntent(clicknotiSolicitudAceptada(tipoSolicitud, telefonoCliente
+                    , nombreCliente,uidCliente))
+                .setContentInfo("nuevo")
+             val random = Random()
+            val idNotity = random.nextInt(1000)
+            assert(nm != null)
+            nm!!.notify(idNotity, builder.build())
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun clicknotiSolicitudAceptada(tipoSolicitud: String?, telefonoCliente: String?, nombreCliente: String?, uidCliente: String?): PendingIntent? {
+        val nf = Intent(applicationContext, MainActivityMostrarSolicitudes::class.java)
+        nf.putExtra("TipoDeSolicitud", tipoSolicitud)
+        nf.putExtra("Telefono", telefonoCliente)
+        nf.putExtra("nombreCompletoCliente", nombreCliente)
+        nf.putExtra("uidCliente",uidCliente)
+        nf.putExtra("Noti", "Noti")
+
+        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        return PendingIntent.getActivity(this, 0, nf, flags)
     }
 
     private fun TraerNotificacion(titulo: String, detalle: String, nombreKerkly: String, nombreCliente: String

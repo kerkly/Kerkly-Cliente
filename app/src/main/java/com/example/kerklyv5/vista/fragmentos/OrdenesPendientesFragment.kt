@@ -2,40 +2,13 @@ package com.example.kerklyv5.vista.fragmentos
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.kerklyv5.MainActivityAceptarServicio
-import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
-import com.example.kerklyv5.controlador.AdapterOrdenPendiente
-import com.example.kerklyv5.controlador.setProgressDialog
-import com.example.kerklyv5.express.FormaPagoExrpess
-import com.example.kerklyv5.express.MensajesExpress
-import com.example.kerklyv5.interfaces.ObtenerOrdenPendienteInterface
-import com.example.kerklyv5.modelo.Pdf
-import com.example.kerklyv5.modelo.serial.OrdenPendiente
-import com.example.kerklyv5.url.Url
 import com.google.android.material.button.MaterialButton
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
 
 class OrdenesPendientesFragment : Fragment() {
     private lateinit var telefono: String

@@ -16,6 +16,7 @@ import com.example.kerklyv5.MainActivityAceptarServicio
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SQLite.DataManager
+import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.controlador.AdapterOrdenPendiente
 import com.example.kerklyv5.controlador.AdapterOrdenPendienteUrgente
 import com.example.kerklyv5.controlador.setProgressDialog
@@ -59,6 +60,7 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
     private lateinit var b: Bundle
     private lateinit var instancias: Instancias
     private lateinit var  uidCliente:String
+    private lateinit var Noti: String
     //private var mAuth: FirebaseAuth? = null
   //  private var currentUser: FirebaseUser? = null
 
@@ -73,15 +75,15 @@ class MainActivityMostrarSolicitudes : AppCompatActivity() {
         txt = findViewById(R.id.txt_ordenesPendientes)
         firebaseDatabase = FirebaseDatabase.getInstance()
         instancias = Instancias()
-      //  mAuth = FirebaseAuth.getInstance()
-      //  currentUser = mAuth!!.currentUser
-
+       //  mAuth = FirebaseAuth.getInstance()
+       //  currentUser = mAuth!!.currentUser
 
         b = intent.extras!!
         TipoSolicitud = b!!.getString("TipoDeSolicitud").toString()
         telefonoCliente = b!!.getString("Telefono").toString()
         nombreCompletoCliente =  b!!.getString("nombreCompletoCliente").toString()
         uidCliente = b!!.getString("uidCliente")!!
+        Noti = b!!.getString("Noti")!!
 
         if (TipoSolicitud == "normal"){
             getOrdenesNormal()
@@ -357,6 +359,13 @@ private  fun showMensaje(mensaje:String){
         })
 
     }*/
-
+   override fun onBackPressed() {
+       if (Noti == "Noti"){
+           val intent = Intent(this, SolicitarServicio::class.java)
+           intent.putExtra("Telefono", telefonoCliente)
+           startActivity(intent)
+           finish()
+       }
+   }
 
 }

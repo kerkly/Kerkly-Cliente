@@ -70,8 +70,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var instancias: Instancias
     private lateinit var uidCliente:String
     private lateinit var conexionPostgreSQL: conexionPostgreSQL
-
-
+    private lateinit var direccion:String
+    private lateinit var telefonoCliente:String
+    private lateinit var Curp:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kerkly_list)
@@ -95,6 +96,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         nombreCliente = b.getString("nombreCliente")!!
         correoCliente =  b.getString("correo")!!
         uidCliente = b.getString("uid")!!
+        direccion = b.getString("direccion").toString()
+        telefonoCliente = b.getString("telefonoCliente").toString()
+        Curp = b.getString("Curp").toString()
         Miadapter = adapterUsuariosCercanos(this)
         recyclerview = findViewById(R.id.recycler_UsuariosPerfil)
         recyclerview.setHasFixedSize(true)
@@ -325,7 +329,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                                 val uid = Miadapter.lista[position].uid
                                 val curp = Miadapter.lista[position].curp
                                 //showMessaje("clik en $nombre")
-                                enviarSolicitud(curp,token)
+                                enviarSolicitud(curp,token,nombre)
                                 /*val intent = Intent(applicationContext, SolicitarServicio::class.java)
                                 b.putBoolean("PresupuestoListo", true)
                                 intent.putExtras(b)
@@ -355,7 +359,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     }
 
 
-    private fun enviarSolicitud(curp:String,tokenKerkly:String) {
+    private fun enviarSolicitud(curp:String,tokenKerkly:String,nombreKerkly: String) {
         val fechaHora = DateFormat.getDateTimeInstance().format(Date())
         val ROOT_URL = Url().url
         val adapter = RestAdapter.Builder()
@@ -392,7 +396,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                        // setProgress.dialog.dismiss()
                         Toast.makeText(applicationContext,"$entrada", Toast.LENGTH_LONG).show()
                     }else{
-                        insertarSolicitudFirebaseNormal(entrada.toInt(),"",problema,correoCliente, oficio,curp,false,fechaHora,latitud,longitud,false,tokenKerkly)
+                        insertarSolicitudFirebaseNormal(entrada.toInt(),"",problema,correoCliente, oficio,curp,false,fechaHora,latitud,longitud,false,tokenKerkly, nombreKerkly)
                     }
                 }
 
@@ -404,31 +408,12 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         )
     }
 
-    fun insertarSolicitudFirebaseNormal(idGenerados: Int,
-        pago_total: String,
-        problema: String,
-        correo: String,
-        TipoServicio: String,
-        idkerkly: String,
-        clienteAcepta: Boolean,
-        fechaHora: String,
-        latitud: Double,
-        longitud: Double,
-        trabajoTerminado: Boolean, tokenKerkly:String) {
+    fun insertarSolicitudFirebaseNormal(idGenerados: Int, pago_total: String, problema: String,
+        correo: String, TipoServicio: String, idkerkly: String, clienteAcepta: Boolean, fechaHora: String,
+        latitud: Double, longitud: Double, trabajoTerminado: Boolean, tokenKerkly:String, nombreKerkly:String) {
 
-                        val modelo = modeloSolicitudNormal(
-                            idGenerados,
-                            pago_total,
-                            problema,
-                            correo,
-                            TipoServicio,
-                            idkerkly,
-                            clienteAcepta,
-                            fechaHora,
-                            latitud,
-                            longitud,
-                            trabajoTerminado
-                        )
+                        val modelo = modeloSolicitudNormal(idGenerados, pago_total, problema,
+                            correo, TipoServicio, idkerkly, clienteAcepta, fechaHora, latitud, longitud, trabajoTerminado)
                         val countersRef2 = instancias.referenciaSolicitudNormal(uidCliente).child(idGenerados.toString())
                         countersRef2.setValue(modelo) { error, _ ->
                             if (error == null) {
@@ -438,7 +423,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                                 intent.putExtras(b)
                                 startActivity(intent)
                                 val llamartopico = llamarTopico()
-                                llamartopico.llamartopico(context, tokenKerkly,  "$problema", "Tienes una Solicitud de $nombreCliente")
+                                llamartopico.llamarTopicEnviarSolicitudNormal(context, tokenKerkly,  "$problema", "Tienes una Solicitud de $nombreCliente",
+                                latitud.toString(),longitud.toString(),idGenerados.toString(),direccion, telefonoCliente,Curp,tokenKerkly,correoCliente,nombreKerkly,uidCliente)
                                 finish()
                             } else {
                                 // Manejar el error en caso de que ocurra

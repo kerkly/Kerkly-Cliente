@@ -56,7 +56,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var tipo = 1
     lateinit var mapa: String
     private lateinit var b: Bundle
-    private lateinit var curp: String
     private lateinit var problema: String
     private lateinit var telefonoCliente: String
     private lateinit var oficio: String
@@ -159,6 +158,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         b.putString("Pais", pais)
                         b.putString("nombreCliente", nombreCliente)
                         b.putString("uid", uid)
+                        b.putString("direccion",Direccion)
+                        b.putString("telefonoCliente",telefonoCliente)
                         i.putExtras(b)
                         startActivity(i)
                         finish()
