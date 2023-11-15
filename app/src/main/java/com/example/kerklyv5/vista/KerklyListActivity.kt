@@ -205,34 +205,28 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         if (hora.toInt() == 0){
             System.out.println("Kerkly a $minuto minutos de distancia $dist")
             postlist!![e].distancia = "Kerkly a $minuto minutos de distancia"
-
         }else{
             System.out.println("Kerkly a $hora hora  y $minuto minutos de distancia $dist")
             postlist!![e].distancia = "Kerkly a $hora hora  y $minuto minutos de distancia"
 
         }
-
-
       if (e == (postlist!!.size - 1)) {
            /* postlist!!.sortBy {
                 it.distancia
             }*/
           recorrerLista()
-        }
+      }
         //System.out.println("Kerkly $e ${postlist!![e].distancia}")
-
     }
     fun recorrerLista (){
         for(i in 0 until postlist!!.size){
-            System.out.println(postlist!!.get(i).uidKerkly)
-            System.out.println("hora ${postlist!!.get(i).uidKerkly} ${postlist!!.get(i).latitud} ${postlist!!.get(i).longitud}  " + postlist!!.get(i).distancia)
+            //System.out.println(postlist!!.get(i).uidKerkly)
+            //System.out.println("hora ${postlist!!.get(i).uidKerkly} ${postlist!!.get(i).latitud} ${postlist!!.get(i).longitud}  " + postlist!!.get(i).distancia)
             obtenerInfoKerkly(postlist!![i].uidKerkly,  postlist!!.get(i).distancia)
         }
-
         recyclerview.adapter = Miadapter
         setProgress.dialog.dismiss()
     }
-
     private fun ObtenerKerklyMasCercanos(){
             // Muestra un ProgressDialog para indicar que se está cargando
             var arrayListPoligonoColindantes: ArrayList<geom> = ArrayList()
@@ -330,9 +324,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                                 val token =Miadapter.lista[position].token
                                 val uid = Miadapter.lista[position].uid
                                 val curp = Miadapter.lista[position].curp
-                            //    showMessaje("clik en $nombre")
+                                //showMessaje("clik en $nombre")
                                 enviarSolicitud(curp,token)
-                             /*   val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                                /*val intent = Intent(applicationContext, SolicitarServicio::class.java)
                                 b.putBoolean("PresupuestoListo", true)
                                 intent.putExtras(b)
                                 startActivity(intent)

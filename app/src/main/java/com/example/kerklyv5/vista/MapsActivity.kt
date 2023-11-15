@@ -1,36 +1,28 @@
 package com.example.kerklyv5.vista
 
 import android.Manifest
-import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.kerklyv5.BaseDatosEspacial.conexionPostgreSQL
 import com.example.kerklyv5.BaseDatosEspacial.geom
-import com.example.kerklyv5.PoligonoCircularCallback
 import com.example.kerklyv5.R
 import com.example.kerklyv5.SolicitarServicio
 import com.example.kerklyv5.controlador.setProgressDialog
-import com.example.kerklyv5.distancia_tiempo.CalcularTiempoDistancia
 import com.example.kerklyv5.interfaces.IngresarPresupuestoUrgente
 import com.example.kerklyv5.modelo.modeloSolicituUrgente
 import com.example.kerklyv5.modelo.modelokerklyCercanos
 import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.modelo.usuarios
-import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
@@ -41,7 +33,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.database.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
@@ -65,7 +58,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var b: Bundle
     private lateinit var curp: String
     private lateinit var problema: String
-    private lateinit var telefono: String
+    private lateinit var telefonoCliente: String
     private lateinit var oficio: String
     private lateinit var edit_referecia: TextInputEditText
 
@@ -85,7 +78,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var postlist: java.util.ArrayList<Kerkly>? =null
     private lateinit var context: Context
     private var i2: Int? = 0
-    private lateinit var token: String
+    private lateinit var tokenCliente: String
+    private lateinit var tokenKerkly: String
     private lateinit var arrayListTiempo: ArrayList<modelokerklyCercanos>
     private lateinit var arraylistUsuarios: ArrayList<usuarios>
     private lateinit var correoCliente:String
@@ -94,9 +88,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var conexionPostgreSQL: conexionPostgreSQL
     private lateinit var  obtenerkerklysYTokens: obtenerKerklys_y_tokens
     private lateinit var Url: Url
+    private lateinit var Direccion:String
+
+    private var mAuth: FirebaseAuth? = null
+    private var currentUser: FirebaseUser? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        mAuth = FirebaseAuth.getInstance()
         b = intent.extras!!
         context = this
         Url = Url()
@@ -115,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         mapFragment.getMapAsync(this)
         // val bandK = b.getBoolean("Ker")
         getLocalizacion()
-        telefono = b.get("Telefono").toString()
+        telefonoCliente = b.get("Telefono").toString()
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
@@ -317,7 +316,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
         return false
     }
-    private fun ingresarPresupuesto() {
+
+     var folio: Int = 0
+    private fun ingresarPresupuesto() : Int{
+
         val fechaHora = DateFormat.getDateTimeInstance().format(Date())
             val ROOT_URL = Url().url
             val adapter = RestAdapter.Builder()
@@ -325,7 +327,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 .build()
             val api = adapter.create(IngresarPresupuestoUrgente::class.java)
             api.presupuesto_urgente(problema,
-                telefono,
+                telefonoCliente,
                 oficio,
                 latitud,
                 longitud,
@@ -353,6 +355,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                             Toast.makeText(applicationContext, "Peticion no  enviada, $entrada", Toast.LENGTH_LONG) .show()
                         }else{
                             val idgenerado = entrada.toInt()
+                            folio = entrada.toInt()
                             insertarSolicitudFirebaseUrgente(idgenerado,"",problema,correoCliente,oficio,"",fechaHora,latitud,longitud)
                         }
                     }
@@ -362,6 +365,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }
                 }
             )
+        return folio
     }
 
 
@@ -444,14 +448,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     calle = "Sin Nombre"
                     cp = "NULL"
                     num_ext = "Sin número"
+                    Direccion = "$calle $colonia $num_ext $cp"
                 }else{
-                   ciudad = direccion[0].locality // ciudad
-                     estado = direccion[0].adminArea //estado
-               pais = direccion[0].countryName // pais
-               cp = direccion[0].postalCode //codigo Postal
-               calle = direccion[0].thoroughfare // la calle
-               colonia =  direccion[0].subLocality// colonia
-               num_ext = direccion[0].subThoroughfare
+                    ciudad = direccion[0].locality // ciudad
+                    estado = direccion[0].adminArea //estado
+                    pais = direccion[0].countryName // pais
+                    cp = direccion[0].postalCode //codigo Postal
+                    calle = direccion[0].thoroughfare // la calle
+                    colonia =  direccion[0].subLocality// colonia
+                    num_ext = direccion[0].subThoroughfare
+                    Direccion = "$calle $colonia $num_ext $cp"
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -706,14 +712,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 showMessage("Lo sentimos pero en esta área no se encuentran kerklys cercanos")
                // setProgress.dialog.dismiss()
             }else {
+               val folio = ingresarPresupuesto()
                 for (kerkly in kerklysCercanos.reversed()) {
                     println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
                     println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
                     conexionPostgreSQL.cerrarConexion()
-                    MandarNoti(kerkly.uidKerkly,problema,nombreCliente)
+                    MandarNoti(kerkly.uidKerkly,problema,nombreCliente, folio.toString())
                 }
              //   insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
-                ingresarPresupuesto()
                // setProgress.dialog.dismiss()
 
             }
@@ -726,8 +732,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     }
 
-    private fun MandarNoti(uid: String, problema: String, nombreCliente:String){
-        obtenerkerklysYTokens.obtenerTokenKerkly(uid,problema,nombreCliente,this)
+    private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String, folio:String){
+        currentUser = mAuth!!.currentUser
+        obtenerkerklysYTokens.obtenerTokenKerklySolicitudUrgente(uidKerkly,this, problema,nombreCliente,
+            latitud.toString(),longitud.toString(),folio, Direccion, telefonoCliente, correoCliente, currentUser!!.uid)
+        //val llamarTopico  = llamarTopico()
+       // llamarTopico.llamarTopicEnviarSolicitudUrgente(this, tokenKerkly, problema,nombreCliente, folio)
        // showMessaje("todo bien CURP: $uid")
     }
 

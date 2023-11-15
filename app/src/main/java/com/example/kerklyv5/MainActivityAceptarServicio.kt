@@ -53,7 +53,7 @@ class MainActivityAceptarServicio : AppCompatActivity() {
             //Toast.makeText(this, "clik", Toast.LENGTH_SHORT).show()
             if (tipoServicio == "Registrado"){
                 AceptarServicioNormal(folio)
-                obtenerTokenKerkly(telefonoKerkly, problema,nombreCliente)
+                obtenerTokenKerkly(telefonoKerkly, problema,nombreCliente, folio.toString())
               //  val intent = Intent(this, SolicitarServicio::class.java)
                 //intent.putExtra("Telefono",telefono)
                 //startActivity(intent)
@@ -77,9 +77,9 @@ class MainActivityAceptarServicio : AppCompatActivity() {
         }
     }
 
-    private fun obtenerTokenKerkly(telefonoKerkly: String, problema: String, nombreCliente: String) {
+    private fun obtenerTokenKerkly(telefonoKerkly: String, problema: String, nombreCliente: String, folio:String) {
         val kerkly = obtenerKerklys_y_tokens()
-       kerkly.obtenerTokenKerkly(telefonoKerkly, problema, nombreCliente, this)
+       kerkly.obtenerTokenKerkly(telefonoKerkly, problema, nombreCliente, folio,this)
     }
 
     private fun AceptarServicioNormal(folio: Int) {

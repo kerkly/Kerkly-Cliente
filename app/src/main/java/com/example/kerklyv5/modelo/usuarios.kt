@@ -13,6 +13,7 @@ class usuarios(telefono: String, email: String, name: String, foto: String, curr
 
     var token: String = token
     var uid: String = uid
+
     constructor() : this("","","","","", "","")
 
 }

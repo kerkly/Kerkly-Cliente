@@ -394,7 +394,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
                     override fun failure(error: RetrofitError?) {
                         println("error 395 ${error!!.message}")
-                        ShowMensaje("error 395" + error.toString())
+                        ShowMensaje("error" + error.toString())
                     }
                 }
             )
@@ -431,7 +431,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                             for (i in 0 until arraylistUsuarios.size) {
                                 // ingresarPresupuesto()
                                 val llamarTopico = llamarTopico()
-                                llamarTopico.llamartopico(this@PedirServicioExpress, arraylistUsuarios[i].token, "(Servicio Urgente) $problematica", "Usuario Sin Registro-> $nombre " + apellidoP + " $apellidoM")
+                                llamarTopico.llamartopicoSolicitudClienteNR(this@PedirServicioExpress, arraylistUsuarios[i].token, "(Servicio Urgente) $problematica", "Usuario Sin Registro-> $nombre " + apellidoP + " $apellidoM")
                                println("${arraylistUsuarios[i].telefono} ${arraylistUsuarios[i].uid} ${arraylistUsuarios[i].token}")
                                 inputProblematicaExpres.text = null
                             }

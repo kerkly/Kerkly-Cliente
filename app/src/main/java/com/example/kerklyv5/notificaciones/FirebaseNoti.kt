@@ -32,18 +32,23 @@ class FirebaseNoti: FirebaseMessagingService() {
         if (message.getData().size > 0) {
             val titulo: String = message.getData().get("titulo")!!
             val detalle: String = message.getData().get("detalle")!!
-            val nombreKerkly: String = message.getData().get("nombreCompletoK")!!
-            val nombreCliente: String = message.getData().get("nombreCompletoCliente")!!
-            val telefonoKerkly: String = message.getData().get("telefonok")!!
-            val telefonoCliente: String = message.getData().get("telefonoCliente")!!
-            val fotoKerkly: String = message.getData().get("urlFotoKerkly")!!
-            val tokenKerkly: String = message.getData().get("tokenKerkly")!!
-            val tokenCliente: String = message.getData().get("tokenCliente")!!
-            val uidCliente: String = message.getData().get("uidCliente")!!
-            val uidKerkly: String = message.getData().get("uidKerkly")!!
+            val tipoNoti: String = message.data.get("tipoNoti")!!
+            if (tipoNoti == "chats"){
+                val nombreKerkly: String = message.getData().get("nombreCompletoK")!!
+                val nombreCliente: String = message.getData().get("nombreCompletoCliente")!!
+                val telefonoKerkly: String = message.getData().get("telefonok")!!
+                val telefonoCliente: String = message.getData().get("telefonoCliente")!!
+                val fotoKerkly: String = message.getData().get("urlFotoKerkly")!!
+                val tokenKerkly: String = message.getData().get("tokenKerkly")!!
+                val tokenCliente: String = message.getData().get("tokenCliente")!!
+                val uidCliente: String = message.getData().get("uidCliente")!!
+                val uidKerkly: String = message.getData().get("uidKerkly")!!
 
-            TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
-                ,fotoKerkly,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
+                TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
+                    ,fotoKerkly,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
+            }
+
+
         }
     }
 
@@ -66,9 +71,9 @@ class FirebaseNoti: FirebaseMessagingService() {
             //   Picasso.get().load(user.getPhotoUrl()).placeholder(R.drawable.iconoperito).into(img);
             //val imf_foto = Picasso.get().load(foto).get()
 
-         /*   val iconResId = applicationContext.resources.getIdentifier(
-                icono, "drawable", applicationContext.packageName
-            )*/
+            /*   val iconResId = applicationContext.resources.getIdentifier(
+                   icono, "drawable", applicationContext.packageName
+               )*/
             builder.setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
                 .setContentTitle(titulo)
@@ -78,7 +83,7 @@ class FirebaseNoti: FirebaseMessagingService() {
                     , telefonoKerkly,telefonoCliente, fotoKerkly, tokenKerkly, tokenCliente
                     , uidCliente, uidKerkly))
                 .setContentInfo("nuevo")
-           // val random = Random()
+            // val random = Random()
             //val idNotity = random.nextInt(1000)
             assert(nm != null)
             nm!!.notify(id2, builder.build())
@@ -96,8 +101,8 @@ class FirebaseNoti: FirebaseMessagingService() {
         //val pendingIntent : PendingIntent = PendingIntent.getActivity(applicationContext, 0, nf, flags)
         //nf.putExtra("notificacion", "chat")
         // Agrega otros datos que desees pasar a la actividad de chat
-       // println("aqui 99---->ker $nombreKerkly clien $nombreCliente telek $telefonoKerkly teleC $telefonoCliente " +
-              //  "urlC $fotoKerkly uid c $uidCliente kerkly $uidKerkly  token k $tokenKerkly token c $tokenCliente")
+        // println("aqui 99---->ker $nombreKerkly clien $nombreCliente telek $telefonoKerkly teleC $telefonoCliente " +
+        //  "urlC $fotoKerkly uid c $uidCliente kerkly $uidKerkly  token k $tokenKerkly token c $tokenCliente")
         nf.putExtra("nombreCompletoK", nombreKerkly)
         nf.putExtra("nombreCompletoCliente", nombreCliente)
         nf.putExtra("telefonok", telefonoKerkly)
@@ -115,9 +120,9 @@ class FirebaseNoti: FirebaseMessagingService() {
 
     }
 
-  override fun onDestroy() {
+    override fun onDestroy() {
         super.onDestroy()
-       onMessageReceived(m)
+        onMessageReceived(m)
     }
 
 }

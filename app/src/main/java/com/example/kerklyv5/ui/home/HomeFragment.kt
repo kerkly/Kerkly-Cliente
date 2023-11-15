@@ -138,19 +138,21 @@ class HomeFragment : Fragment(){
                           for ((clave, palabra) in palabrasClave) {
                               if (clave == pa) {
                                   palabraAsociada = palabra
-                                  println("---> $palabraAsociada")
+                                  println("141---> $palabraAsociada")
                                   break
                               }
                           }
                           if (palabraAsociada != null) {
-                             // println("La palabra asociada a '$pa' es: $palabraAsociada")
-                             // listaTextos.clear()
+                              println("La palabra asociada a '$pa' es: $palabraAsociada")
+                              listaTextos.clear()
                               listaTextos.add(palabraAsociada)
                               spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
                               //textProblem.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, listaTextos.distinct()))
 
                           } else {
                               println("No se encontró una palabra asociada a '$pa'")
+                             // listaTextos.clear()
+                            //  spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
                           }
                          /* val patron: Pattern = Pattern.compile(expresion)
                           val emparejador: Matcher = patron.matcher(pa)
