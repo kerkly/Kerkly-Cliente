@@ -203,4 +203,6 @@
     <string name="Descargando">Descargado</string>
     <string name="Publishablekey">pk_test_51NxujVD0vuzqQPKcVE6nxzXd9rQGXe1ZaEMjdQpsqiKFL0BcKGaq5WWGKpruBc5aVPnc6mDEk3ck1kEj7zYtOywW00YMW0Kh1n</string>
     <string name="secretKey">sk_test_51NxujVD0vuzqQPKcGUiZy6L8iaV08WtZ1GdUxodfKCemXYX0bJGC2JFICyOhI1zA4CCDfcXAHuMt0AIcKzmEMPCf00lKUMivr7</string>
+    <string name="palabrasAsociadas">Lo sentimos pero ninguna palabra coincide, intente con otras palabras claves </string>
+
 </resources>

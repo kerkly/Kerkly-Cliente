@@ -42,6 +42,7 @@ class OrdenesPendientesFragment : Fragment() {
             val intent = Intent(requireContext(), MainActivityMostrarSolicitudes::class.java)
             b!!.putString("TipoDeSolicitud","normal")
             b!!.putString("uidCliente", uidCliente)
+            b!!.putString("Noti", "no")
             intent.putExtras(b!!)
             startActivity(intent)
         }
@@ -51,6 +52,7 @@ class OrdenesPendientesFragment : Fragment() {
             val intent = Intent(requireContext(), MainActivityMostrarSolicitudes::class.java)
             b!!.putString("TipoDeSolicitud","urgente")
             b!!.putString("uidCliente", uidCliente)
+            b!!.putString("Noti", "no")
             intent.putExtras(b!!)
             startActivity(intent)
         }

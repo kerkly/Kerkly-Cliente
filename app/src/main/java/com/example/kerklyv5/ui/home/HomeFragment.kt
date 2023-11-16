@@ -51,6 +51,7 @@ class HomeFragment : Fragment(){
     private var mAuth: FirebaseAuth? = null
     private var currentUser: FirebaseUser? = null
     private var locationManager: LocationManager? = null
+    private var banPalabaraAsosiada: Boolean =  false
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,7 +76,14 @@ class HomeFragment : Fragment(){
                 val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(settingsIntent)
             }else {
-                seleccionarKerkly()
+                if (banPalabaraAsosiada == true){
+                    layoutProblem.error = null
+                    seleccionarKerkly()
+                }else{
+                    //showMessage(R.string.)
+                    layoutProblem.error = resources.getString(R.string.palabrasAsociadas)
+                }
+
             }
         }
         //click servicio Urgente
@@ -92,7 +100,7 @@ class HomeFragment : Fragment(){
                 if (problema.isEmpty()) {
                     layoutProblem.error = getString(R.string.campo_requerido)
                 } else {
-                    layoutProblem.error = null
+                   // layoutProblem.error = null
                     //   val diccionarioPath = "https://firebasestorage.googleapis.com/v0/b/hybrid-saga-346617.appspot.com/o/0_palabras_todas_no_conjugaciones.txt?alt=media&token=eb2a8142-d979-4a45-834f-ec1953e4b48b"
                     // val diccionario = File(diccionarioPath).readLines().toSet()
 
@@ -103,16 +111,23 @@ class HomeFragment : Fragment(){
                     //    println("La palabra no existe en el diccionario")
                     //    Toast.makeText(requireContext(),"La palabra no existe en el diccionario",Toast.LENGTH_SHORT).show()
                     // }
-                    val i = Intent(context, MapsActivity::class.java)
-                    b.putBoolean("Express", true)
-                    b.putString("Oficio", oficio)
-                    b.putString("Telefono", telefono)
-                    b.putString("Nombre", currentUser!!.displayName)
-                    b.putString("correo", currentUser!!.email)
-                    b.putString("Problema", problema)
-                    b.putString("uid", currentUser!!.uid)
-                    i.putExtras(b)
-                    startActivity(i)
+                    if (banPalabaraAsosiada == true){
+                        layoutProblem.error = null
+                        val i = Intent(context, MapsActivity::class.java)
+                        b.putBoolean("Express", true)
+                        b.putString("Oficio", oficio)
+                        b.putString("Telefono", telefono)
+                        b.putString("Nombre", currentUser!!.displayName)
+                        b.putString("correo", currentUser!!.email)
+                        b.putString("Problema", problema)
+                        b.putString("uid", currentUser!!.uid)
+                        i.putExtras(b)
+                        startActivity(i)
+                    }else{
+                        //showMessage(R.string.)
+                        layoutProblem.error = resources.getString(R.string.palabrasAsociadas)
+                        //showMessage(resources.getString(R.string.palabrasAsociadas))
+                    }
                 }
             }
         }
@@ -144,6 +159,7 @@ class HomeFragment : Fragment(){
                           }
                           if (palabraAsociada != null) {
                               println("La palabra asociada a '$pa' es: $palabraAsociada")
+                              banPalabaraAsosiada = true
                               listaTextos.clear()
                               listaTextos.add(palabraAsociada)
                               spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
@@ -151,6 +167,7 @@ class HomeFragment : Fragment(){
 
                           } else {
                               println("No se encontró una palabra asociada a '$pa'")
+                              banPalabaraAsosiada = false
                              // listaTextos.clear()
                             //  spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
                           }
