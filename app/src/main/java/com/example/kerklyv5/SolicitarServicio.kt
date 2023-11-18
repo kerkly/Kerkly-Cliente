@@ -187,6 +187,7 @@ class SolicitarServicio : AppCompatActivity() {
         } else {
            // setFragmentHome(telefono)
         }
+        finish()
     }
 
     private fun SeleecionarFoto() {
@@ -635,7 +636,7 @@ class SolicitarServicio : AppCompatActivity() {
                                             am,
                                             correo
                                         )
-                                        dataManager.verificarSiElUsarioExiste(
+                                     /*   dataManager.verificarSiElUsarioExiste(
                                             this@SolicitarServicio,
                                             fotoPerfil,
                                             txt_nombre,
@@ -647,7 +648,7 @@ class SolicitarServicio : AppCompatActivity() {
                                             ap,
                                             am,
                                             correo
-                                        )
+                                        )*/
                                         getOficios()
                                         setFragmentHome(telefono.toString())
 
@@ -655,6 +656,8 @@ class SolicitarServicio : AppCompatActivity() {
                                     }
                                 })
                             //  cargarImagen(foto2!!)
+                            txt_correo.text =currentUser!!.email.toString()
+                            txt_nombre.text = nombre
                             setProgressDialog.dialog.dismiss()
                             sesion(correo)
                         } else {
@@ -704,7 +707,7 @@ class SolicitarServicio : AppCompatActivity() {
                 })*/
             sesion(currentUser!!.email.toString())
 
-            dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
+        //    dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
           //  sesionAbierta(currentUser!!.email.toString())
             var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
             firebaseMessaging.addOnCompleteListener {
@@ -742,7 +745,7 @@ class SolicitarServicio : AppCompatActivity() {
                 }
             })
             cargarImagen(currentUser!!.photoUrl.toString())
-            txt_nombre.text = currentUser!!.displayName.toString()
+            txt_nombre.text = currentUser!!.displayName
             txt_correo.text = currentUser!!.email.toString()
         }else {
             muestraOpciones()

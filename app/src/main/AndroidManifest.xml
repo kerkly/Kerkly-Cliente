@@ -35,15 +35,19 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".pasarelaPagos.MainActivityPagoEnOxxo"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".pasarelaPagos.CheckoutActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".vista.fragmentos.MainActivityMostrarSolicitudes"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivityAceptarServicio"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <service
@@ -57,15 +61,19 @@
 
         <activity
             android:name=".MainActivityChats"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".vista.MainActivityVerificarSMS"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".vista.KerklyListActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".extras.IntroSliderActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".vista.PantallaInicio"
@@ -79,7 +87,9 @@
         </activity>
         <activity
             android:name=".vista.CuerpoMensajeRecibidoActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -91,59 +101,77 @@
         <activity
             android:name=".MapsActivityKer"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_maps_ker" />
         <activity
             android:name=".express.MensajesExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.ComprobantePagoExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.TranferenciaBancariaExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Pago"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.FormaPagoExrpess"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".Contrato"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".vista.MapsActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".vista.RecuperarCuenta"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".vista.Registro"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".vista.Correo"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.PagoExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.ContratoExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".vista.RecuperarContra"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".MensajesActivity"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".express.PedirServicioExpress"
+            android:screenOrientation="portrait"
             android:exported="true" />
         <activity
             android:name=".SolicitarServicio"
             android:exported="true"
-            android:label="@string/title_activity_solicitar_servicio" />
+            android:label="@string/title_activity_solicitar_servicio"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".vista.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
 
         <meta-data

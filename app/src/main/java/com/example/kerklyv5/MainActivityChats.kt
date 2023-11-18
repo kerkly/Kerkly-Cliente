@@ -144,7 +144,8 @@ class MainActivityChats : AppCompatActivity() {
         //databaseReferenceKerkly = firebaseDatabase.getReference("UsuariosR").child(telefonoKerkly.toString()).child("chats").child("$telefonoKerkly"+"_"+"$telefonoCliente")
 
         boton.setOnClickListener {
-          if (editText.text == null){
+            val mensaje = editText.text.toString()
+          if (mensaje == ""){
               Toast.makeText(this, "Escribe tu mensaje" , Toast.LENGTH_SHORT).show()
           }else{
            databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
