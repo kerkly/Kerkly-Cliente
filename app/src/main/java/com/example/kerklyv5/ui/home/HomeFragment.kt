@@ -145,6 +145,7 @@ class HomeFragment : Fragment(){
                       val parts: List<String> = p.split(" ")
                       //val palabrasClaves = listOf("palabra1", "palabra2", "palabra3", "palabra4")
                     listaTextos.clear()
+                    layoutProblem.error =  null
                       for (i in 0 until parts.size) {
                           var pa = parts[i]
                           //println("palabras separadas $pa")
@@ -255,7 +256,6 @@ fun obtenerOficiosDB(){
      lista= dataManager.getAllOficios()
         SpinerADapter(lista)
         Diccionario()
-
   //  val adaptador = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, palC)
    // textProblem.setAdapter(adaptador)
    // println("Palabras ingresadas:")
