@@ -142,7 +142,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     // setProgress.dialog.dismiss()
                     getLocalizacion()
                 } else {
-                    setLocation(latitud, longitud)
+                    //setLocation(latitud, longitud)
+                  /*  if(latitud == 0.0 && longitud == 0.0){
+                        setLocation(latitud,longitud)
+                    }else{*/
                     if (!band) {
                         val i = Intent(applicationContext, KerklyListActivity::class.java)
                         correoCliente = b.getString("correo").toString()
@@ -166,10 +169,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     } else {
                         showMessaje("Por vafor espere un momento, No salga de la app..")
                         println("marcador debde ser $latitud $longitud")
-                        setLocation(latitud, longitud)
+                      //  setLocation(latitud, longitud)
                         PoligonosColindantes(latitud, longitud)
                     }
                 }
+
+                //}
         }
     }
 
@@ -212,6 +217,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     latitud = location.latitude
                     longitud = location.longitude
 
+                    setLocation(latitud,longitud)
                    /* for (idPoligono in idsPoligonosUsuario) {
                         // Realiza alguna acción con el ID de polígono, por ejemplo:
                         println("ID de polígono: $idPoligono")
@@ -369,6 +375,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 println("ID de polígono: $idPoligono")
                 showMessaje("ID de polígono: ${idPoligono.id_0}")
             }*/
+            setLocation(latitud,longitud)
         }
     }
 
@@ -377,6 +384,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //  System.out.println("entro")
             latitud = p0.position.latitude
             longitud = p0.position.longitude
+           // setLocation(latitud,longitud)
         }
         return false
     }
@@ -386,6 +394,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //Toast.makeText(context, "start", Toast.LENGTH_SHORT).show()
             latitud = p0.position.latitude
             longitud = p0.position.longitude
+           // setLocation(latitud,longitud)
 
         }
     }
@@ -396,7 +405,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             latitud = p0.position.latitude
             longitud = p0.position.longitude
             //setLocation(latitud, longitud)
-            println("marcador moviendose $latitud $longitud")
+            //setLocation(latitud,longitud)
+           // println("marcador moviendose $latitud $longitud")
         }
     }
 
