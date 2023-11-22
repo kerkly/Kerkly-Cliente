@@ -594,7 +594,9 @@ class SolicitarServicio : AppCompatActivity() {
                         nombre = "$NombreF $ap $am"
                         correo = postList[0].Correo
 
-                        if (correo == currentUser!!.email) {
+                        val correoActual = currentUser?.email?.toLowerCase()
+                        val correoComparar = correo?.toLowerCase()
+                        if(correoActual == correoComparar){
                            // nombreCompletoCliente = nombre as String
                             FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
                                 if (!task.isSuccessful) {

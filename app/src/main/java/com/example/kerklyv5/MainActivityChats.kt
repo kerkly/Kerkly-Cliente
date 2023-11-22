@@ -148,6 +148,7 @@ class MainActivityChats : AppCompatActivity() {
           if (mensaje == ""){
               Toast.makeText(this, "Escribe tu mensaje" , Toast.LENGTH_SHORT).show()
           }else{
+              println("uid Cliente $uidCliente uidKerkly $uidKerkly")
            databaseReferenceCliente.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
            databaseReferenceKerkly.push().setValue(Mensaje(editText.text.toString(), getTime(),"","",""))
               llamartopico.chats(this,tokenKerkly, editText.text.toString(), nombreCompletoCliente,

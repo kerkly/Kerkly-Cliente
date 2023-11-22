@@ -365,7 +365,10 @@ private  fun showMensaje(mensaje:String){
            intent.putExtra("Telefono", telefonoCliente)
            startActivity(intent)
            finish()
+       }else{
+           finish()
        }
+
    }
 
 }

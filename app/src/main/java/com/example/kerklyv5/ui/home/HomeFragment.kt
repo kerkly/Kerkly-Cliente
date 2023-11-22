@@ -11,6 +11,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -31,7 +32,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class HomeFragment : Fragment(){
-     lateinit var spinner: Spinner
+    lateinit var spinner: Spinner
     private lateinit var textProblem: EditText
     private lateinit var layoutProblem: TextInputLayout
     private lateinit var oficio: String
@@ -43,7 +44,7 @@ class HomeFragment : Fragment(){
     val setprogress = setProgressDialog()
     lateinit var listaTextos: ArrayList<String>
     private lateinit var btn_otrosOficios: MaterialButton
-     lateinit var dataManager: DataManager
+    lateinit var dataManager: DataManager
     private lateinit var lista: ArrayList<MisOficios>
     private  var palabrasClave = mutableMapOf<String, String>()
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -52,6 +53,9 @@ class HomeFragment : Fragment(){
     private var currentUser: FirebaseUser? = null
     private var locationManager: LocationManager? = null
     private var banPalabaraAsosiada: Boolean =  false
+
+    // Declarar la lista de palabras asociadas fuera del método
+    val listaPalabrasAsociadas = mutableListOf<String>()
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -132,80 +136,65 @@ class HomeFragment : Fragment(){
             }
         }
         listaTextos = ArrayList()
-          textProblem.addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    println("beforeTextChanged $p0")
-                }
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                   println("onTextChanged $p0")
-                }
+        textProblem.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                println("beforeTextChanged $p0")
+            }
 
-                override fun afterTextChanged(p0: Editable?) {
-                      val p = p0.toString()
-                      val parts: List<String> = p.split(" ")
-                      //val palabrasClaves = listOf("palabra1", "palabra2", "palabra3", "palabra4")
-                    listaTextos.clear()
-                    layoutProblem.error =  null
-                      for (i in 0 until parts.size) {
-                          var pa = parts[i]
-                          //println("palabras separadas $pa")
-                         //var palabraAsociada = palabrasClave[pa]
-                          var palabraAsociada: String? = null
-                          for ((clave, palabra) in palabrasClave) {
-                              if (clave == pa) {
-                                  palabraAsociada = palabra
-                                  println("141---> $palabraAsociada")
-                                  break
-                              }
-                          }
-                          if (palabraAsociada != null) {
-                              println("La palabra asociada a '$pa' es: $palabraAsociada")
-                              banPalabaraAsosiada = true
-                              listaTextos.clear()
-                              listaTextos.add(palabraAsociada)
-                              spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
-                              //textProblem.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_dropdown_item_1line, listaTextos.distinct()))
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                println("onTextChanged $p0")
+            }
 
-                          } else {
-                              println("No se encontró una palabra asociada a '$pa'")
-                              banPalabaraAsosiada = false
-                             // listaTextos.clear()
-                            //  spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaTextos))
-                          }
-                         /* val patron: Pattern = Pattern.compile(expresion)
-                          val emparejador: Matcher = patron.matcher(pa)
-                          val esCoincidente = emparejador.find()
-                          var estaSiEs = ""
-                          if (esCoincidente) {
-                              estaSiEs = parts[i]
-                              listaTextos.add(parts[i])
-                              //btnfiltro.text = "texto Reconocido: $estaSiEs + tamaño del arraylist ${listaTextos.size}"
-                              if (listaTextos.size <= 1) {
-                                  spinner.setAdapter(
-                                      ArrayAdapter<String>(
-                                          requireContext(),
-                                          android.R.layout.simple_spinner_dropdown_item,
-                                          listaTextos
-                                      )
-                                  )
+            override fun afterTextChanged(p0: Editable?) {
+                val p = p0.toString()
+                val parts: List<String> = p.split(" ")
 
-                              } else {
-                                  listaTextos.clear()
-                                  obtenerOficiosDB()
-                                  //listaTextos.clear()
-                              }
-                          } else {
-                              println("no reconocido: ")
-                              //btnfiltro.text = "no reconocido: "
-                          }*/
-                      }
-                    if (p0.toString() == "") {
-                        // btnfiltro.text = "no hay texto"
-                        SpinerADapter(lista)
-                        listaTextos.clear()
+                listaTextos.clear()
+                layoutProblem.error = null
+
+                var contienePalabraAsociada = false
+
+                for (i in 0 until parts.size) {
+                    var pa = parts[i].trim()
+                    if (pa.isNotBlank()) {
+                        var palabraAsociada: String? = null
+                        for ((clave, palabra) in palabrasClave) {
+                            if (clave == pa) {
+                                palabraAsociada = palabra
+                                break
+                            }
+                        }
+
+                        if (palabraAsociada != null) {
+                            println("La palabra asociada a '$pa' es: $palabraAsociada")
+                            banPalabaraAsosiada = true
+
+                            if (!listaPalabrasAsociadas.contains(palabraAsociada)) {
+                                listaPalabrasAsociadas.add(0, palabraAsociada)
+                            }
+
+                            listaTextos.clear()
+                            listaTextos.add(palabraAsociada)
+                            spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaPalabrasAsociadas))
+
+                            contienePalabraAsociada = true
+                        } else {
+                            banPalabaraAsosiada = false
+                            if (listaPalabrasAsociadas.isEmpty()) {
+                                llenarSpinner()
+                            }
+                        }
                     }
                 }
-            })
+
+                if (p0.toString().isBlank() && !contienePalabraAsociada) {
+                    // Llamar al método cuando el texto está vacío y no contiene ninguna palabra asociada
+                   llenarSpinner()
+                    listaPalabrasAsociadas.clear()
+                }
+            }
+        })
+
         btn_otrosOficios = root.findViewById(R.id.boton_Oficios)
         btn_otrosOficios.setOnClickListener {
             listaTextos.clear()
@@ -220,6 +209,36 @@ class HomeFragment : Fragment(){
             }
         }
         return root
+    }
+
+    private fun llenarSpinner(){
+        lateinit var listita: ArrayList<String>
+        listita = ArrayList()
+        listita.add("Selecciona un oficio")
+        listita.add("Otro")
+        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listita)
+
+        spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+
+                // Verifica si la opción seleccionada es "Otro"
+                if (selectedItem == "Otro") {
+                    // Aquí puedes manejar el evento cuando se selecciona "Otro"
+                    // Por ejemplo, mostrar un cuadro de diálogo, iniciar otra actividad, etc.
+                    // Puedes agregar tu lógica aquí.
+                  //  Toast.makeText(requireContext(), "Seleccionaste Otro", Toast.LENGTH_SHORT).show()
+                    SpinerADapter(lista)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Implementa este método si deseas manejar el caso en el que no se selecciona nada.
+            }
+        }
+
     }
     class SharedViewModel : ViewModel() {
         val actualizacionNecesaria = MutableLiveData<Boolean>()
@@ -254,7 +273,8 @@ fun obtenerOficiosDB(){
     lista = ArrayList()
 //    dataManager = DataManager(requireContext())
      lista= dataManager.getAllOficios()
-        SpinerADapter(lista)
+       //SpinerADapter(lista)
+     llenarSpinner()
         Diccionario()
   //  val adaptador = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, palC)
    // textProblem.setAdapter(adaptador)
