@@ -53,7 +53,8 @@ class HomeFragment : Fragment(){
     private var currentUser: FirebaseUser? = null
     private var locationManager: LocationManager? = null
     private var banPalabaraAsosiada: Boolean =  false
-
+    // Declaración de la variable miembro
+    private var textoAnterior: String = ""
     // Declarar la lista de palabras asociadas fuera del método
     val listaPalabrasAsociadas = mutableListOf<String>()
 
@@ -87,7 +88,6 @@ class HomeFragment : Fragment(){
                     //showMessage(R.string.)
                     layoutProblem.error = resources.getString(R.string.palabrasAsociadas)
                 }
-
             }
         }
         //click servicio Urgente
@@ -104,17 +104,6 @@ class HomeFragment : Fragment(){
                 if (problema.isEmpty()) {
                     layoutProblem.error = getString(R.string.campo_requerido)
                 } else {
-                   // layoutProblem.error = null
-                    //   val diccionarioPath = "https://firebasestorage.googleapis.com/v0/b/hybrid-saga-346617.appspot.com/o/0_palabras_todas_no_conjugaciones.txt?alt=media&token=eb2a8142-d979-4a45-834f-ec1953e4b48b"
-                    // val diccionario = File(diccionarioPath).readLines().toSet()
-
-                    //  if (problema in diccionario) {
-                    //    println("La palabra existe en el diccionario")
-                    //      Toast.makeText(requireContext(),"La palabra existe en el diccionario",Toast.LENGTH_SHORT).show()
-                    //  } else {
-                    //    println("La palabra no existe en el diccionario")
-                    //    Toast.makeText(requireContext(),"La palabra no existe en el diccionario",Toast.LENGTH_SHORT).show()
-                    // }
                     if (banPalabaraAsosiada == true){
                         layoutProblem.error = null
                         val i = Intent(context, MapsActivity::class.java)
@@ -144,16 +133,41 @@ class HomeFragment : Fragment(){
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 println("onTextChanged $p0")
             }
-
             override fun afterTextChanged(p0: Editable?) {
                 val p = p0.toString()
                 val parts: List<String> = p.split(" ")
 
-                listaTextos.clear()
+                // Verificar si se eliminó una palabra
+                val palabrasEliminadas = encontrarPalabrasEliminadas(textoAnterior, p)
+                if (palabrasEliminadas.isNotEmpty()) {
+                    println("Palabras eliminadas: $palabrasEliminadas")
+
+                    // Eliminar las palabras asociadas de listaPalabrasAsociadas
+                    for (palabraEliminada in palabrasEliminadas) {
+                        val palabraAsociadaEliminada = palabrasClave[palabraEliminada]
+                        if (palabraAsociadaEliminada != null) {
+                            listaPalabrasAsociadas.remove(palabraAsociadaEliminada)
+                            println("Palabra asociada eliminada: $palabraAsociadaEliminada")
+                        }
+                    }
+
+                    // Actualizar el Spinner con la nueva lista
+                    spinner.setAdapter(
+                        ArrayAdapter<String>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            listaPalabrasAsociadas
+                        )
+                    )
+                } else {
+                    println("No se eliminaron palabras.")
+                }
+
+                // Actualizar el texto anterior
+                textoAnterior = p
+               // listaTextos.clear()
                 layoutProblem.error = null
-
                 var contienePalabraAsociada = false
-
                 for (i in 0 until parts.size) {
                     var pa = parts[i].trim()
                     if (pa.isNotBlank()) {
@@ -164,23 +178,20 @@ class HomeFragment : Fragment(){
                                 break
                             }
                         }
-
                         if (palabraAsociada != null) {
                             println("La palabra asociada a '$pa' es: $palabraAsociada")
                             banPalabaraAsosiada = true
 
                             if (!listaPalabrasAsociadas.contains(palabraAsociada)) {
                                 listaPalabrasAsociadas.add(0, palabraAsociada)
+                                println("palabra agregada a lista")
                             }
-
-                            listaTextos.clear()
-                            listaTextos.add(palabraAsociada)
                             spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaPalabrasAsociadas))
-
                             contienePalabraAsociada = true
                         } else {
                             banPalabaraAsosiada = false
                             if (listaPalabrasAsociadas.isEmpty()) {
+                                println("no coincide...")
                                 llenarSpinner()
                             }
                         }
@@ -191,6 +202,7 @@ class HomeFragment : Fragment(){
                     // Llamar al método cuando el texto está vacío y no contiene ninguna palabra asociada
                    llenarSpinner()
                     listaPalabrasAsociadas.clear()
+                    println("borrado..")
                 }
             }
         })
@@ -209,6 +221,13 @@ class HomeFragment : Fragment(){
             }
         }
         return root
+    }
+
+    private fun encontrarPalabrasEliminadas(textoAnterior: String, textoActual: String): List<String> {
+        val palabrasAntes = textoAnterior.split(" ")
+        val palabrasDespues = textoActual.split(" ")
+
+        return palabrasAntes.filterNot { palabrasDespues.contains(it) }
     }
 
     private fun llenarSpinner(){
@@ -276,12 +295,6 @@ fun obtenerOficiosDB(){
        //SpinerADapter(lista)
      llenarSpinner()
         Diccionario()
-  //  val adaptador = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, palC)
-   // textProblem.setAdapter(adaptador)
-   // println("Palabras ingresadas:")
-   // for (palabra in palC) {
-       // println(palabra)
- //   }
 }
     fun showMessage(mensaje: String){
         Toast.makeText(requireContext(),mensaje,Toast.LENGTH_SHORT).show()
@@ -292,9 +305,6 @@ fun obtenerOficiosDB(){
         spinner.adapter = aa
     }
     fun Diccionario(){
-        //inicio = "(?i)(\\W|^)("
-        //pal = ""
-       // final ="\\smía|ostras)(\\W|\$)"
         var palClaves = ""
         var oficio = ""
         for (i in 0 until lista!!.size){
@@ -308,7 +318,5 @@ fun obtenerOficiosDB(){
                // palC.add(pa)
             }
         }
-       // expresion = "$inicio$pal"+"$final"
-       // println("expresion armada $inicio"+pal+final)
     }
 }
