@@ -2,28 +2,25 @@ package com.example.kerklyv5.BaseDatosEspacial
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import com.example.kerklyv5.PoligonoCircularCallback
-import org.postgresql.util.PGobject
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
-
 class conexionPostgreSQL {
     var conexion: Connection? = null
     @SuppressLint("SuspiciousIndentation")
-    fun obtenerConexion(context: Context) {
-        val threadPolicy: ThreadPolicy = ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(threadPolicy)
+    fun obtenerConexion(context: Context) :Connection?{
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            val threadPolicy = ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(threadPolicy)
+        }
         try {
             Class.forName("org.postgresql.Driver") // Cargar el driver JDBC
-            val host = "2.tcp.ngrok.io"
-            val port = "14955"
+            val host = "6.tcp.ngrok.io"
+            val port = "16646"
             val databaseName = "Kerkly"
             val username = "luis_admin"
             val password = "Lu0599@"
@@ -31,11 +28,13 @@ class conexionPostgreSQL {
 
              conexion = DriverManager.getConnection(url, username, password)
             //Toast.makeText(context, "Conexión exitosa", Toast.LENGTH_SHORT).show()
-
+            return conexion
         }catch (e: SQLException){
             println(e.message)
             e.printStackTrace()
+            conexion = null
         }
+        return null
     }
     fun cerrarConexion(){
         conexion!!.close()

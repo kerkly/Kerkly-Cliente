@@ -6,9 +6,12 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.SQLException
 import android.location.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -403,19 +406,29 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
 
     private fun KerklyCercanos(latitud: Double, longitud: Double, oficio: String){
         val conexion  = conexionPostgreSQL.obtenerConexion(this)
-        if (conexion != null){
-            val secciones =  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0)
-            val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
-            if (kerklysCercanos.isEmpty()){
-                ShowMensaje("Lo Sentimos pero en esta área no se encuentran kerklys cercanos")
-            }else{
-                for(kerkly in kerklysCercanos.reversed()){
-                    conexionPostgreSQL.cerrarConexion()
-                    MandarNoti(kerkly.uidKerkly, problematica, "$nombre $apellidoP $apellidoM")
+        if (conexion != null) {
+            try {
+                val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0)
+                val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
+                if (kerklysCercanos.isEmpty()) {
+                    ShowMensaje("Lo Sentimos pero en esta área no se encuentran kerklys cercanos")
+                } else {
+                    for (kerkly in kerklysCercanos.reversed()) {
+                        conexionPostgreSQL.cerrarConexion()
+                        MandarNoti(kerkly.uidKerkly, problematica, "$nombre $apellidoP $apellidoM")
+                    }
+                    ShowMensaje("En un momento recibira Respuesta")
                 }
-                ShowMensaje("En un momento recibira Respuesta")
+            } catch (e: SQLException) {
+                // Manejar la excepción (lanzar, notificar al usuario, etc.)
+                println("Error al realizar operaciones de base de datos: ${e.message}")
+                ShowMensaje("Error al realizar operaciones de base de datos: ${e.message}")
+                e.printStackTrace()
+                // Otras acciones de manejo de errores según sea necesario
             }
+
         }
+
     }
 
     private fun MandarNoti(uidKerkly: String, problematica: String, s: String) {
