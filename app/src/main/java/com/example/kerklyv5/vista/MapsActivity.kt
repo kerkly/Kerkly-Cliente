@@ -71,6 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var pais: String
     private var band = false
     private lateinit var nombreCliente: String
+    var folio =""
     private var locationManager: LocationManager? = null
     val setProgress = setProgressDialog()
 
@@ -170,7 +171,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         showMessaje("Por vafor espere un momento, No salga de la app..")
                         println("marcador debde ser $latitud $longitud")
                       //  setLocation(latitud, longitud)
-                        PoligonosColindantes(latitud, longitud)
+                        //PoligonosColindantes(latitud, longitud)
+                        ingresarPresupuesto()
                     }
                 }
 
@@ -311,8 +313,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
 
-     var folio: Int = 0
-    private fun ingresarPresupuesto() : Int{
+
+    private fun ingresarPresupuesto(){
 
         val fechaHora = DateFormat.getDateTimeInstance().format(Date())
             val ROOT_URL = Url().url
@@ -348,9 +350,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         if (cadena.equals(entrada)) {
                             Toast.makeText(applicationContext, "Peticion no  enviada, $entrada", Toast.LENGTH_LONG) .show()
                         }else{
-                            val idgenerado = entrada.toInt()
-                            folio = entrada.toInt()
-                            insertarSolicitudFirebaseUrgente(idgenerado,"",problema,correoCliente,oficio,"",fechaHora,latitud,longitud)
+
+                            folio = entrada
+                            PoligonosColindantes(latitud, longitud)
+                            insertarSolicitudFirebaseUrgente(folio,"",problema,correoCliente,oficio,"",fechaHora,latitud,longitud)
                         }
                     }
                     override fun failure(error: RetrofitError?) {
@@ -359,7 +362,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }
                 }
             )
-        return folio
+
     }
 
 
@@ -446,7 +449,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
 
-    fun insertarSolicitudFirebaseUrgente(idgenerado:Int,
+    fun insertarSolicitudFirebaseUrgente(idgenerado:String,
         pago_total: String,
         problema: String,
         correo: String,
@@ -459,7 +462,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
         val reference = instancias.referenciaSolicitudUrgente(uid)
                          val modelo = modeloSolicituUrgente(
-                             idgenerado,
+                             idgenerado.toInt(),
                                                pago_total,
                                                problema,
                                                correo,
@@ -505,12 +508,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 showMessage("Lo sentimos pero en esta área no se encuentran kerklys cercanos")
                // setProgress.dialog.dismiss()
             }else {
-               val folio = ingresarPresupuesto()
+                println("foliooo en PoligonosColindantes ------> $folio")
                 for (kerkly in kerklysCercanos.reversed()) {
                     println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
                     println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
                     conexionPostgreSQL.cerrarConexion()
-                    MandarNoti(kerkly.uidKerkly,problema,nombreCliente, folio.toString())
+                    MandarNoti(kerkly.uidKerkly,problema,nombreCliente)
                 }
              //   insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
                // setProgress.dialog.dismiss()
@@ -525,7 +528,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     }
 
-    private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String, folio:String){
+    private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String){
         currentUser = mAuth!!.currentUser
         obtenerkerklysYTokens.obtenerTokenKerklySolicitudUrgente(uidKerkly,this, problema,nombreCliente,
             latitud.toString(),longitud.toString(),folio, Direccion, telefonoCliente, correoCliente, currentUser!!.uid)

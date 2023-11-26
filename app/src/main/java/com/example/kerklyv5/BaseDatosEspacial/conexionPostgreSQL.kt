@@ -25,7 +25,6 @@ class conexionPostgreSQL {
             val username = "luis_admin"
             val password = "Lu0599@"
             val url = "jdbc:postgresql://$host:$port/$databaseName"
-
              conexion = DriverManager.getConnection(url, username, password)
             //Toast.makeText(context, "Conexión exitosa", Toast.LENGTH_SHORT).show()
             return conexion
@@ -39,8 +38,6 @@ class conexionPostgreSQL {
     fun cerrarConexion(){
         conexion!!.close()
     }
-
-
     //metodo que mediante un un poligono circular creado. determina sobre que secciones pertenece
     fun poligonoCircular(latitud: Double,longitud: Double,radio: Double): ArrayList<geom>{
       // val latitud = "17.520514"

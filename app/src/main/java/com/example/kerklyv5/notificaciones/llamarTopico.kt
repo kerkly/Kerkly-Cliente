@@ -59,6 +59,7 @@ class llamarTopico {
             //  val token = "fNBcaF1mT2qEj9KexMEduK:APA91bGPhunaVKF8eBITrArKl_G_5qvl-ZLAOPzsBxhEZaNXH-MqmrISayZDxVt1FjzdU-qXPECesJ2IvhPM-f1lgo6786bANQT_apL2iMhV2DV5k1Uw9YYp1_m_5qcT8IfaW4QETJE_"
             json.put("to", "/$token/" + "EnviarNoti")
             val notificacion = JSONObject()
+            println("folio en llamarTopicEnviarSolicitudUrgente------> $Folio")
             notificacion.put("tipoNoti","llamarTopicEnviarSolicitudUrgente")
             notificacion.put("titulo", Titulo)
             notificacion.put("detalle", Mensaje)

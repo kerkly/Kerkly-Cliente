@@ -189,10 +189,11 @@ class HomeFragment : Fragment(){
                             spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaPalabrasAsociadas))
                             contienePalabraAsociada = true
                         } else {
-                            banPalabaraAsosiada = false
+
                             if (listaPalabrasAsociadas.isEmpty()) {
                                 println("no coincide...")
                                 llenarSpinner()
+                                banPalabaraAsosiada = false
                             }
                         }
                     }
