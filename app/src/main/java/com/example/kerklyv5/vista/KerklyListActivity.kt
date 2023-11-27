@@ -116,82 +116,12 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
-        //modificacion
-       // getKerklysCercanos()
-        //metodo para obtener a los kerklys mas cercanos usando la base de datos espacial
         ObtenerKerklyMasCercanos()
     }
     private fun setScrollBar() {
         recyclerview.scrollToPosition(Miadapter.itemCount-1)
         // println("entro 217 "+ {Miadapter.itemCount-1 })
     }
-
-   /* private fun getKerklysCercanos () {
-        val ROOT_URL = Url().url
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client: OkHttpClient = OkHttpClient.Builder().build()
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl("$ROOT_URL/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-        val presupuestoGET = retrofit.create(ObtenerKerklyInterface::class.java)
-        val call = presupuestoGET.kerklys(oficio)
-
-        call?.enqueue(object : retrofit2.Callback<List<Kerkly?>?> {
-
-            override fun onResponse(call: Call<List<Kerkly?>?>, response: retrofit2.Response<List<Kerkly?>?>) {
-
-                postlist = response.body() as ArrayList<Kerkly>
-                var size = 0
-
-                if (postlist!!.size > 0) {
-                   // if (postlist!!.size >= 4) {
-                     //   size = 4
-                    //} else {
-                      //  size = postlist!!.size
-                    //}
-
-
-                    for (i in 0 until postlist!!.size) {
-                        var latitudFinal = postlist!![i].latitud
-                        var longitudFinal = postlist!![i].longitud
-
-                        val url2 = instancias.CalcularDistancia(latitud,longitud,latitudFinal,longitudFinal)
-                        CalcularTiempoDistancia(context).execute(url2)
-                    }
-                }
-
-                adapter = AdapterKerkly(postlist!!)
-
-                adapter.setOnClickListener {
-                   // Log.d("curp", "Hora: " + postlist!![recyclerview.getChildAdapterPosition(it)].minutos)
-
-                    curp = postlist!![recyclerview.getChildAdapterPosition(it)].Curp
-
-                    //primero Mandamos la solicitud a un kerkly
-                    val telefoK =  postlist!![recyclerview.getChildAdapterPosition(it)].Telefonok
-                    System.out.println("el telefo del kerkly $telefoK")
-                    setProgress.setProgressDialog(this@KerklyListActivity)
-                    obtenerToken.obtenerTokenKerkly(uid, problema, nombreCliente, this@KerklyListActivity)
-                    enviarSolicitud()
-                }
-
-            }
-
-            override fun onFailure(call: Call<List<Kerkly?>?>, t: Throwable) {
-
-                Log.d("error del retrofit", t.toString())
-                Toast.makeText(applicationContext, t.toString(), Toast.LENGTH_LONG).show()
-            }
-        })
-    }*/
 
 
     @SuppressLint("SuspiciousIndentation")
@@ -202,8 +132,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         i2 = i2!! + 1
         val e = i2!! - 1
         System.out.println("valor de e : $e")
-       // postlist!![e].hora = (min / 60).toInt().toString()
-       // postlist!![e].minuto = (min % 60).toInt().toString()
+        // postlist!![e].hora = (min / 60).toInt().toString()
+        // postlist!![e].minuto = (min % 60).toInt().toString()
         var hora = (min / 60).toInt().toString()
         var minuto = (min % 60).toInt().toString()
         if (hora.toInt() == 0){
@@ -214,14 +144,16 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             postlist!![e].distancia = "Kerkly a $hora hora  y $minuto minutos de distancia"
 
         }
-      if (e == (postlist!!.size - 1)) {
-           /* postlist!!.sortBy {
-                it.distancia
-            }*/
-          recorrerLista()
-      }
+        if (e == (postlist!!.size - 1)) {
+            /* postlist!!.sortBy {
+                 it.distancia
+             }*/
+            recorrerLista()
+        }
         //System.out.println("Kerkly $e ${postlist!![e].distancia}")
     }
+
+
     fun recorrerLista (){
         for(i in 0 until postlist!!.size){
             //System.out.println(postlist!!.get(i).uidKerkly)
@@ -232,49 +164,51 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         setProgress.dialog.dismiss()
     }
     private fun ObtenerKerklyMasCercanos(){
-            // Muestra un ProgressDialog para indicar que se está cargando
-            var arrayListPoligonoColindantes: ArrayList<geom> = ArrayList()
-            //conexionPostgreSQL = conexionPostgreSQL()
-            val conexion = conexionPostgreSQL.obtenerConexion(this)
+        try {
+        val conexion = conexionPostgreSQL.obtenerConexion(this)
+        conexion.use {
+            // Llamada al método poligonoCircular con el callback
             if (conexion != null) {
-                // Llamada al método poligonoCircular con el callback
-                val secciones=  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0, )
-                val kerklysCercanos =  conexionPostgreSQL.Los5KerklyMasCercanos(secciones,longitud,latitud,oficio)
-                // Ahora kerklysCercanos contiene la lista de los 5 Kerklys más cercanos
-                if (kerklysCercanos.isEmpty()){
-                    showMessaje("Lo sentimos pero en esta área no se encuentran kerklys cercanos")
-                    setProgress.dialog.dismiss()
-                    val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                    b.putBoolean("PresupuestoListo", true)
-                    intent.putExtras(b)
-                    startActivity(intent)
-                    finish()
-                }else {
-                    postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
-                   // var cont = 0
-                    for (kerkly in kerklysCercanos.reversed()) {
-                       // println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
-                        //println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
+                val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0,)
+                if (secciones != null) {
+                    val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
+                    if (kerklysCercanos == null || kerklysCercanos.isEmpty()) {
                         conexionPostgreSQL.cerrarConexion()
-                       //  latitud = 17.520514
-                         //longitud = -99.463207
-                        val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
-                        CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
-                      //  cont++
-                        // MandarNoti(kerkly.uidKerkly, problema, nombreCliente)
+                        // Si no se encontraron Kerklys, imprimir un mensaje
+                        showMessaje("Lo sentimos, pero en esta área no se encuentran kerklys cercanos")
+                        setProgress.dialog.dismiss()
+                        //val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                       // b.putBoolean("PresupuestoListo", false)
+                       // intent.putExtras(b)
+                       // startActivity(intent)
+                       // finish()
+
+                    } else {
+                        postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
+                        for (kerkly in kerklysCercanos.reversed()){
+                            println("kerkly ----->id ${kerkly.idKerkly} ${kerkly.uidKerkly} ${kerkly.distancia}")
+                            conexionPostgreSQL.cerrarConexion()
+                            val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
+                            CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
+                        }
                     }
 
-                    //   insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
-                    //ingresarPresupuesto()
-                 //   setProgress.dialog.dismiss()
-
+                } else {
+                    // El objeto es null, manejarlo según sea necesario
+                    showMessaje("La lista de secciones es null")
+                    conexionPostgreSQL.cerrarConexion()
                 }
-
-            }else {
-                // Maneja el caso en el que la conexión no se pudo establecer
-                showMessaje("problemas de conexión  ")
-                setProgress.dialog.dismiss()
+            }else{
+                showMessaje("Problemas de conexión")
             }
+
+        }
+
+        } catch (e: Exception) {
+            // Maneja excepciones específicas según tu lógica de manejo de errores
+            e.printStackTrace()
+            showMessaje("Error: ${e.message}")
+        }
 
 
     }

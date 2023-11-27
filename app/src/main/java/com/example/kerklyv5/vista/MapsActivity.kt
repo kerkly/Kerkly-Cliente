@@ -148,6 +148,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         setLocation(latitud,longitud)
                     }else{*/
                     if (!band) {
+                        //val latitud = 17.536212
+                        //val longitud = -99.495486
                         val i = Intent(applicationContext, KerklyListActivity::class.java)
                         correoCliente = b.getString("correo").toString()
                         b.putString("correo", correoCliente)
@@ -468,7 +470,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                                                correo,
                                                TipoServicio,
                                                idKerklyAcepto,
-                             fechaHora,
+                                                fechaHora,
                                                latitud,
                                                longitud,false
                                            )
@@ -494,39 +496,43 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show()
     }
 
-    private fun PoligonosColindantes(latitud: Double, longitud: Double){
-        // Muestra un ProgressDialog para indicar que se está cargando
-        var arrayListPoligonoColindantes: ArrayList<geom> = ArrayList()
-         //conexionPostgreSQL = conexionPostgreSQL()
-        val conexion = conexionPostgreSQL.obtenerConexion(this)
-        if (conexion != null) {
-            // Llamada al método poligonoCircular con el callback
-          val secciones=  conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0 )
-            val kerklysCercanos =  conexionPostgreSQL.Los5KerklyMasCercanos(secciones,longitud,latitud,oficio)
-            // Ahora kerklysCercanos contiene la lista de los 5 Kerklys más cercanos
-            if (kerklysCercanos.isEmpty()){
-                showMessage("Lo sentimos pero en esta área no se encuentran kerklys cercanos")
-               // setProgress.dialog.dismiss()
-            }else {
-                println("foliooo en PoligonosColindantes ------> $folio")
-                for (kerkly in kerklysCercanos.reversed()) {
-                    println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
-                    println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
-                    conexionPostgreSQL.cerrarConexion()
-                    MandarNoti(kerkly.uidKerkly,problema,nombreCliente)
+    private fun PoligonosColindantes(latitud: Double, longitud: Double) {
+        try {
+            // Muestra un ProgressDialog para indicar que se está cargando
+            var arrayListPoligonoColindantes: ArrayList<geom> = ArrayList()
+
+            val conexion = conexionPostgreSQL.obtenerConexion(this)
+            conexion.use { // Esto garantiza que la conexión se cierre correctamente al salir del bloque
+                if (conexion != null) {
+                    val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0)
+                    val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
+
+                    if (kerklysCercanos == null || kerklysCercanos.isEmpty()) {
+                        showMessage("Lo sentimos, pero en esta área no se encuentran kerklys cercanos")
+                        conexionPostgreSQL.cerrarConexion()
+                    } else {
+                        println("foliooo en PoligonosColindantes ------> $folio")
+                        for (kerkly in kerklysCercanos.reversed()) {
+                            println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
+                            println("Coordenadas: Latitud ${kerkly.latitud}, Longitud ${kerkly.longitud}")
+                            MandarNoti(kerkly.uidKerkly, problema, nombreCliente)
+                        }
+                        // insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
+                        conexionPostgreSQL.cerrarConexion()
+                    }
+                } else {
+                    // Maneja el caso en el que la conexión no se pudo establecer
+                    showMessage("Problemas de conexión")
                 }
-             //   insertarSolicitudFirebaseUrgente("0",problema,correoCliente,oficio,"",cur,,,)
-               // setProgress.dialog.dismiss()
-
             }
+        } catch (e: Exception) {
+            // Maneja excepciones específicas según tu lógica de manejo de errores
+            e.printStackTrace()
+            showMessage("Error: ${e.message}")
 
-        }else {
-            // Maneja el caso en el que la conexión no se pudo establecer
-            showMessage("problemas de conexión  ")
-            //setProgress.dialog.dismiss()
         }
-
     }
+
 
     private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String){
         currentUser = mAuth!!.currentUser

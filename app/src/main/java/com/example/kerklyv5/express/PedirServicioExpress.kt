@@ -410,10 +410,10 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             try {
                 val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0)
                 val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
-                if (kerklysCercanos.isEmpty()) {
+                if (kerklysCercanos?.isEmpty() == true) {
                     ShowMensaje("Lo Sentimos pero en esta área no se encuentran kerklys cercanos")
                 } else {
-                    for (kerkly in kerklysCercanos.reversed()) {
+                    for (kerkly in kerklysCercanos?.reversed()!!) {
                         conexionPostgreSQL.cerrarConexion()
                         MandarNoti(kerkly.uidKerkly, problematica, "$nombre $apellidoP $apellidoM")
                     }
