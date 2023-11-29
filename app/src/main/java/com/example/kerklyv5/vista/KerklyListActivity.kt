@@ -184,7 +184,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                        // finish()
 
                     } else {
-                        postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
+                       // postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
+                        postlist = ArrayList(kerklysCercanos.reversed())
+
                         for (kerkly in kerklysCercanos.reversed()){
                             println("kerkly ----->id ${kerkly.idKerkly} ${kerkly.uidKerkly} ${kerkly.distancia}")
                             conexionPostgreSQL.cerrarConexion()

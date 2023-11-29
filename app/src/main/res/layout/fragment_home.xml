@@ -9,11 +9,10 @@
     tools:context=".ui.home.HomeFragment">
 
     <ScrollView
+        android:id="@+id/scrollViewHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,20 +45,6 @@
                 android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
-                <!--     <AutoCompleteTextView
-                      android:id="@+id/inputProblematica"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_margin="16dp" /> -->
-
-                  <!--   <EditText
-                         android:id="@+id/inputProblematica"
-                         android:layout_width="match_parent"
-                         android:layout_height="110dp"
-                         android:hint="Escribe la problematica... "
-                         android:inputType="textMultiLine"/>
-
-                         -->
                     <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/layoutProblematica"
                             android:layout_width="match_parent"
@@ -119,12 +104,6 @@
                              android:background="@drawable/spinner_style"
                              android:entries="@array/oficios"
                              tools:ignore="TouchTargetSizeCheck" />
-
-
-                       <!--  <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/recycler_oficios"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent" /> -->
 
                <com.google.android.material.button.MaterialButton
                    android:id="@+id/boton_Oficios"

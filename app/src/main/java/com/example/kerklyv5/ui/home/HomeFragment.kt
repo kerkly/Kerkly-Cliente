@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
@@ -11,11 +12,15 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
@@ -57,6 +62,7 @@ class HomeFragment : Fragment(){
     private var textoAnterior: String = ""
     // Declarar la lista de palabras asociadas fuera del método
     val listaPalabrasAsociadas = mutableListOf<String>()
+    private lateinit var scrollview: ScrollView
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -74,6 +80,8 @@ class HomeFragment : Fragment(){
         boton_servicioUrgente = root.findViewById(R.id.boton_servicio_urgente)
         //imageboton = root.findViewById(R.id.kerkly_boton)
        // btnfiltro = root.findViewById(R.id.filtrohome)
+
+        scrollview =  root.findViewById(R.id.scrollViewHome)
         obtenerOficiosDB()
         botonPresupuesto.setOnClickListener {
             val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -125,6 +133,22 @@ class HomeFragment : Fragment(){
             }
         }
         listaTextos = ArrayList()
+        textProblem.setOnClickListener {
+            // Desplaza el ScrollView hacia arriba cuando se hace clic en el TextView
+            scrollview.post {
+                scrollview.fullScroll(View.FOCUS_UP)
+            }
+        }
+
+// Agrega un listener al ScrollView para manejar el evento de desplazamiento
+      /*  scrollview.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                // Ajusta la altura del ScrollView al tamaño de la pantalla
+                scrollview.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                return true
+            }
+        })*/
+
         textProblem.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 println("beforeTextChanged $p0")
