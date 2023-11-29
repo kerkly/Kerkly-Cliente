@@ -35,6 +35,7 @@ import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.url.Instancias
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.firebase.database.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
@@ -75,12 +76,18 @@ class MainActivityChats : AppCompatActivity() {
     private lateinit var databaseReferenceCliente: DatabaseReference
     private lateinit var databaseReferenceKerkly:DatabaseReference
     private lateinit var fotoCliente:String
+    private lateinit var fotoKerkly:String
     private lateinit var uidCliente:String
     private lateinit var uidKerkly:String
     private lateinit var Noti:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_chats)
+        var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
+        firebaseMessaging.addOnCompleteListener {
+            //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+        }
+
         instancias = Instancias()
         boton = findViewById(R.id.boton_chat)
         editText = findViewById(R.id.editTextChat)
@@ -94,18 +101,20 @@ class MainActivityChats : AppCompatActivity() {
 
          nombreKerkly = b.getString("nombreCompletoK").toString()
         nombreCompletoCliente = b.getString("nombreCompletoCliente")!!
-       // val correoKerkly = b.getString("correoK")
+        fotoKerkly = b!!.getString("urlFotoKerkly").toString()
+        fotoCliente = b.getString("urlFotoCliente").toString()
          telefonoKerkly = b.getString("telefonok").toString()
          telefonoCliente = b!!.getString("telefonoCliente").toString()
-         fotoCliente = b!!.getString("urlFotoKerkly").toString()
+
         tokenKerkly = b!!.getString("tokenKerkly").toString()
         tokenCliente = b!!.getString("tokenCliente").toString()
         uidCliente = b!!.getString("uidCliente").toString()
         uidKerkly = b!!.getString("uidKerkly").toString()
         Noti = b.getString("Noti").toString()
-        println("uid Cliente $uidCliente uidKerkly $uidKerkly")
-        println("aquii---> Nombre k $nombreKerkly Cliente $nombreCompletoCliente telek $telefonoKerkly")
-        val photoUrl = Uri.parse(fotoCliente)
+        //println("uid Cliente $uidCliente uidKerkly $uidKerkly")
+        //println("aquii---> Nombre k $nombreKerkly Cliente $nombreCompletoCliente telek $telefonoKerkly")
+
+        val photoUrl = Uri.parse(fotoKerkly)
         Picasso.get().load(photoUrl).into(object : com.squareup.picasso.Target {
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 System.out.println("Respuesta 1 ")
@@ -281,7 +290,6 @@ class MainActivityChats : AppCompatActivity() {
         progressBar= findViewById(R.id.progressBar)
         imageButtonSeleccionarArchivo.setOnClickListener {
             SeleccionarArchivo()
-
         }
 
 
@@ -482,25 +490,6 @@ class MainActivityChats : AppCompatActivity() {
         dialog.show()
     }
 
-    private suspend fun showPdfPage(pageIndex: Int) {
-        withContext(Dispatchers.IO) {
-            val page: PdfRenderer.Page = pdfRenderer.openPage(pageIndex)
-
-            val bitmap: Bitmap = Bitmap.createBitmap(
-                page.width,
-                page.height,
-                Bitmap.Config.ARGB_8888
-            )
-
-            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-
-            withContext(Dispatchers.Main) {
-                imagenCompleta.setImageBitmap(bitmap)
-            }
-
-            page.close()
-        }
-    }
 
     fun getRuta(NOMBRE_DIRECTORIO: String): File? {
         // El fichero sera almacenado en un directorio dentro del directorio
@@ -517,13 +506,6 @@ class MainActivityChats : AppCompatActivity() {
                 println("El directorio de descargas no existe")
                 ruta.mkdirs()
             }
-            /*   if (ruta != null) {
-                    if (!ruta.mkdirs()) {
-                        if (!ruta.exists()) {
-                            return null
-                        }
-                    }
-                }*/
         }
         return ruta
     }
@@ -549,10 +531,6 @@ class MainActivityChats : AppCompatActivity() {
     }
     @SuppressLint("SimpleDateFormat")
     private fun getTime(): String {
-       // val formatter = SimpleDateFormat("HH:mm")
-        //val curDate = Date(System.currentTimeMillis())
-        // Obtener la hora actual
-        //val str: String = formatter.format(curDate)
         val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
         return currentDateTimeString
     }
@@ -621,12 +599,12 @@ class MainActivityChats : AppCompatActivity() {
     private fun EnviarArchivo(uriArchivo: Uri, tipoArchivo: String){
         val nombreArchivo: String = obtenerNombreArchivo(uriArchivo)
         // Obtén una referencia al storage de Firebase
-        val storageRef = FirebaseStorage.getInstance().reference
+        val storageRef = instancias.storageRef
         // Crea un nombre de archivo único para evitar conflictos
-        val filename = nombreArchivo
+       // val filename = nombreArchivo
       /*  val fileRef = storageRef.child("UsuariosR").child(telefonoCliente.toString()).child("chats")
             .child("$telefonoCliente"+"_"+"$telefonoKerkly").child(filename)*/
-        val fileRef = instancias.EnviarArchivoStorageReference(uidCliente,uidKerkly,filename)
+        val fileRef = instancias.EnviarArchivoStorageReference(uidCliente,uidKerkly,nombreArchivo)
 
         if (tipoArchivo == "pdf"){
             println("nombre del archivo " + nombreArchivo)
@@ -646,7 +624,9 @@ class MainActivityChats : AppCompatActivity() {
                         // Guarda la URL del archivo en Firebase Realtime Database
                         //val databaseRef = FirebaseDatabase.getInstance().reference
                         val fileUrl = uri.toString()
-                        databaseReferenceKerkly.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        val databaseReference = instancias.referenciaChatsKerkly(uidKerkly, uidCliente)
+                        databaseReference.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                        val databaseReferenceCliente =  instancias.referenciaChatscliente(uidCliente,uidKerkly)
                         databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.chats(this,tokenKerkly, nombreArchivo, nombreCompletoCliente,
@@ -656,7 +636,6 @@ class MainActivityChats : AppCompatActivity() {
                     }
             }
         }else{
-            // Carga el archivo PDF en Firebase Storage
             val uploadTask = fileRef.putFile(uriArchivo)
             // Registra un Listener para obtener la URL del archivo una vez cargado
             uploadTask.addOnProgressListener {taskSnapshot ->
@@ -672,7 +651,9 @@ class MainActivityChats : AppCompatActivity() {
                         // Guarda la URL del archivo en Firebase Realtime Database
                         //val databaseRef = FirebaseDatabase.getInstance().reference
                         val fileUrl = uri.toString()
+                        val databaseReferenceKerkly =  instancias.referenciaChatsKerkly(uidKerkly,uidCliente)
                         databaseReferenceKerkly.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
+                       val databaseReferenceCliente = instancias.referenciaChatscliente(uidCliente,uidKerkly)
                         databaseReferenceCliente.push().setValue(Mensaje(nombreArchivo, getTime(),"",fileUrl,tipoArchivo))
                         storageRef.child("$tipoArchivo").child(fileUrl)
                         llamartopico.chats(this,tokenKerkly, nombreArchivo, nombreCompletoCliente,
@@ -705,22 +686,20 @@ class MainActivityChats : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (Noti == "Noti"){
-            val intent = Intent(this, SolicitarServicio::class.java)
-            intent.putExtra("Telefono", telefonoCliente)
-            startActivity(intent)
-            finish()
-        }
+
         if ( imagenCompleta.visibility == View.VISIBLE){
             imagenCompleta.visibility = View.GONE
             // Liberar la referencia a la imagen en imageView
             imagenCompleta?.setImageDrawable(null)
             //imagenCompleta = null
 
-            // Llamar al onBackPressed de la clase base
-         //   super.onBackPressed()
-
     }else{
+            if (Noti == "Noti"){
+                val intent = Intent(this, SolicitarServicio::class.java)
+                intent.putExtra("Telefono", telefonoCliente)
+                startActivity(intent)
+                finish()
+            }
             if (childEventListener == null || childEventListener2 == null){
                 //  Toast.makeText(applicationContext, "null el childEventListener", Toast.LENGTH_SHORT).show()
             }else {

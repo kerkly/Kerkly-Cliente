@@ -34,20 +34,22 @@ class FirebaseNoti: FirebaseMessagingService() {
             val titulo: String = message.getData().get("titulo")!!
             val detalle: String = message.getData().get("detalle")!!
             val tipoNoti: String = message.getData().get("tipoNoti")!!
-            print("aquii---> $tipoNoti")
+            //print("aquii---> $tipoNoti")
             if (tipoNoti == "chats"){
                 val nombreKerkly: String = message.getData().get("nombreCompletoK")!!
                 val nombreCliente: String = message.getData().get("nombreCompletoCliente")!!
                 val telefonoKerkly: String = message.getData().get("telefonok")!!
                 val telefonoCliente: String = message.getData().get("telefonoCliente")!!
                 val fotoKerkly: String = message.getData().get("urlFotoKerkly")!!
+                val fotoCliente: String = message.getData().get("urlFotoCliente")!!
                 val tokenKerkly: String = message.getData().get("tokenKerkly")!!
                 val tokenCliente: String = message.getData().get("tokenCliente")!!
                 val uidCliente: String = message.getData().get("uidCliente")!!
                 val uidKerkly: String = message.getData().get("uidKerkly")!!
 
+
                 TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
-                    ,fotoKerkly,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
+                    ,fotoKerkly,fotoCliente,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
             }
             if (tipoNoti =="llamarTopicSolicitud"){
                 val tipoSolicitud = message.getData().get("TipoDeSolicitud")
@@ -110,7 +112,7 @@ class FirebaseNoti: FirebaseMessagingService() {
     }
 
     private fun TraerNotificacion(titulo: String, detalle: String, nombreKerkly: String, nombreCliente: String
-                                  , telefonoKerkly: String,telefonoCliente:String, fotoKerkly: String, tokenKerkly: String, tokenCliente: String
+                                  , telefonoKerkly: String,telefonoCliente:String, fotoKerkly: String, fotoCliente:String, tokenKerkly: String, tokenCliente: String
                                   , uidCliente: String, uidKerkly: String) {
         val id = "mensajeCliente"
         val id2 = id.hashCode()
@@ -137,7 +139,7 @@ class FirebaseNoti: FirebaseMessagingService() {
                 .setSmallIcon(R.drawable.archivos)
                 .setContentText(detalle)
                 .setContentIntent(clicknoti(nombreKerkly, nombreCliente
-                    , telefonoKerkly,telefonoCliente, fotoKerkly, tokenKerkly, tokenCliente
+                    , telefonoKerkly,telefonoCliente, fotoKerkly,fotoCliente, tokenKerkly, tokenCliente
                     , uidCliente, uidKerkly))
                 .setContentInfo("nuevo")
             // val random = Random()
@@ -150,7 +152,7 @@ class FirebaseNoti: FirebaseMessagingService() {
     }
 
     private fun clicknoti(nombreKerkly: String, nombreCliente: String
-                          , telefonoKerkly: String,telefonoCliente: String, fotoKerkly: String, tokenKerkly: String, tokenCliente: String
+                          , telefonoKerkly: String,telefonoCliente: String, fotoKerkly: String,fotoCliente: String, tokenKerkly: String, tokenCliente: String
                           , uidCliente: String, uidKerkly: String): PendingIntent? {
 
 
@@ -165,11 +167,16 @@ class FirebaseNoti: FirebaseMessagingService() {
         nf.putExtra("telefonok", telefonoKerkly)
         nf.putExtra("telefonoCliente",telefonoCliente)
         nf.putExtra("urlFotoKerkly", fotoKerkly)
+        nf.putExtra("urlFotoCliente", fotoCliente)
         nf.putExtra("tokenKerkly", tokenKerkly)
         nf.putExtra("tokenCliente", tokenCliente)
         nf.putExtra("uidCliente", uidCliente)
         nf.putExtra("uidKerkly", uidKerkly)
         nf.putExtra("Noti", "Noti")
+
+        println("url cliente $fotoCliente")
+
+        println("url kerkly $fotoKerkly")
 
         nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0

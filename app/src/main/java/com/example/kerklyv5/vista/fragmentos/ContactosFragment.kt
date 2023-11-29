@@ -173,6 +173,7 @@ class ContactosFragment : Fragment() {
                                 b!!.putString("nombreCompletoCliente", nombreCliente)
                               //  Toast.makeText(requireContext(),"$token",Toast.LENGTH_SHORT).show()
                                 b!!.putString("urlFotoKerkly",urlfoto)
+                                b!!.putString("urlFotoCliente",fotoCliente)
                                 b!!.putString("uidCliente",uidCliente)
                                 b!!.putString("uidKerkly",uidKerkly)
 
