@@ -169,7 +169,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         conexion.use {
             // Llamada al método poligonoCircular con el callback
             if (conexion != null) {
-                val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0,)
+                val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 1000.0,)
                 if (secciones != null) {
                     val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
                     if (kerklysCercanos == null || kerklysCercanos.isEmpty()) {
@@ -191,15 +191,18 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                             val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
                             CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
                         }
+                        setProgress.dialog.dismiss()
                     }
 
                 } else {
                     // El objeto es null, manejarlo según sea necesario
                     showMessaje("La lista de secciones es null")
                     conexionPostgreSQL.cerrarConexion()
+                    setProgress.dialog.dismiss()
                 }
             }else{
                 showMessaje("Problemas de conexión")
+                setProgress.dialog.dismiss()
             }
 
         }
@@ -208,6 +211,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             // Maneja excepciones específicas según tu lógica de manejo de errores
             e.printStackTrace()
             showMessaje("Error: ${e.message}")
+            setProgress.dialog.dismiss()
         }
 
 

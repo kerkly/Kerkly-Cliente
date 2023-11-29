@@ -57,65 +57,62 @@ class conexionPostgreSQL {
         return listaDeSecciones
     }
 
-    fun Los5KerklyMasCercanos(idPoligonosUsuario: ArrayList<geom>, longitudUsuario: Double, latitudUsuario: Double,oficio: String): MutableList<Kerkly>? {
-     //  val latitudUsuario =  17.520514
-      //  val longitudUsuario = -99.463207
-        println("lat $latitudUsuario")
-        println("lon $longitudUsuario")
+    fun Los5KerklyMasCercanos(
+        idPoligonosUsuario: ArrayList<geom>,
+        longitudUsuario: Double,
+        latitudUsuario: Double,
+        oficio: String
+    ): MutableList<Kerkly>? {
         val kerklysCercanos = mutableListOf<Kerkly>()
 
         for (idPoligono in idPoligonosUsuario) {
-            val consultaKerklySQL = "SELECT \"curp\", \"uidKerkly\", ST_X(ubicacion::geometry) AS longitud, ST_Y(ubicacion::geometry) AS latitud, \n" +
-                    "ST_Distance(ubicacion::geometry, ST_SetSRID(ST_Point(?, ?)::geometry, 4326)) AS distancia\n" +
-                    "FROM \"oficio_kerkly\"\n" +
-                    "INNER JOIN \"Oficios\" ON \"Oficios\".\"idOficio\"::numeric = \"oficio_kerkly\".\"idOficioK\"::numeric\n" +
-                    "INNER JOIN \"KerklyEnMovimiento\" ON \"KerklyEnMovimiento\".\"curp\" = \"oficio_kerkly\".\"idKerklyK\"\n" +
-                    "WHERE \"IdPoligono\" = ?\n" +
-                    "AND \"Oficios\".\"nombreO\" = ?\n" +
-                    "ORDER BY distancia ASC\n" +
-                    "LIMIT 5"
+            val consultaKerklySQL =
+                "SELECT \"curp\", \"uidKerkly\",\n" +
+                        "    ST_X(ubicacion::geometry)  AS longitud,\n" +
+                        "    ST_Y(ubicacion::geometry)  AS latitud,\n" +
+                        "   ST_Distance(ubicacion::geometry, ST_SetSRID(ST_Point(?, ?)::geometry, 4326)) AS distancia \n" +
+                        "FROM \"KerklyEnMovimiento\"\n" +
+                        "INNER JOIN \"oficios_kerklyM\"  ON \"curp\" = \"id_kerklyK\"\n" +
+                        "INNER JOIN \"Oficios\" ON \"id_oficioK\"::numeric = \"idOficio\"::numeric\n" +
+                        "WHERE \"IdPoligono\" = ? AND \"nombreO\" = ?\n" +
+                        "ORDER BY distancia ASC\n" +
+                        "LIMIT 5"
 
-            println("idpoligono ${idPoligono.id_0}")
+
             val preparedStatement = conexion?.prepareStatement(consultaKerklySQL)
             preparedStatement?.setDouble(1, longitudUsuario)
             preparedStatement?.setDouble(2, latitudUsuario)
             preparedStatement?.setInt(3, idPoligono.id_0)
-            preparedStatement?.setString(4,oficio.toString())
+            preparedStatement?.setString(4, oficio)
 
             val resultSetKerkly = preparedStatement?.executeQuery()
-            while (resultSetKerkly?.next()   == true){
-                val idKerkly = resultSetKerkly?.getString("curp")
-                val uidKerkly = resultSetKerkly?.getString("uidKerkly")
-                val distancia = resultSetKerkly?.getDouble("distancia").toString()
-                val longitud = resultSetKerkly?.getDouble("longitud")
-                val latitud = resultSetKerkly?.getDouble("latitud")
-                println("distancia $uidKerkly $idKerkly $distancia  $latitud $longitud")
-            }
+
             // Verificar si no se encontraron resultados
-            if (resultSetKerkly == null || !resultSetKerkly.next()) {
-                println("No se encontraron Kerklys cercanos para el polígono y oficio dados.")
-                return null
-            } else {
-                // Continuar con el procesamiento de los resultados encontrados
+            if (resultSetKerkly != null && resultSetKerkly.next()) {
                 do {
                     val idKerkly = resultSetKerkly.getString("curp")
                     val uidKerkly = resultSetKerkly.getString("uidKerkly")
                     val distancia = resultSetKerkly.getDouble("distancia").toString()
                     val longitud = resultSetKerkly.getDouble("longitud")
                     val latitud = resultSetKerkly.getDouble("latitud")
+
+                    println("idpoligono ${idPoligono.id_0}")
                     println("distancia $uidKerkly $idKerkly $distancia  $latitud $longitud")
-                    // Obtener las coordenadas como un String en formato "POINT(longitud latitud)"
-                    // val coordenadasStr = resultSetKerkly.getString("coordenadas")
-                    // Extraer las coordenadas de la cadena
+
                     val kerkly = Kerkly(idKerkly, uidKerkly, distancia, latitud, longitud)
                     kerklysCercanos.add(kerkly)
                 } while (resultSetKerkly.next())
+            } else {
+                println("idpoligono ${idPoligono.id_0}")
+                println("No se encontraron Kerklys cercanos para el polígono y oficio dados.")
+
             }
         }
 
         // Devolver null si no se encontraron Kerklys cercanos
-        return kerklysCercanos
+        return  kerklysCercanos
     }
+
 
 
 }
