@@ -75,7 +75,7 @@ class FirebaseNoti: FirebaseMessagingService() {
         val builder = NotificationCompat.Builder(this, id.toString())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val nc = NotificationChannel(id, "nuevoCliente", NotificationManager.IMPORTANCE_HIGH)
+            val nc = NotificationChannel(id, "solicitudAceptada", NotificationManager.IMPORTANCE_HIGH)
             nc.setShowBadge(true)
             assert(nm != null)
             nm!!.createNotificationChannel(nc)
@@ -111,9 +111,10 @@ class FirebaseNoti: FirebaseMessagingService() {
         return PendingIntent.getActivity(this, 0, nf, flags)
     }
 
-    private fun TraerNotificacion(titulo: String, detalle: String, nombreKerkly: String, nombreCliente: String
-                                  , telefonoKerkly: String,telefonoCliente:String, fotoKerkly: String, fotoCliente:String, tokenKerkly: String, tokenCliente: String
-                                  , uidCliente: String, uidKerkly: String) {
+    private fun TraerNotificacion(titulo: String, detalle: String, nombreKerkly: String,
+                                  nombreCliente: String, telefonoKerkly: String,telefonoCliente:String,
+                                  fotoKerkly: String, fotoCliente:String, tokenKerkly: String,
+                                  tokenCliente: String, uidCliente: String, uidKerkly: String) {
         val id = "mensajeCliente"
         val id2 = id.hashCode()
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -126,13 +127,6 @@ class FirebaseNoti: FirebaseMessagingService() {
             nm!!.createNotificationChannel(nc)
         }
         try {
-            //Bitmap imf_foto= Picasso.get(getApplicationContext()).load(foto).get();
-            //   Picasso.get().load(user.getPhotoUrl()).placeholder(R.drawable.iconoperito).into(img);
-            //val imf_foto = Picasso.get().load(foto).get()
-
-            /*   val iconResId = applicationContext.resources.getIdentifier(
-                   icono, "drawable", applicationContext.packageName
-               )*/
             builder.setAutoCancel(true)
                 .setWhen(System.currentTimeMillis())
                 .setContentTitle(titulo)
@@ -154,7 +148,6 @@ class FirebaseNoti: FirebaseMessagingService() {
     private fun clicknoti(nombreKerkly: String, nombreCliente: String
                           , telefonoKerkly: String,telefonoCliente: String, fotoKerkly: String,fotoCliente: String, tokenKerkly: String, tokenCliente: String
                           , uidCliente: String, uidKerkly: String): PendingIntent? {
-
 
         val nf = Intent(applicationContext, MainActivityChats::class.java)
         //val pendingIntent : PendingIntent = PendingIntent.getActivity(applicationContext, 0, nf, flags)

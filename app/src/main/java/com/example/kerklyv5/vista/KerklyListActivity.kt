@@ -6,9 +6,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.Toast
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kerklyv5.BaseDatosEspacial.Kerkly
@@ -73,6 +77,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     private lateinit var direccion:String
     private lateinit var telefonoCliente:String
     private lateinit var Curp:String
+    private var handler: Handler? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kerkly_list)
@@ -105,6 +110,8 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         recyclerview.layoutManager = LinearLayoutManager(context)
         recyclerview.adapter = Miadapter
 
+
+        Log.d("kerklylist ", "Ubicacion kerklylist, $latitud, $longitud")
         Miadapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
@@ -116,7 +123,14 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         oficio = b.getString("Oficio").toString()
         problema = b.get("Problema").toString()
 
-        ObtenerKerklyMasCercanos()
+        val handlerThread = HandlerThread("obtenerKerklyNormal")
+        handlerThread.start()
+        handler = Handler(handlerThread.looper)
+        handler?.post({
+            ObtenerKerklyMasCercanos()
+        })
+
+
     }
     private fun setScrollBar() {
         recyclerview.scrollToPosition(Miadapter.itemCount-1)
@@ -177,23 +191,23 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                         // Si no se encontraron Kerklys, imprimir un mensaje
                         showMessaje("Lo sentimos, pero en esta área no se encuentran kerklys cercanos")
                         setProgress.dialog.dismiss()
-                        //val intent = Intent(applicationContext, SolicitarServicio::class.java)
-                       // b.putBoolean("PresupuestoListo", false)
-                       // intent.putExtras(b)
-                       // startActivity(intent)
-                       // finish()
-
+                       /* val intent = Intent(applicationContext, SolicitarServicio::class.java)
+                        b.putBoolean("PresupuestoListo", false)
+                        intent.putExtras(b)
+                        startActivity(intent)
+                        finish()*/
+                        handler?.looper?.quitSafely()
                     } else {
                        // postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
                         postlist = ArrayList(kerklysCercanos.reversed())
-
                         for (kerkly in kerklysCercanos.reversed()){
-                            println("kerkly ----->id ${kerkly.idKerkly} ${kerkly.uidKerkly} ${kerkly.distancia}")
+                            //println("kerkly ----->id ${kerkly.idKerkly} ${kerkly.uidKerkly} ${kerkly.distancia}")
                             conexionPostgreSQL.cerrarConexion()
                             val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
                             CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
                         }
                         setProgress.dialog.dismiss()
+                        handler?.looper?.quitSafely()
                     }
 
                 } else {
@@ -201,10 +215,12 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
                     showMessaje("La lista de secciones es null")
                     conexionPostgreSQL.cerrarConexion()
                     setProgress.dialog.dismiss()
+                    handler?.looper?.quitSafely()
                 }
             }else{
                 showMessaje("Problemas de conexión")
                 setProgress.dialog.dismiss()
+                handler?.looper?.quitSafely()
             }
 
         }
@@ -214,6 +230,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
             e.printStackTrace()
             showMessaje("Error: ${e.message}")
             setProgress.dialog.dismiss()
+            handler?.looper?.quitSafely()
         }
 
 
@@ -375,5 +392,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     }
     fun showMessaje(mensaje:String){
         Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 }
