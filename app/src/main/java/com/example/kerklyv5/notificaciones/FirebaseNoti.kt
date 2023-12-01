@@ -106,9 +106,13 @@ class FirebaseNoti: FirebaseMessagingService() {
         nf.putExtra("uidCliente",uidCliente)
         nf.putExtra("Noti", "Noti")
 
-        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-        return PendingIntent.getActivity(this, 0, nf, flags)
+
+        // nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val uniqueId = uidCliente.hashCode() // Puedes cambiar esto según tus necesidades
+        return PendingIntent.getActivity(applicationContext, uniqueId, nf, flags)
     }
 
     private fun TraerNotificacion(titulo: String, detalle: String, nombreKerkly: String,
@@ -171,9 +175,13 @@ class FirebaseNoti: FirebaseMessagingService() {
 
         println("url kerkly $fotoKerkly")
 
-        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        val flags = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-        return PendingIntent.getActivity(this, 0, nf, flags)
+
+        // nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val uniqueId = uidKerkly.hashCode() // Puedes cambiar esto según tus necesidades
+        return PendingIntent.getActivity(applicationContext, uniqueId, nf, flags)
 
     }
 

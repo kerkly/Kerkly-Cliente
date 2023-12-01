@@ -89,6 +89,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var mAuth: FirebaseAuth? = null
     private var currentUser: FirebaseUser? = null
     private var handler: Handler? = null
+   // private lateinit var Noti:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -384,29 +385,36 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 val geocoder: Geocoder
                 val direccion: List<Address>
                 geocoder = Geocoder(this, Locale.getDefault())
-                direccion = geocoder.getFromLocation(latitud, longitud, 1)!! // 1 representa la cantidad de resultados a obtener
-                //val address = direccion[0].getAddressLine(0) // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                //Toast.makeText(this, "Entroooo ${direccion[0].locality}", Toast.LENGTH_SHORT).show()
-                if (direccion[0].locality == null || direccion[0].subLocality == null || direccion[0].thoroughfare == null){
-                  //  Toast.makeText(this, "Entroooo ${direccion[0].postalCode}", Toast.LENGTH_SHORT).show()
-                    pais = direccion[0].countryName
-                    estado = direccion[0].adminArea
-                    ciudad = "Sin nombre"
-                    colonia = "Sin nombre"
-                    calle = "Sin Nombre"
-                    cp = "NULL"
-                    num_ext = "Sin número"
-                    Direccion = "$calle $colonia $num_ext $cp"
-                }else{
-                    ciudad = direccion[0].locality // ciudad
-                    estado = direccion[0].adminArea //estado
-                    pais = direccion[0].countryName // pais
-                    cp = direccion[0].postalCode //codigo Postal
-                    calle = direccion[0].thoroughfare // la calle
-                    colonia =  direccion[0].subLocality// colonia
-                    num_ext = direccion[0].subThoroughfare
-                    Direccion = "$calle $colonia $num_ext $cp"
+                direccion = geocoder.getFromLocation(latitud, longitud, 1)!!
+
+                // Verificar si hay al menos un resultado
+                if (direccion.isNotEmpty()) {
+                    val address = direccion[0]
+
+                    if (address.locality == null || address.subLocality == null || address.thoroughfare == null) {
+                        pais = address.countryName
+                        estado = address.adminArea
+                        ciudad = "Sin nombre"
+                        colonia = "Sin nombre"
+                        calle = "Sin Nombre"
+                        cp = "NULL"
+                        num_ext = "Sin número"
+                        Direccion = "$calle $colonia $num_ext $cp"
+                    } else {
+                        ciudad = address.locality // ciudad
+                        estado = address.adminArea //estado
+                        pais = address.countryName // pais
+                        cp = address.postalCode //codigo Postal
+                        calle = address.thoroughfare // la calle
+                        colonia =  address.subLocality// colonia
+                        num_ext = address.subThoroughfare
+                        Direccion = "$calle $colonia $num_ext $cp"
+                    }
+                } else {
+                    // Manejar el caso cuando no hay resultados de la geolocalización
+                    // ...
                 }
+
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -513,6 +521,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
        // llamarTopico.llamarTopicEnviarSolicitudUrgente(this, tokenKerkly, problema,nombreCliente, folio)
        // showMessaje("todo bien CURP: $uid")
     }
+
+
 
 }
 

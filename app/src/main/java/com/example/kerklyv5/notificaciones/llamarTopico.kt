@@ -225,7 +225,7 @@ class llamarTopico {
         val json = JSONObject()
         try {
             //  val token = "fNBcaF1mT2qEj9KexMEduK:APA91bGPhunaVKF8eBITrArKl_G_5qvl-ZLAOPzsBxhEZaNXH-MqmrISayZDxVt1FjzdU-qXPECesJ2IvhPM-f1lgo6786bANQT_apL2iMhV2DV5k1Uw9YYp1_m_5qcT8IfaW4QETJE_"
-            json.put("to", "/$token/" + "EnviarNoti")
+            json.put("to", "/$token/" + "EnviarNoti$Folio")
             val notificacion = JSONObject()
             notificacion.put("tipoNoti","llamarTopicEnviarSolicitudNormal")
             notificacion.put("titulo", Titulo)
@@ -244,6 +244,8 @@ class llamarTopico {
             notificacion.put("correoKerkly",correoCliente)
             notificacion.put("nombreCompletoKerkly", NombreKerkly)
             notificacion.put("uidCliente",uidCliente)
+
+            println("Folio---> $Folio, coordenadas $latitud $longitud")
 
             json.put("data", notificacion)
             val URL = "https://fcm.googleapis.com/fcm/send"

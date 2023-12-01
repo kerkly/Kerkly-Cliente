@@ -397,4 +397,6 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
     override fun onBackPressed() {
         finish()
     }
+
+
 }

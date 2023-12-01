@@ -33,6 +33,7 @@ import com.example.kerklyv5.modelo.Mensaje
 import com.example.kerklyv5.modelo.MensajeCopia
 import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.url.Instancias
+import com.example.kerklyv5.vista.PantallaInicio
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
@@ -695,8 +696,8 @@ class MainActivityChats : AppCompatActivity() {
 
     }else{
             if (Noti == "Noti"){
-                val intent = Intent(this, SolicitarServicio::class.java)
-                intent.putExtra("Telefono", telefonoCliente)
+                val intent = Intent(this, PantallaInicio::class.java)
+                //intent.putExtra("Telefono", telefonoCliente)
                 startActivity(intent)
                 finish()
             }
