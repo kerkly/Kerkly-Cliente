@@ -521,9 +521,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
        // llamarTopico.llamarTopicEnviarSolicitudUrgente(this, tokenKerkly, problema,nombreCliente, folio)
        // showMessaje("todo bien CURP: $uid")
     }
-
-
-
 }
 
 

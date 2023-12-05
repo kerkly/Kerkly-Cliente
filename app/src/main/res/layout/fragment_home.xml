@@ -160,7 +160,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_presupuesto"
-                    android:layout_width="130dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:layout_weight="1"

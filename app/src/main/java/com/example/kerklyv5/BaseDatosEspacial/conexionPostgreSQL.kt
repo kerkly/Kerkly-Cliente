@@ -64,19 +64,22 @@ class conexionPostgreSQL {
         oficio: String
     ): MutableList<Kerkly>? {
         val kerklysCercanos = mutableListOf<Kerkly>()
+        val latitudUsuario  =17.544556
+            val longitudUsuario = -99.497408
 
         for (idPoligono in idPoligonosUsuario) {
             val consultaKerklySQL =
                 "SELECT \"curp\", \"uidKerkly\",\n" +
                         "    ST_X(ubicacion::geometry)  AS longitud,\n" +
                         "    ST_Y(ubicacion::geometry)  AS latitud,\n" +
-                        "   ST_Distance(ubicacion::geometry, ST_SetSRID(ST_Point(?, ?)::geometry, 4326)) AS distancia \n" +
+                        "    ST_Distance(ubicacion::geometry, ST_SetSRID(ST_Point(?, ?)::geometry, 4326)) AS distancia \n" +
                         "FROM \"KerklyEnMovimiento\"\n" +
                         "INNER JOIN \"oficios_kerklyM\"  ON \"curp\" = \"id_kerklyK\"\n" +
                         "INNER JOIN \"Oficios\" ON \"id_oficioK\"::numeric = \"idOficio\"::numeric\n" +
-                        "WHERE \"IdPoligono\" = ? AND \"nombreO\" = ?\n" +
-                        "ORDER BY distancia ASC\n" +
-                        "LIMIT 5"
+                        "WHERE \"IdPoligono\" = ? AND \"nombreO\" = ? AND \"on\" = ?\n"
+            "ORDER BY distancia ASC\n" +
+                    "LIMIT 5"
+
 
 
             val preparedStatement = conexion?.prepareStatement(consultaKerklySQL)
@@ -84,9 +87,9 @@ class conexionPostgreSQL {
             preparedStatement?.setDouble(2, latitudUsuario)
             preparedStatement?.setInt(3, idPoligono.id_0)
             preparedStatement?.setString(4, oficio)
+            preparedStatement?.setBoolean(5,true)
 
             val resultSetKerkly = preparedStatement?.executeQuery()
-
             // Verificar si no se encontraron resultados
             if (resultSetKerkly != null && resultSetKerkly.next()) {
                 do {
