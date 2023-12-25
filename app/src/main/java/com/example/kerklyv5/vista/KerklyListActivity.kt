@@ -104,6 +104,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         direccion = b.getString("direccion").toString()
         telefonoCliente = b.getString("telefonoCliente").toString()
         Curp = b.getString("Curp").toString()
+
         Miadapter = adapterUsuariosCercanos(this)
         recyclerview = findViewById(R.id.recycler_UsuariosPerfil)
         recyclerview.setHasFixedSize(true)
@@ -126,11 +127,19 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         val handlerThread = HandlerThread("obtenerKerklyNormal")
         handlerThread.start()
         handler = Handler(handlerThread.looper)
-        handler?.post({
-            ObtenerKerklyMasCercanos()
-        })
+      /* handler?.post({
+          //  ObtenerKerklyMasCercanos()
+        })*/
 
-
+        val kerklysCercanos = b.getParcelableArrayList<Kerkly>("kerklyCercanos")
+        // postlist = kerklysCercanos.reversed() as ArrayList<Kerkly>
+        postlist = ArrayList(kerklysCercanos!!.reversed())
+        for (kerkly in kerklysCercanos.reversed()){
+            //println("kerkly ----->id ${kerkly.idKerkly} ${kerkly.uidKerkly} ${kerkly.distancia}")
+            val url2 = instancias.CalcularDistancia(latitud, longitud, kerkly.latitud, kerkly.longitud)
+            CalcularTiempoDistancia(this@KerklyListActivity).execute(url2)
+        }
+        setProgress.dialog.dismiss()
     }
     private fun setScrollBar() {
         recyclerview.scrollToPosition(Miadapter.itemCount-1)
@@ -177,7 +186,9 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         recyclerview.adapter = Miadapter
         setProgress.dialog.dismiss()
     }
-    private fun ObtenerKerklyMasCercanos(){
+/*    private fun ObtenerKerklyMasCercanos2() {
+       // latitud = 17.540419
+       // longitud = -99.495576
         try {
         val conexion = conexionPostgreSQL.obtenerConexion(this)
         conexion.use {
@@ -234,7 +245,7 @@ class KerklyListActivity : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         }
 
 
-    }
+    }*/
 
     private fun obtenerInfoKerkly(uid:String,hora:String){
         val databaseUsu = instancias.referenciaInformacionDelKerkly(uid)

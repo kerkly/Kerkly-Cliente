@@ -54,110 +54,43 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val mensaje = lista[position]
+
         holder.txt_mensaje.text = mensaje.mensaje
         holder.txt_fecha.text = mensaje.hora
         holder.txtMensajeLeido.text = mensaje.mensajeLeido
 
         var tipo_usuario = mensaje.tipo_usuario.trim()
+        val esCliente = tipo_usuario == "cliente"
 
-        if (tipo_usuario == "cliente") {
-            holder.txtMensajeLeido.visibility = View.VISIBLE
-
-            if (mensaje.archivo == "") {
-                holder.layoutArchivo.visibility = View.GONE
-            } else {
-                holder.layoutArchivo.visibility = View.VISIBLE
-                holder.imageViewArchivo.setImageResource(when (mensaje.tipoArchivo) {
-                    "imagen" -> R.drawable.descargaimagen
-                    "pdf" -> R.drawable.icono_pdf
-                    else -> R.drawable.descargaimagen
-                })
-            }
-
-            holder.layoutArchivo.style {
-                this.layoutGravity(Gravity.END)
-            }
-            holder.layoutMensajeLeido.style {
-                this.layoutGravity(Gravity.END)
-            }
-            holder.layoutmensaje.style {
-                this.backgroundRes(R.drawable.burbuja_chat_der)
-                this.layoutGravity(Gravity.END)
-            }
-            holder.layoutHora.style {
-                this.layoutGravity(Gravity.END)
-            }
-
-            if (position > 0 && tipo_usuario == lista[position - 1].tipo_usuario.trim()) {
-                holder.layoutmensaje.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutHora.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutMensajeLeido.style {
-                    this.layoutMarginTopDp(5)
-                }
-            } else {
-                holder.layoutmensaje.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutHora.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutMensajeLeido.style {
-                    this.layoutMarginTopDp(5)
-                }
-            }
-
-        } else if (tipo_usuario == "Kerkly") {
-            holder.txtMensajeLeido.visibility = View.GONE
-
-            if (mensaje.archivo == "") {
-                holder.layoutArchivo.visibility = View.GONE
-            } else {
-                holder.layoutArchivo.visibility = View.VISIBLE
-                holder.imageViewArchivo.setImageResource(when (mensaje.tipoArchivo) {
-                    "imagen" -> R.drawable.descargaimagen
-                    "pdf" -> R.drawable.icono_pdf
-                    else -> R.drawable.descargaimagen
-                })
-            }
-
-            holder.layoutArchivo.style {
-                this.layoutGravity(Gravity.START)
-            }
-            holder.layoutmensaje.style {
-                this.backgroundRes(R.drawable.burbuja_chat)
-                this.layoutGravity(Gravity.START)
-            }
-            holder.layoutHora.style {
-                this.layoutGravity(Gravity.START)
-            }
-
-            if (position > 0 && tipo_usuario == lista[position - 1].tipo_usuario.trim()) {
-                holder.layoutmensaje.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutHora.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutMensajeLeido.style {
-                    this.layoutMarginTopDp(5)
-                }
-            } else {
-                holder.layoutmensaje.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutHora.style {
-                    this.layoutMarginTopDp(5)
-                }
-                holder.layoutMensajeLeido.style {
-                    this.layoutMarginTopDp(5)
-                }
-            }
+        with(holder.layoutmensaje) {
+            setStyleAndVisibility(if (esCliente) Gravity.END else Gravity.START, 5)
+            this.setBackgroundResource(if (esCliente) R.drawable.burbuja_chat_der else R.drawable.burbuja_chat)
         }
+        with(holder.layoutHora) {
+            setStyleAndVisibility(if (esCliente) Gravity.END else Gravity.START, 0)
         }
+        with(holder.layoutMensajeLeido) {
+            setStyleAndVisibility(if (esCliente) android.view.Gravity.END else android.view.Gravity.START, 0)
+        }
+
+        with(holder.txtMensajeLeido) {
+            setStyleAndVisibility(if (esCliente) Gravity.END else Gravity.START, 0)
+        }
+
+        with(holder.layoutArchivo) {
+            setVisibility(mensaje.archivo.isNotEmpty())
+            setStyleAndVisibility(if (esCliente) Gravity.END else Gravity.START, 0)
+        }
+
+        holder.imageViewArchivo.setImageResource(
+            when (mensaje.tipoArchivo) {
+                "imagen" -> R.drawable.descargaimagen
+                "pdf" -> R.drawable.icono_pdf
+                else -> R.drawable.descargaimagen
+            }
+        )
+
+    }
 
     override fun getItemCount(): Int {
         return lista.size
@@ -171,5 +104,22 @@ class AdapterChat(c: Context): RecyclerView.Adapter<AdapterChat.ViewHolder>() {
         var tam = lista.size
         lista.remove(lista.get(tam-1))
         notifyItemInserted(lista.size)
+    }
+
+    private fun View.setStyleAndVisibility(gravity: Int, margin: Int) {
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        params.gravity = gravity
+        params.topMargin = margin // Ajusta el margen superior aquí
+        this.layoutParams = params
+    }
+
+
+
+    private fun View.setVisibility(isVisible: Boolean) {
+        this.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 }

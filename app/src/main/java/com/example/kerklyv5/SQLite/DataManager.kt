@@ -7,13 +7,13 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.request.RequestOptions
 import com.example.kerklyv5.modelo.usuariosSqlite
-import com.example.kerklyv5.ui.home.HomeFragment
 import com.squareup.picasso.Picasso
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 
@@ -21,54 +21,44 @@ class DataManager(context: Context) {
     val context: Context = context
     private val databaseHelper: DatabaseHelper = DatabaseHelper(context)
 
-private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
+private fun insertUser(palabrasClaves: String,nombreOfi: String, Descripcion:String) {
         val values = ContentValues()
-        values.put(DatabaseHelper.COLUMN_ID,id)
+       // values.put(DatabaseHelper.COLUMN_ID,id)
         values.put(DatabaseHelper.COLUMN_PC, palabrasClaves)
         values.put(DatabaseHelper.COLUMN_NAME, nombreOfi)
-
+        values.put(DatabaseHelper.COLUMN_DESCRIPCION,Descripcion)
         val db = databaseHelper.writableDatabase
         db.insert(DatabaseHelper.TABLE_NAME, null, values)
         db.close()
     }
 
-    fun insertOrUpdateOficio(oficio: MisOficios, palabrasClaves: String,nombreOfi: String) {
-        val isUsuarioTableExists = databaseHelper.isTableExists(DatabaseHelper.TABLE_NAME)
-        if (isUsuarioTableExists) {
+    fun insertOrUpdateOficio(palabrasClaves: String, nombreOfi: String, Descripcion: String) {
+        try {
             val db = databaseHelper.writableDatabase
-            // Consulta para verificar si ya existe un registro con el mismo valor de id
-            val query =
-                "SELECT * FROM ${DatabaseHelper.TABLE_NAME} WHERE ${DatabaseHelper.COLUMN_ID} = ?"
-            val cursor = db.rawQuery(query, arrayOf(oficio.id.toString()))
+            // Consulta para verificar si ya existe un registro con el mismo valor de nombreOfi
+            val query = "SELECT * FROM ${DatabaseHelper.TABLE_NAME} WHERE LOWER(${DatabaseHelper.COLUMN_NAME}) = LOWER(?)"
+            val cursor = db.rawQuery(query, arrayOf(nombreOfi.trim()))
 
             if (cursor.moveToFirst()) {
-                // Si se encuentra un registro con el mismo id, puedes decidir si quieres actualizarlo o ignorar la inserción
-                // Por ejemplo, puedes actualizar el registro existente con los nuevos datos
-                // updateOficio(oficio)
-                println("si se encuentra")
+                Log.d("MiApp", "Se encontró el registro con nombreOfi: $nombreOfi")
             } else {
-                // Si no se encuentra ningún registro con el mismo id, puedes proceder a insertar el nuevo registro
-                /*val values = ContentValues()
-            values.put(DatabaseHelper.COLUMN_ID, oficio.id)
-            values.put(DatabaseHelper.COLUMN_PC, oficio.palabrasClaves)
-            values.put(DatabaseHelper.COLUMN_NAME, oficio.nombreOfi)
+                val values = ContentValues()
+                values.put(DatabaseHelper.COLUMN_PC, palabrasClaves)
+                values.put(DatabaseHelper.COLUMN_NAME, nombreOfi)
+                values.put(DatabaseHelper.COLUMN_DESCRIPCION, Descripcion)
 
-            db.insert(DatabaseHelper.TABLE_NAME, null, values)*/
-                println("no se encuentra el oficio")
-                insertUser(oficio.id, palabrasClaves, nombreOfi)
+                db.insert(DatabaseHelper.TABLE_NAME, null, values)
+                Log.d("MiApp", " nombreOfi: $nombreOfi, se insertó uno nuevo")
+               // insertUser(palabrasClaves, nombreOfi, Descripcion)
             }
 
             cursor.close()
             db.close()
-        }else{
-            println("no existe la tabla oficio")
-            databaseHelper.onCreate(databaseHelper.writableDatabase) // Crear la tabla
-            insertUser(oficio.id, palabrasClaves, nombreOfi)
-           /* val homeFragment = HomeFragment()
-            homeFragment.dataManager = DataManager(context)
-            homeFragment.obtenerOficiosDB()*/
+        } catch (e: Exception) {
+            Log.e("MiApp", "Error al insertar o actualizar oficio: ${e.message}")
         }
     }
+
 
 
     @SuppressLint("Range")
@@ -82,25 +72,75 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
             val id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID))
             val palabrasClaves = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_PC))
             val nombreOfi = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_NAME))
-            val oficio = MisOficios(id, palabrasClaves,nombreOfi)
+            val Descripcion = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DESCRIPCION))
+            val oficio = MisOficios(id, palabrasClaves,nombreOfi,Descripcion)
+            //println(" -------$id $nombreOfi")
             oficiosList.add(oficio)
         }
         cursor.close()
         db.close()
         return oficiosList as ArrayList<MisOficios>
     }
-    fun deleteAllTablas() {
+
+    fun obtenerDescripcion(oficioBuscado: String): String {
+        val db = databaseHelper.readableDatabase
+        var descripcion = "No se encontró descripción"
+
+        val selectQuery = "SELECT ${DatabaseHelper.COLUMN_DESCRIPCION} FROM ${DatabaseHelper.TABLE_NAME} WHERE ${DatabaseHelper.COLUMN_NAME} = ?"
+        val selectionArgs = arrayOf(oficioBuscado)
+
+        val cursor = db?.rawQuery(selectQuery, selectionArgs)
+
+        try {
+            val cursor = db?.rawQuery(selectQuery, selectionArgs)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    descripcion = it.getString(it.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DESCRIPCION))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MiApp", "Error al realizar la consulta a la base de datos: ${e.message}")
+        }
+
+
+        db.close()
+        return descripcion
+    }
+
+
+    fun deleteAllTablas(context: Context) {
+        val db = databaseHelper.writableDatabase
+
+        try {
+            db.beginTransaction()
+
+            // Reiniciar las secuencias de ID
+            db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME='${DatabaseHelper.TABLE_NAME}'")
+            db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME='${DatabaseHelper.TABLE_NAME_USUARIOS}'")
+
+            // Eliminar todos los registros de las tablas "Oficio" y "Usuario"
+            db.delete(DatabaseHelper.TABLE_NAME, null, null)
+            db.delete(DatabaseHelper.TABLE_NAME_USUARIOS, null, null)
+
+            db.setTransactionSuccessful()
+            Log.d("MiApp", "Registros eliminados y secuencias de ID reiniciadas")
+
+        } catch (e: Exception) {
+            Log.e("MiApp", "Error al eliminar registros: ${e.message}")
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
+    fun resetIdSequence(tableName: String) {
         val db = databaseHelper.writableDatabase
         try {
-            db.beginTransaction() // Comenzar una transacción
-            db.delete(DatabaseHelper.TABLE_NAME, null, null) // Eliminar todos los registros de la tabla "Oficio"
-            db.delete(DatabaseHelper.TABLE_NAME_USUARIOS, null, null) // Eliminar todos los registros de la tabla "Usuario"
-            db.setTransactionSuccessful() // Marcar la transacción como exitosa
-            println("Tablas eliminadas")
+            db.execSQL("DELETE FROM sqlite_sequence WHERE name='$tableName'")
+            println("Secuencia de ID reiniciada para la tabla $tableName")
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
-            db.endTransaction() // Finalizar la transacción, independientemente de si fue exitosa o no
             db.close()
         }
     }
@@ -143,8 +183,8 @@ private fun insertUser(id: Int, palabrasClaves: String,nombreOfi: String) {
         } else {
             // La tabla "Usuario" no existe en la base de datos
           //  println("La tabla \"Usuario\" no existe en la base de datos")
-            databaseHelper.onCreate(databaseHelper.writableDatabase) // Crear la tabla
-            InsertarDatosDelUsuario(telefono, fotoByteArray, nombre, apellidoPa, apellidoMa, correo)
+          //  databaseHelper.onCreate(databaseHelper.writableDatabase) // Crear la tabla
+           // InsertarDatosDelUsuario(telefono, fotoByteArray, nombre, apellidoPa, apellidoMa, correo)
 
         }
 

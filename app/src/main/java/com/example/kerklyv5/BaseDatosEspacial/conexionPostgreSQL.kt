@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.widget.Toast
+import java.io.IOException
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
@@ -19,8 +21,8 @@ class conexionPostgreSQL {
         }
         try {
             Class.forName("org.postgresql.Driver") // Cargar el driver JDBC
-            val host = "6.tcp.ngrok.io"
-            val port = "16646"
+            val host = "2.tcp.ngrok.io"
+            val port = "18163"
             val databaseName = "Kerkly"
             val username = "luis_admin"
             val password = "Lu0599@"
@@ -62,10 +64,12 @@ class conexionPostgreSQL {
         longitudUsuario: Double,
         latitudUsuario: Double,
         oficio: String
-    ): MutableList<Kerkly>? {
+    ,context: Context): MutableList<Kerkly>? {
         val kerklysCercanos = mutableListOf<Kerkly>()
-        val latitudUsuario  =17.544556
-            val longitudUsuario = -99.497408
+        try {
+
+       // val latitudUsuario  =17.544556
+           // val longitudUsuario = -99.497408
 
         for (idPoligono in idPoligonosUsuario) {
             val consultaKerklySQL =
@@ -112,10 +116,23 @@ class conexionPostgreSQL {
             }
         }
 
+        } catch (e: SQLException) {
+            // Manejo de la excepción de la base de datos
+            showMessage("Error de conexión a la base de datos: ${e.message}",context)
+        } catch (e: IOException) {
+            // Manejo de la excepción de E/S
+            showMessage("Error de conexión: ${e.message}",context)
+        } catch (e: Exception) {
+            // Manejo de otras excepciones
+            showMessage("Error inesperado: ${e.message}",context)
+        }
         // Devolver null si no se encontraron Kerklys cercanos
         return  kerklysCercanos
     }
 
+    private fun showMessage(s: String,context: Context) {
+        Toast.makeText(context,s,Toast.LENGTH_LONG).show()
+    }
 
 
 }

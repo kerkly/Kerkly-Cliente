@@ -15,16 +15,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    >
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
-
-
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView7"
@@ -43,8 +39,8 @@
                 android:layout_gravity="center"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/servicios">
-            </com.airbnb.lottie.LottieAnimationView>
+                app:lottie_rawRes="@raw/servicios"></com.airbnb.lottie.LottieAnimationView>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,100 +48,93 @@
                 android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/layoutProblematica"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="20dp"
-                            android:hint="Escribe la problematica... "
-                            android:enabled="true"
-                            app:boxStrokeColor="@color/white"
-                            app:startIconDrawable="@drawable/ic_baseline_edit_24"
-                            app:boxCornerRadiusBottomStart="50dp"
-                             app:boxCornerRadiusTopEnd="50dp" >
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutProblematica"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:enabled="true"
+                    android:hint="Escribe la problematica... "
+                    app:boxCornerRadiusBottomStart="50dp"
+                    app:boxCornerRadiusTopEnd="50dp"
+                    app:boxStrokeColor="@color/white"
+                    app:startIconDrawable="@drawable/ic_baseline_edit_24">
 
 
-                          <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/inputProblematica"
-                                android:layout_width="match_parent"
-                                android:layout_height="100dp"
-                                android:gravity="start"
-                                android:fontFamily="@font/quicksand_bold"
-                                android:inputType="textMultiLine"
-                                android:overScrollMode="always"
-                                android:scrollbarStyle="insideInset"
-                                android:scrollbars="vertical"
-                                android:singleLine="false"
-                                android:textColor="@color/black"
-                                android:textSize="18sp"
-                                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,TouchTargetSizeCheck" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/textView5Express"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="Elija un Servicio:"
-                        android:textColor="@color/black"
-                        android:textSize="20sp" />
-
-                   <LinearLayout
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/inputProblematica"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginEnd="15dp"
-                        android:orientation="vertical">
+                        android:layout_height="100dp"
+                        android:fontFamily="@font/quicksand_bold"
+                        android:gravity="start"
+                        android:inputType="textMultiLine"
+                        android:overScrollMode="always"
+                        android:scrollbarStyle="insideInset"
+                        android:scrollbars="vertical"
+                        android:singleLine="false"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,TouchTargetSizeCheck" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView5Express"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Elija un Servicio:"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="15dp"
+                android:orientation="horizontal">
 
 
-                         <Spinner
-                             android:id="@+id/spinnerNormal"
-                             android:layout_width="match_parent"
-                             android:layout_height="60dp"
-                             android:layout_weight="1"
-                             android:padding="14dp"
-                             android:layout_marginStart="10dp"
-                             android:layout_gravity="center"
-                             android:background="@drawable/spinner_style"
-                             android:entries="@array/oficios"
-                             tools:ignore="TouchTargetSizeCheck" />
+                <Spinner
+                    android:id="@+id/spinnerNormal"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner_style"
+                    android:entries="@array/oficios"
+                    android:padding="14dp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
-               <com.google.android.material.button.MaterialButton
-                   android:id="@+id/boton_Oficios"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_marginStart="10dp"
-                   android:layout_gravity="center"
-                   android:gravity="center"
-                   android:layout_marginTop="10dp"
-                   android:background="@drawable/fondo_boton"
-                   android:text="@string/btn_masOficios"
-                   android:textColor="@color/black"
-                   app:backgroundTint="@color/colorBoton"
-                   app:iconTint="@color/black"
-                   android:visibility="gone"
-                   tools:ignore="OnClick,TouchTargetSizeCheck" />
+                <ImageView
+                    android:id="@+id/buttonObtenerSeleccion"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:src="@drawable/archivoinfo" />
+
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_marginBottom="40dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/boton_servicio_urgente"
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="start"
                     android:layout_marginStart="10dp"
                     android:layout_weight="1"
-                    android:layout_gravity="start"
-                    android:gravity="center"
                     android:background="@drawable/fondo_boton"
+                    android:gravity="center"
                     android:text="@string/servicio_urgente"
                     android:textColor="@color/black"
                     app:backgroundTint="@color/colorBoton"
@@ -172,7 +161,7 @@
                     app:iconTint="@color/black"
                     tools:ignore="OnClick,TouchTargetSizeCheck" />
             </LinearLayout>
-            </LinearLayout>
+        </LinearLayout>
 
     </ScrollView>
 

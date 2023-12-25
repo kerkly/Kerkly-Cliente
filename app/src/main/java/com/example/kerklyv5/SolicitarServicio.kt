@@ -85,7 +85,7 @@ import java.text.DateFormat
 import java.util.*
 
 
-class SolicitarServicio : AppCompatActivity() {
+class  SolicitarServicio : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivitySolicitarServicioBinding
     var b: Bundle? = null
@@ -673,7 +673,6 @@ class SolicitarServicio : AppCompatActivity() {
                         }
                     }
                 }
-
                 override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
                     Toast.makeText(
                         applicationContext,
@@ -684,7 +683,6 @@ class SolicitarServicio : AppCompatActivity() {
                     setProgressDialog.dialog.dismiss()
                 }
             })
-
         }
     }
 
@@ -765,17 +763,26 @@ class SolicitarServicio : AppCompatActivity() {
     fun metodoSalir() {
         AuthUI.getInstance()
             .signOut(applicationContext)
-            .addOnCompleteListener {// muestraOpciones()
-                }.addOnFailureListener { e ->
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Operaciones adicionales después de cerrar sesión
+                    dataManager.deleteAllTablas(this)
+
+                    // Cerrar la actividad solo después de completar las operaciones
+                   // finish()
+                } else {
+                    Toast.makeText(
+                        applicationContext, "Error al cerrar sesión", Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            .addOnFailureListener { e ->
                 Toast.makeText(
-                    applicationContext, ""
-                            + e.message, Toast.LENGTH_LONG
+                    applicationContext, "" + e.message, Toast.LENGTH_LONG
                 ).show()
             }
-        dataManager.deleteAllTablas()
-
-        finish()
     }
+
     private fun getOficios () {
         val ROOT_URL = Url().url
         val gson = GsonBuilder()
@@ -807,9 +814,10 @@ class SolicitarServicio : AppCompatActivity() {
                 for (i in 0 until listaArrayOficios!!.size){
                 //    oficio = listaArrayOficios[i].nombreO
                   //  pal = pal+ oficio +"|"
+                    println(listaArrayOficios[i].nombreO + " descripcion ${listaArrayOficios[i].Descripcion}")
                  //   println("oficio $oficio Palabras Claves: " + listaArrayOficios[i].PalabrasClaves)
-                    oficios = MisOficios(i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
-                    dataManager.insertOrUpdateOficio(oficios,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO)
+                    oficios = MisOficios(i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO,listaArrayOficios[i].Descripcion)
+                    dataManager.insertOrUpdateOficio(listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO,listaArrayOficios[i].Descripcion)
                setFragmentHome(telefono)
                 }
                 //expresion = "$inicio$pal"+"$final"

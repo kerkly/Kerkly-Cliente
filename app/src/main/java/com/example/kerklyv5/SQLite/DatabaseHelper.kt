@@ -8,7 +8,7 @@ import android.util.Base64
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
      val context: Context = context
     companion object {
-        private const val DATABASE_NAME = "DBkerkly.db"
+        private const val DATABASE_NAME = "DBkerklyC.db"
         private const val DATABASE_VERSION = 1
 
         // Define la estructura de la tabla
@@ -16,6 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
          const val COLUMN_ID = "id"
          const val COLUMN_PC = "palabras_claves"
          const val COLUMN_NAME = "nombreOfi"
+         const val COLUMN_DESCRIPCION = "Descripcion"
 
         //segunda tabla
         const val TABLE_NAME_USUARIOS = "Usuario"
@@ -31,7 +32,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     override fun onCreate(db: SQLiteDatabase?) {
         // Crea la tabla
-        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY, $COLUMN_PC TEXT, $COLUMN_NAME TEXT)"
+        val createTableQuery = "CREATE TABLE $TABLE_NAME ($COLUMN_ID INTEGER  PRIMARY KEY AUTOINCREMENT, $COLUMN_PC TEXT, $COLUMN_NAME TEXT,$COLUMN_DESCRIPCION TEXT)"
         db?.execSQL(createTableQuery)
 
         val createTableUSer = "CREATE TABLE $TABLE_NAME_USUARIOS($COLUMN_ID_USUARIOS INTEGER PRIMARY KEY, $COLUMN_TELEFONO TEXT, $COLUMN_FOTO BLOB, $COLUMN_NOMBRE TEXT, $COLUMN_APELIIDO_PA TEXT, $COLUMN_APELIIDO_MA  TEXT,$COLUMN_CORREO TEXT)"
@@ -40,8 +41,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        // Si necesitas realizar cambios en la estructura de la base de datos
-        // puedes implementar la lógica de actualización aquí
+      /*  if (oldVersion == 1 && newVersion == 2) {
+            // Agregar la columna Descripcion en la actualización
+            val addColumnQuery = "ALTER TABLE $TABLE_NAME ADD COLUMN $COLUMN_DESCRIPCION TEXT"
+            db?.execSQL(addColumnQuery)
+        }*/
     }
 
     override fun onDowngrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

@@ -54,7 +54,7 @@ class obtenerKerklys_y_tokens {
                     tokenKerkly = u2!!.token
                     val telefonoKerkly = u2!!.telefono
                     val nombreK = u2!!.nombre
-                    System.out.println("el token del kerkly " +tokenKerkly)
+                    System.out.println("nombre: ${u2.nombre} el token del kerkly " +tokenKerkly)
                     llamartopico.llamarTopicEnviarSolicitudUrgente(context, tokenKerkly, "(Solicitud Urgente) $Mensaje", "Mensaje de $Titulo",
                         latitud,longitud, Folio, direccion, telefonoCliente, curp,telefonoKerkly, correoCliente, nombreK, uidCliente)
                 }

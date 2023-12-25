@@ -1,8 +1,9 @@
 package com.example.kerklyv5.SQLite
 
-class MisOficios(id: Int, palabrasClaves: String, nombreOfi:String) {
+class MisOficios(id: Int, palabrasClaves: String, nombreOfi:String,Descripcion:String) {
     var id: Int = id
     var palabrasClaves:String = palabrasClaves
     var nombreOfi:String = nombreOfi
-     constructor() :this(0,"","")
+    var Descripcion: String = Descripcion
+     constructor() :this(0,"","","")
 }

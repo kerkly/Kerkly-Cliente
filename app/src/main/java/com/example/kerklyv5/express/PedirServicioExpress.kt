@@ -409,7 +409,7 @@ class PedirServicioExpress : AppCompatActivity(), CalcularTiempoDistancia.Geo {
         if (conexion != null) {
             try {
                 val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, 3000.0)
-                val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio)
+                val kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio,this)
                 if (kerklysCercanos?.isEmpty() == true) {
                     ShowMensaje("Lo Sentimos pero en esta área no se encuentran kerklys cercanos")
                 } else {
