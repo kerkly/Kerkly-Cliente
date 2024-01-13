@@ -285,6 +285,7 @@ class CheckoutActivity : AppCompatActivity() {
             is PaymentSheetResult.Completed -> {
                 // El pago se completó con éxito, puedes mostrar un mensaje de confirmación o realizar acciones adicionales.
               //  showToast("Payment complete!")
+                mandarNotificion()
                 Handler().postDelayed({
                     notificarServer.sendWebhookRequest()
                 }, 1000) // Pausa de 1 segundo
@@ -311,7 +312,9 @@ class CheckoutActivity : AppCompatActivity() {
         }
     }
 
-
+    private fun mandarNotificion() {
+        TODO("Not yet implemented")
+    }
 
 
     private fun showToast(mensaje:String){

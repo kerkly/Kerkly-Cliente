@@ -32,19 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="10dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_calle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:errorEnabled="true">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_calle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/calle" />
-
-            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_ciudad"
@@ -94,7 +82,22 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_calle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:errorEnabled="true">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_calle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/calle" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout_numeroExt"
                 android:layout_width="match_parent"

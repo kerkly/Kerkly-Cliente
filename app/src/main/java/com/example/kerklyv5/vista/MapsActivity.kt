@@ -2,12 +2,15 @@ package com.example.kerklyv5.vista
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.text.SimpleDateFormat
 import android.location.*
 import android.net.ConnectivityManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -16,10 +19,12 @@ import android.os.Looper
 import android.provider.Settings
 import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.kerklyv5.BaseDatosEspacial.conexionPostgreSQL
@@ -32,18 +37,33 @@ import com.example.kerklyv5.modelo.modeloSolicituUrgente
 import com.example.kerklyv5.modelo.modelokerklyCercanos
 import com.example.kerklyv5.modelo.serial.Kerkly
 import com.example.kerklyv5.modelo.usuarios
+import com.example.kerklyv5.modelo.usuariosKerkly
+import com.example.kerklyv5.notificaciones.llamarTopico
 import com.example.kerklyv5.notificaciones.obtenerKerklys_y_tokens
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
@@ -52,6 +72,7 @@ import java.io.BufferedReader
 //import kotlinx.android.synthetic.main.confirmar_direccion.*
 import java.io.IOException
 import java.io.InputStreamReader
+import java.sql.Date
 import java.text.DateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -81,7 +102,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var band = false
     private lateinit var nombreCliente: String
     var folio =""
-    private var locationManager: LocationManager? = null
+   private var locationManager: LocationManager? = null
+   private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
     private lateinit var context: Context
     private lateinit var arrayListTiempo: ArrayList<modelokerklyCercanos>
     private lateinit var arraylistUsuarios: ArrayList<usuarios>
@@ -98,27 +121,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var handler: Handler? = null
    // private lateinit var Noti:String
 
+
   /*  private lateinit var progressDialog: ProgressDialog
     private lateinit var progressBar: ProgressBar*/
   private var poligonoCircular: Polygon? = null
     private  var nuevoRadio= 0.0
     private  var kerklysCercanos: MutableList<com.example.kerklyv5.BaseDatosEspacial.Kerkly>? = null
+    private lateinit var dialog: Dialog
+
+
+    private lateinit var editCiudad: TextInputEditText
+    private lateinit var edit_cp: TextInputEditText
+    private lateinit var calle_edit: TextInputEditText
+    private lateinit var colonia_edit: TextInputEditText
+    private lateinit var numero_extEdit: TextInputEditText
+    private lateinit var lyout_referencia: TextInputLayout
+    private lateinit var boton: MaterialButton
+    private lateinit var btn_direccion: MaterialButton
+    private lateinit var progressBar: ProgressBar
+    private lateinit var uidKerkly:String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         mAuth = FirebaseAuth.getInstance()
+        currentUser = mAuth!!.currentUser
         b = intent.extras!!
         context = this
         Url = Url()
         instancias = Instancias()
-        // Inicializar ProgressDialog y ProgressBar
-      /*  progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("Cargando...")
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-        progressDialog.setCancelable(false)*/
-
-        /*progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal)
-        progressDialog.max = 100*/
+        dialog = Dialog(this)
+        BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
+        progressBar = findViewById(R.id.progressBarMap)
+        progressBar.visibility = View.VISIBLE
+        BotonEnviarU.visibility = View.GONE
         arrayListTiempo = ArrayList<modelokerklyCercanos>()
         arraylistUsuarios = ArrayList<usuarios>()
         obtenerkerklysYTokens =  obtenerKerklys_y_tokens()
@@ -146,75 +181,78 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //Toast.makeText(applicationContext, mapa, Toast.LENGTH_LONG).show()
 
         }*/
-        BotonEnviarU = findViewById(R.id.buttonEnviarUbicacion)
+
+        //dialog
+        dialog.setContentView(R.layout.confirmar_direccion)
+        boton = dialog.findViewById(R.id.actualizar_btn)
+        editCiudad = dialog.findViewById<TextInputEditText>(R.id.edit_ciudad)
+        edit_cp = dialog.findViewById<TextInputEditText>(R.id.edit_codigoP)
+        calle_edit = dialog.findViewById<TextInputEditText>(R.id.edit_calle)
+        colonia_edit = dialog.findViewById<TextInputEditText>(R.id.edit_colonia)
+        numero_extEdit = dialog.findViewById<TextInputEditText>(R.id.edit_numeroExt)
+        edit_referecia = dialog.findViewById(R.id.edit_referencia)
+        lyout_referencia = dialog.findViewById(R.id.layout_referencia)
+        referencia = edit_referecia.text.toString()
+        btn_direccion = dialog.findViewById(R.id.btn_direccion_exrpess)
+        //termina
+
         BotonEnviarU.setOnClickListener {
-            //    setProgress.setProgressDialog(this@MapsActivity)
-                locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                if (!gpsEnabled) {
-                    val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    startActivity(settingsIntent)
-                    // setProgress.dialog.dismiss()
-                    getLocalizacion()
-                } else {
-                    if (latitud == 0.0 && longitud ==0.0){
-                        handler?.looper?.quitSafely()
-                    }else{
-                  /*  if (!band) {
-                        //val latitud = 17.536212
-                        //val longitud = -99.495486
-                        setLocation(latitud,longitud)
-                     /*   val i = Intent(applicationContext, KerklyListActivity::class.java)
-                        correoCliente = b.getString("correo").toString()
-                        b.putString("correo", correoCliente)
-                        b.putString("Calle", calle)
-                        b.putString("Colonia", colonia)
-                        b.putString("Código Postal", cp)
-                        b.putString("Exterior", num_ext)
-                        b.putDouble("Latitud", latitud)
-                        b.putDouble("Longitud", longitud)
-                        b.putString("Ciudad", ciudad)
-                        b.putString("Estado", estado)
-                        b.putString("Pais", pais)
-                        b.putString("nombreCliente", nombreCliente)
-                        b.putString("uid", uid)
-                        b.putString("direccion",Direccion)
-                        b.putString("telefonoCliente",telefonoCliente)
-                        i.putExtras(b)
-                        startActivity(i)
-                        finish()*/
-                    } else {
-                     //   val handlerThread = HandlerThread("obtenerKerklyUrgente")
-                     //   handlerThread.start()
-                      //  handler = Handler(handlerThread.looper)
-                       // handler?.post({
-                           // ingresarPresupuesto()
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-                    //    })
+            val gpsEnabled = locationManager!!. isProviderEnabled(LocationManager.GPS_PROVIDER)
+            if (!gpsEnabled) {
+                val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(settingsIntent)
+                getLocalizacion()
+            } else {
+                val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkInfo = connectivityManager.activeNetworkInfo
 
-                    }*/
-                        showMessaje("Por favor espere un momento....")
-                        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                        val networkInfo = connectivityManager.activeNetworkInfo
-
-                        if (networkInfo != null && networkInfo.isConnected) {
-                            // Realizar operaciones que requieren conexión
-                            PoligonosColindantes(latitud,longitud,1000.0)
-                        } else {
-                            // No hay conexión disponible, muestra un mensaje al usuario
-                            showMessage("No hay conexión a Internet")
-                        }
-
-                    }
+                if (networkInfo != null && networkInfo.isConnected) {
+                    progressBar.visibility = View.VISIBLE
+                    showMessaje("Por favor espere un momento....")
+                    PoligonosColindantes(latitud, longitud, 1000.0)
+                  //  MandarNoti("KJxpY59aB8gtXX96n4wdr7C9TBw1",problema,currentUser!!.displayName.toString(),)
+               } else {
+                    showMessage("No hay conexión a Internet")
+                    progressBar.visibility = View.GONE
                 }
+            }
         }
-    }
+
+        }
+
+
+   /* private fun actualizar() {
+        dialog.dismiss()
+        showMessaje("Por favor espere un momento....")
+        ciudad = editCiudad.text.toString()
+       // estado = direccion[0].adminArea ?: "Sin nombre"
+       // pais = direccion[0].countryName ?: "Sin Nombre"
+        cp = edit_cp.text.toString()
+        calle = calle_edit.text.toString()
+        colonia = colonia_edit.text.toString()
+        num_ext = numero_extEdit.text.toString()
+
+       Direccion= "$pais $estado $ciudad $cp $colonia $calle $num_ext"
+        PoligonosColindantes(latitud,longitud,1000.0)
+        //calle_edit.setText(calle)
+       ///colonia_edit.setText(colonia)
+       // numero_extEdit.setText(num_ext)
+        //edit_cp.setText(cp)
+        //var ubicacion: String = "$ciudad, $estado, $pais"
+      //  editCiudad.setText(ubicacion)
+        //calle_edit.setText(calle)
+        //colonia_edit.setText(colonia)
+    }*/
+
     private fun showMessage(s: String) {
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show()
     }
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val gpsEnabled = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!gpsEnabled) {
@@ -225,7 +263,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             // mMap.isMyLocationEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = true
 
-            locationManager = this@MapsActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+          /*  locationManager = this@MapsActivity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val locationListener: LocationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
                    val miUbicacion = LatLng(location.getLatitude(), location.getLongitude())
@@ -287,8 +325,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 // for ActivityCompat#requestPermissions for more details.
                 return
             }
-            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)
+            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0f, locationListener)*/
 
+            locationCallback = object : LocationCallback(){
+                override fun onLocationResult(locationResult: LocationResult) {
+                    locationResult.lastLocation.let {
+                        val miUbicacion = LatLng(it!!.getLatitude(), it.getLongitude())
+                        fusedLocationClient.removeLocationUpdates(locationCallback)
+                        marcador = googleMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title(nombreCliente.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.miubicacion4)))!!
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 20F))
+                        latitud = it.latitude
+                        longitud = it.longitude
+                        CrearPoligonoCircular(1000.0,latitud,longitud)
+                        setLocation(latitud,longitud)
+                    }
+                }
+            }
+
+            // Solicitar actualizaciones de ubicación
+            val locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(5000) // Intervalo en milisegundos para recibir actualizaciones (5 segundos)
+                .setFastestInterval(1000) // Intervalo mínimo en milisegundos entre actualizaciones ( segundos)
+
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+            }
                 googleMap.setOnMarkerClickListener(this)
                 googleMap.setOnMarkerDragListener(this)
 
@@ -354,6 +421,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 num_ext,
                 cp,
                 object : Callback<Response?> {
+                    @RequiresApi(Build.VERSION_CODES.N)
                     override fun success(t: Response?, response: Response?) {
                         var salida: BufferedReader? = null
                         var entrada = ""
@@ -371,7 +439,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                         }else{
                             folio = entrada
                            // PoligonosColindantes(latitud, longitud)
-                            val fechaHora = DateFormat.getDateTimeInstance().format(Date())
+                            val fechaHora = obtenerFechaFormateada(System.currentTimeMillis())
                             insertarSolicitudFirebaseUrgente(folio,"",problema,correoCliente,oficio,"",fechaHora,latitud,longitud)
                             for (kerkly in kerklysCercanos!!.reversed()) {
                                 println("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
@@ -386,7 +454,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                                 /*   val miUbicacion = LatLng(kerkly.latitud, kerkly.longitud)
                                    marcador = mMap.addMarker(MarkerOptions().position(miUbicacion).draggable(true).title("Kerklys").icon(BitmapDescriptorFactory.fromResource(R.drawable.iconocliente)))!!
                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 10F))*/
-                                MandarNoti(kerkly.uidKerkly, problema, nombreCliente)
+                                MandarNoti(kerkly.uidKerkly, problema, nombreCliente,fechaHora)
                                 //showMessaje("CURP: ${kerkly.idKerkly}, UID: ${kerkly.uidKerkly}, Distancia: ${kerkly.distancia}")
                             }
 
@@ -398,6 +466,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     }
                 }
             )
+    }
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun obtenerFechaFormateada(timestampMillis: Long): String {
+        try {
+            // Crea un objeto Date a partir del timestamp
+            val fecha = Date(timestampMillis)
+
+            // Formato deseado para la fecha y hora
+            val formato = SimpleDateFormat("hh:mm a dd 'de' MMMM yyyy", Locale.getDefault())
+
+            // Formatea la fecha y devuelve la cadena resultante
+            return formato.format(fecha)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return ""
     }
     override fun onMarkerDragEnd(p0: Marker) {
         if (p0.equals(marcador)) {
@@ -456,6 +540,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 num_ext = direccion[0].subThoroughfare ?: "Sin número"
 
             Direccion= "$pais $estado $ciudad $cp $colonia $calle $num_ext"
+            calle_edit.setText(calle)
+            colonia_edit.setText(colonia)
+            numero_extEdit.setText(num_ext)
+            edit_cp.setText(cp)
+            var ubicacion: String = "$ciudad, $estado, $pais"
+            editCiudad.setText(ubicacion)
+            calle_edit.setText(calle)
+            colonia_edit.setText(colonia)
+
 
         } catch (e: IOException) {
             e.printStackTrace()
@@ -542,8 +635,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                                                    showMessaje("hubo un error ")
                                                    handler?.looper?.quitSafely()
                                                }
-                                           }
-
+                        }
     }
 
 
@@ -552,67 +644,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
  var alertDialog: AlertDialog? = null
-    private fun PoligonosColindantes(latitud: Double, longitud: Double,radio:Double){
-        // Deshabilitar el botón
-        runOnUiThread {
-            BotonEnviarU.isEnabled = false
-            BotonEnviarU.invalidate()  // O BotonEnviarU.requestLayout()
-        }
-
+    private fun PoligonosColindantes(latitud: Double, longitud: Double, radio: Double) {
         try {
             val conexion = conexionPostgreSQL.obtenerConexion(this)
-            conexion.use { // Esto garantiza que la conexión se cierre correctamente al salir del bloque
+            conexion.use {
                 if (conexion != null) {
-                    val startTime = System.currentTimeMillis()
-                    // Simula tiempo de consulta
-                    Thread.sleep(2000) // 2000 milisegundos (2 segundos) como ejemplo, ajusta según necesites
-                    val endTime = System.currentTimeMillis()
-                    val elapsedTime = endTime - startTime
-                    try {
-                        try {
-                            val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, radio)
-                             kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio,this)
+                    val secciones = conexionPostgreSQL.poligonoCircular(latitud, longitud, radio)
+                    kerklysCercanos = conexionPostgreSQL.Los5KerklyMasCercanos(secciones, longitud, latitud, oficio, this)
 
                     if (kerklysCercanos == null || kerklysCercanos!!.isEmpty()) {
-
-                        val builder = AlertDialog.Builder(this)
-                        builder.setTitle("Sin resultados")
-                        builder.setCancelable(false)
-                        builder.setMessage("No se encontraron kerklys cercanos en esta área. ¿Deseas aumentar el radio de búsqueda?")
-                         alertDialog = builder.create()
-                        builder.setPositiveButton("Sí") { _, _ ->
-                            BotonEnviarU.isEnabled = true
-                             nuevoRadio = radio + 2000.0
-                            println("nuevo radio $nuevoRadio")
-                            if (nuevoRadio > 0) {
-                                alertDialog?.dismiss()
-                                CrearPoligonoCircular(nuevoRadio,latitud,longitud)
-
-                                // Agregar un retraso de 2 segundos (ajusta según sea necesario)
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    showMessaje("Por favor espere")
-                                    PoligonosColindantes(latitud, longitud, nuevoRadio)
-                                }, 5000)
-                            } else {
-                                // Muestra un mensaje si el nuevo radio no es válido
-                                //showMessage("Por favor, ingresa un radio válido mayor que cero.")
-                            }
+                        runOnUiThread {
+                            progressBar.visibility = View.GONE
+                            BotonEnviarU.visibility = View.VISIBLE
                         }
-                        builder.setNegativeButton("No") { dialog, _ ->
-                            // El usuario ha seleccionado no aumentar el radio de búsqueda, puedes realizar las acciones correspondientes aquí
-                            dialog.dismiss()
-                            BotonEnviarU.isEnabled = true
-                        }
-                        builder.show()
-
-                      //  conexionPostgreSQL.cerrarConexion()
-                      //  handler?.looper?.quitSafely()
-                      //  progressDialog.dismiss()
+                       showAlertDialog("Sin resultados", "No se encontraron kerklys cercanos en esta área. ¿Deseas aumentar el radio de búsqueda?",radio)
                     } else {
-                        BotonEnviarU.isEnabled = true
-
-                        alertDialog?.dismiss()
-                        if (!band){
+                        runOnUiThread {
+                            BotonEnviarU.isEnabled = true
+                            progressBar.visibility = View.GONE
+                        }
+                        if (!band) {
                             val i = Intent(applicationContext, KerklyListActivity::class.java)
                             correoCliente = b.getString("correo").toString()
                             b.putString("correo", correoCliente)
@@ -627,50 +678,99 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                             b.putString("Pais", pais)
                             b.putString("nombreCliente", nombreCliente)
                             b.putString("uid", uid)
-                            b.putString("direccion",Direccion)
-                            b.putString("telefonoCliente",telefonoCliente)
-                            b.putParcelableArrayList("kerklyCercanos",ArrayList(kerklysCercanos))
+                            b.putString("direccion", Direccion)
+                            b.putString("telefonoCliente", telefonoCliente)
+                            b.putParcelableArrayList("kerklyCercanos", ArrayList(kerklysCercanos))
+                            b.putString("nombreOficio", oficio)
                             i.putExtras(b)
                             startActivity(i)
                             finish()
-                        }else{
-                       // println("foliooo en PoligonosColindantes ------> $folio")
-                        conexionPostgreSQL.cerrarConexion()
+                        } else {
+                            conexionPostgreSQL.cerrarConexion()
                             ingresarPresupuesto()
-                          //  showMessage("todo bien")
                         }
-                    }
-                        } catch (e: Exception) {
-                            // Aquí manejas la excepción
-                            showMessage("Se produjo una excepción: ${e.message}")
-                        }
-                    } finally {
-                        conexionPostgreSQL.cerrarConexion()
                     }
                 } else {
-                    // Maneja el caso en el que la conexión no se pudo establecer
                     showMessage("Problemas de conexión")
-                   // handler?.looper?.quitSafely()
-                   // progressDialog.dismiss()
+                    runOnUiThread {
+                        progressBar.visibility = View.GONE
+                    }
                 }
             }
         } catch (e: Exception) {
-                showMessage("Error: ${e.message}")
-            println("Error: ${e.message}")
-        }finally {
-               // progressDialog.dismiss()
+            showMessage("Se produjo una excepción: ${e.message}")
+            runOnUiThread {
+                progressBar.visibility = View.GONE
+            }
         }
+    }
+
+    private fun showAlertDialog(title: String, message: String,radio: Double) {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(title)
+            builder.setCancelable(false)
+            builder.setMessage(message)
+            alertDialog = builder.create()
+            builder.setPositiveButton("Sí") { _, _ ->
+                progressBar.visibility = View.VISIBLE
+                BotonEnviarU.isEnabled = true
+                nuevoRadio = radio + 2000.0
+                println("nuevo radio $nuevoRadio")
+                if (nuevoRadio > 0) {
+                    alertDialog?.dismiss()
+                    CrearPoligonoCircular(nuevoRadio, latitud, longitud)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        showMessaje("Por favor espere")
+                        PoligonosColindantes(latitud, longitud, nuevoRadio)
+                    }, 5000)
+                }
+            }
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+                BotonEnviarU.isEnabled = true
+                progressBar.visibility = View.GONE
+            }
+            builder.show()
 
     }
 
 
-    private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String){
-        currentUser = mAuth!!.currentUser
-        obtenerkerklysYTokens.obtenerTokenKerklySolicitudUrgente(uidKerkly,this, problema,nombreCliente,
-            latitud.toString(),longitud.toString(),folio, Direccion, telefonoCliente, correoCliente, currentUser!!.uid)
-        //val llamarTopico  = llamarTopico()
-       // llamarTopico.llamarTopicEnviarSolicitudUrgente(this, tokenKerkly, problema,nombreCliente, folio)
-       // showMessaje("todo bien CURP: $uid")
+
+    private fun MandarNoti(uidKerkly: String, problema: String, nombreCliente:String,fechaHora: String){
+        if (band == true){
+            val llamartopico = llamarTopico()
+            instancias = Instancias()
+            val databaseUsu = instancias.referenciaInformacionDelKerkly(uidKerkly)
+            databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.value == null){
+                        println("error null al obtener token")
+                        progressBar.visibility = View.GONE
+                    }else{
+                        val u2 = snapshot.getValue(usuariosKerkly::class.java)
+                        val curp = u2!!.curp
+                       val tokenKerkly = u2!!.token
+                        val telefonoKerkly = u2!!.telefono
+                        val nombreK = u2!!.nombre
+                        val correok = u2!!.correo
+                        llamartopico.llamarTopicEnviarSolicitudUrgente(this@MapsActivity, tokenKerkly, "(Solicitud Urgente) $problema", "Mensaje de $nombreCliente",
+                            latitud.toString(),longitud.toString(), folio, Direccion, telefonoCliente, curp,telefonoKerkly, correoCliente,correok, nombreK, currentUser!!.uid.toString(),problema,fechaHora, oficio)
+                        progressBar.visibility = View.GONE
+                    }
+
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    System.out.println("Firebase: $error")
+                }
+
+            })
+        }else{
+            showMessage("solo urgente ")
+            progressBar.visibility  = View.GONE
+        }
+
+
     }
 
 
@@ -694,6 +794,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val polygonOptions = PolygonOptions()
         polygonOptions.addAll(circlePoints)
          poligonoCircular = mMap.addPolygon(polygonOptions)
+        progressBar.visibility  = View.GONE
+        BotonEnviarU.visibility = View.VISIBLE
     }
 
     private fun eliminarPoligonoAnterior() {

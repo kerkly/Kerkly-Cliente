@@ -29,6 +29,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit.Callback
 import retrofit.RestAdapter
 import retrofit.RetrofitError
+import retrofit.client.OkClient
 import retrofit.client.Response
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -37,6 +38,7 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 
 class MainActivityControlador {
@@ -248,9 +250,9 @@ class MainActivityControlador {
                 }
 
                 override fun failure(error: RetrofitError?) {
-                    println("error244 $error")
-                    Toast.makeText(contexto, "Tenemos Problemas con el Servidor.... por favor intente mas tarde", Toast.LENGTH_SHORT).show()
-                    contexto.finish()
+                    println("error244 $id $error")
+                    Toast.makeText(contexto, "Problemas de conexion... por favor intente mas tarde", Toast.LENGTH_SHORT).show()
+                   // contexto.finish()
                 }
             }
         )

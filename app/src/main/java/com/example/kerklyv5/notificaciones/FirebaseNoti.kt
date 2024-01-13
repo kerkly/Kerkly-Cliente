@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.kerklyv5.MainActivityChats
 import com.example.kerklyv5.R
+import com.example.kerklyv5.express.MensajesExpress
 import com.example.kerklyv5.vista.PantallaInicio
 import com.example.kerklyv5.vista.fragmentos.MainActivityMostrarSolicitudes
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -46,36 +47,83 @@ class FirebaseNoti: FirebaseMessagingService() {
                 val tokenCliente: String = message.getData().get("tokenCliente")!!
                 val uidCliente: String = message.getData().get("uidCliente")!!
                 val uidKerkly: String = message.getData().get("uidKerkly")!!
-
-
                 TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
                     ,fotoKerkly,fotoCliente,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
             }
-            if (tipoNoti =="llamarTopicSolicitud"){
+            if (tipoNoti =="llamarTopicAceptarSolicitudNormal"){
                 val tipoSolicitud = message.getData().get("TipoDeSolicitud")
                 val telefonoCliente = message.getData().get("Telefono")
                 val nombreCliente = message.getData().get("nombreCompletoCliente")
                 val uidCliente = message.getData().get("uidCliente")
-                TraerNotificacionSolicitudAceptada(titulo, detalle,tipoSolicitud,telefonoCliente,nombreCliente,uidCliente)
+                val folio = message.data.get("folio")
+                val fecha = message.data.get("Fecha")
+                val problema = message.data.get("Problema")
+                val pagoTotal = message.data.get("pagoTotal")
+                val oficio = message.data.get("Oficio")
+                val telefonoKerkly = message.data.get("telefonoKerkly")
+                val nombreKerkly = message.data.get("nombreCompletoKerkly")
+                val direccionKerkly = message.data.get("direccionKerkly")
+                val correoKerkly = message.data.get("correoKerkly")
+                val uidKerkly = message.data.get("uidKerkly")
+                TraerNotificacionSolicitudNormalAceptada(titulo, detalle,tipoSolicitud,telefonoCliente,
+                    nombreCliente,uidCliente,
+                    folio!!,fecha,problema,pagoTotal
+                    ,oficio,telefonoKerkly,nombreKerkly,
+                    direccionKerkly,correoKerkly,
+                    uidKerkly!!
+                )
+            }
+            if (tipoNoti == "llamarTopicAceptarSolicitudUrgente"){
+                val tipoSolicitud = message.getData().get("TipoDeSolicitud")
+                val telefonoCliente = message.getData().get("Telefono")
+                val nombreCliente = message.getData().get("nombreCompletoCliente")
+                val uidCliente = message.getData().get("uidCliente")
+                val folio = message.data.get("folio")
+                val fecha = message.data.get("Fecha")
+                val problema = message.data.get("Problema")
+                val pagoTotal = message.data.get("pagoTotal")
+                val oficio = message.data.get("Oficio")
+                val telefonoKerkly = message.data.get("telefonoKerkly")
+                val nombreKerkly = message.data.get("nombreCompletoKerkly")
+                val direccionKerkly = message.data.get("direccionKerkly")
+                val correoKerkly = message.data.get("correoKerkly")
+                val uidKerkly = message.data.get("uidKerkly")
+                TraerNotificacionSolicitudUrgenteAceptada(titulo, detalle,tipoSolicitud,telefonoCliente,
+                    nombreCliente,uidCliente,
+                    folio!!,fecha,problema,pagoTotal
+                    ,oficio,telefonoKerkly,nombreKerkly,
+                    direccionKerkly,correoKerkly,
+                    uidKerkly!!
+                )
             }
         }
     }
 
-    private fun TraerNotificacionSolicitudAceptada(
+    private fun TraerNotificacionSolicitudUrgenteAceptada(
         titulo: String,
         detalle: String,
         tipoSolicitud: String?,
         telefonoCliente: String?,
         nombreCliente: String?,
-        uidCliente: String?
+        uidCliente: String?,
+        folio: String,
+        fecha: String?,
+        problema: String?,
+        pagoTotal: String?,
+        oficio: String?,
+        telefonoKerkly: String?,
+        nombreKerkly: String?,
+        direccionKerkly: String?,
+        correoKerkly: String?,
+        uidKerkly: String
     ) {
-        val id = tipoSolicitud
+        val id = "$tipoSolicitud $folio"
         //val id2 = id.hashCode()
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val builder = NotificationCompat.Builder(this, id.toString())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val nc = NotificationChannel(id, "solicitudAceptada", NotificationManager.IMPORTANCE_HIGH)
+            val nc = NotificationChannel(id, "solicitudUrgenteAceptada", NotificationManager.IMPORTANCE_HIGH)
             nc.setShowBadge(true)
             assert(nm != null)
             nm!!.createNotificationChannel(nc)
@@ -86,8 +134,66 @@ class FirebaseNoti: FirebaseMessagingService() {
                 .setContentTitle(titulo)
                 .setSmallIcon(R.drawable.archivos)
                 .setContentText(detalle)
-                .setContentIntent(clicknotiSolicitudAceptada(tipoSolicitud, telefonoCliente
-                    , nombreCliente,uidCliente))
+                .setContentIntent(clicknotiSolicitudUrgenteAceptada(tipoSolicitud, telefonoCliente
+                    , nombreCliente,uidCliente,folio,fecha,problema,pagoTotal
+                    ,oficio,telefonoKerkly,nombreKerkly,
+                    direccionKerkly,correoKerkly,uidKerkly))
+                .setContentInfo("nuevo")
+            val random = Random()
+            val idNotity = random.nextInt(1000)
+            assert(nm != null)
+            nm!!.notify(idNotity, builder.build())
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun clicknotiSolicitudUrgenteAceptada(tipoSolicitud: String?, telefonoCliente: String?,
+        nombreCliente: String?, uidCliente: String?, folio: String, fecha: String?,
+        problema: String?, pagoTotal: String?, oficio: String?, telefonoKerkly: String?, nombreKerkly: String?,
+        direccionKerkly: String?, correoKerkly: String?, uidKerkly: String): PendingIntent? {
+        val nf = Intent(applicationContext, PantallaInicio::class.java)
+
+
+        nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val uniqueId = uidKerkly.hashCode() // Puedes cambiar esto según tus necesidades
+        return PendingIntent.getActivity(applicationContext, uniqueId, nf, flags)
+    }
+
+    private fun TraerNotificacionSolicitudNormalAceptada(
+        titulo: String,
+        detalle: String,
+        tipoSolicitud: String?,
+        telefonoCliente: String?,
+        nombreCliente: String?,
+        uidCliente: String?,folio:String,
+        fecha: String?,problema: String?,pagoTotal: String?
+        ,oficio: String?,telefonoKerkly: String?,nombre_completo_kerkly: String?,
+        direccionKerkly: String?,correoKerkly: String?,uidKerkly: String
+    ) {
+        val id =  "$tipoSolicitud $folio"
+        //val id2 = id.hashCode()
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val builder = NotificationCompat.Builder(this, id.toString())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nc = NotificationChannel(id, "solicitudNormalAceptada", NotificationManager.IMPORTANCE_HIGH)
+            nc.setShowBadge(true)
+            assert(nm != null)
+            nm!!.createNotificationChannel(nc)
+        }
+        try {
+            builder.setAutoCancel(true)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(titulo)
+                .setSmallIcon(R.drawable.archivos)
+                .setContentText(detalle)
+                .setContentIntent(clicknotiSolicitudNormalAceptada(tipoSolicitud, telefonoCliente
+                    , nombreCliente,uidCliente,folio,fecha,problema,pagoTotal
+            ,oficio,telefonoKerkly,nombre_completo_kerkly,
+            direccionKerkly,correoKerkly,uidKerkly))
                 .setContentInfo("nuevo")
              val random = Random()
             val idNotity = random.nextInt(1000)
@@ -98,14 +204,28 @@ class FirebaseNoti: FirebaseMessagingService() {
         }
     }
 
-    private fun clicknotiSolicitudAceptada(tipoSolicitud: String?, telefonoCliente: String?, nombreCliente: String?, uidCliente: String?): PendingIntent? {
-        val nf = Intent(applicationContext, MainActivityMostrarSolicitudes::class.java)
+    private fun clicknotiSolicitudNormalAceptada(tipoSolicitud: String?, telefonoCliente: String?,
+                                                 nombreCliente: String?, uidCliente: String?
+                                                 ,folio:String,fecha: String?,problema: String?,pagoTotal: String?
+                                                 ,oficio: String?,telefonoKerkly: String?,nombre_completo_kerkly: String?,
+                                                 direccionKerkly: String?,correoKerkly: String?,uidKerkly: String): PendingIntent? {
+        val nf = Intent(applicationContext, MensajesExpress::class.java)
+        nf.putExtra("tipoServicio","Registrado")
+        nf.putExtra("nombreCompletoKerkly", nombre_completo_kerkly)
+        nf.putExtra("telefonoKerkly", telefonoKerkly)
+        nf.putExtra("direccionKerkly", direccionKerkly)
+        nf.putExtra("correoKerkly", correoKerkly)
         nf.putExtra("TipoDeSolicitud", tipoSolicitud)
         nf.putExtra("Telefono", telefonoCliente)
-        nf.putExtra("nombreCompletoCliente", nombreCliente)
+        nf.putExtra("Problema", problema)
+        nf.putExtra("NombreCliente", nombreCliente)
+        nf.putExtra("uidKerkly", uidKerkly)
+        nf.putExtra("Folio", folio.toInt())
+        nf.putExtra("pagoTotal", pagoTotal!!.toDouble())
         nf.putExtra("uidCliente",uidCliente)
         nf.putExtra("Noti", "Noti")
-
+        nf.putExtra("Fecha", fecha)
+        nf.putExtra("Oficio", oficio)
 
         // nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK

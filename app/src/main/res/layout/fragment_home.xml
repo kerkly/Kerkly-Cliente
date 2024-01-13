@@ -138,7 +138,6 @@
                     android:text="@string/servicio_urgente"
                     android:textColor="@color/black"
                     app:backgroundTint="@color/colorBoton"
-                    app:icon="@drawable/ic_vector__4_"
                     app:iconTint="@color/black"
                     tools:ignore="OnClick,TouchTargetSizeCheck" />
 
@@ -157,7 +156,6 @@
                     android:text="@string/presupuesto"
                     android:textColor="@color/black"
                     app:backgroundTint="@color/colorBoton"
-                    app:icon="@drawable/ic_vector__4_"
                     app:iconTint="@color/black"
                     tools:ignore="OnClick,TouchTargetSizeCheck" />
             </LinearLayout>

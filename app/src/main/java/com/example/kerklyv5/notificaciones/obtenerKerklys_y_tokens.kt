@@ -36,10 +36,9 @@ class obtenerKerklys_y_tokens {
 
     }
 
-    fun obtenerTokenKerklySolicitudUrgente(uidKerkly:String,context: Context, Mensaje: String, Titulo: String,latitud:String,
+   /* fun obtenerTokenKerklySolicitudUrgente(uidKerkly:String,context: Context, Mensaje: String, Titulo: String,latitud:String,
                                            longitud:String, Folio:String,direccion:String,telefonoCliente:String,
-                                           correoCliente:String, uidCliente:String
-    ){
+                                           correoCliente:String, uidCliente:String,problema: String){
 
         val llamartopico = llamarTopico()
         instancias = Instancias()
@@ -47,16 +46,16 @@ class obtenerKerklys_y_tokens {
         databaseUsu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.value == null){
-
+                    println("error null al obtener token")
                 }else{
                     val u2 = snapshot.getValue(usuariosKerkly::class.java)
                     val curp = u2!!.curp
                     tokenKerkly = u2!!.token
                     val telefonoKerkly = u2!!.telefono
                     val nombreK = u2!!.nombre
-                    System.out.println("nombre: ${u2.nombre} el token del kerkly " +tokenKerkly)
+                    val correok = u2!!.correo
                     llamartopico.llamarTopicEnviarSolicitudUrgente(context, tokenKerkly, "(Solicitud Urgente) $Mensaje", "Mensaje de $Titulo",
-                        latitud,longitud, Folio, direccion, telefonoCliente, curp,telefonoKerkly, correoCliente, nombreK, uidCliente)
+                        latitud,longitud, Folio, direccion, telefonoCliente, curp,telefonoKerkly, correoCliente,correok, nombreK, uidCliente,problema)
                 }
 
             }
@@ -67,5 +66,5 @@ class obtenerKerklys_y_tokens {
 
         })
 
-    }
+    }*/
 }

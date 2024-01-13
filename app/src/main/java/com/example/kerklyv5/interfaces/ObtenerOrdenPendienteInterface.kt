@@ -11,11 +11,16 @@ interface ObtenerOrdenPendienteInterface {
 
     @FormUrlEncoded
     @GET("ObtenerOrdenesPendientes.php")
-    open fun ordenP(@Query("telefonoCliente") telefonoCliente: String):
+    open fun ordenP(@Query("telefonoCliente") telefonoCliente: String,
+            @Query("pageNumber") pageNumber: Int,
+            @Query("pageSize") pageSize: Int):
             Call<List<OrdenPendiente?>?>?
 
     @FormUrlEncoded
     @GET("obtenerSolicitudUrgentes.php")
-    open fun ordenUrgente(@Query("telefonoCliente") telefonoCliente: String):
+    open fun ordenUrgente(
+            @Query("telefonoCliente") telefonoCliente: String,
+    @Query("pageNumber") pageNumber: Int,
+    @Query("pageSize") pageSize: Int):
             Call<List<OrdenPendienteUrgente?>?>?
 }

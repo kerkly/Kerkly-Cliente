@@ -21,9 +21,9 @@ class conexionPostgreSQL {
         }
         try {
             Class.forName("org.postgresql.Driver") // Cargar el driver JDBC
-            val host = "2.tcp.ngrok.io"
-            val port = "18163"
-            val databaseName = "Kerkly"
+            val host = "2.tcp.us-cal-1.ngrok.io"
+            val port = "13088"
+            val databaseName = "kerkly"
             val username = "luis_admin"
             val password = "Lu0599@"
             val url = "jdbc:postgresql://$host:$port/$databaseName"

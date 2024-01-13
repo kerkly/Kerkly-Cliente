@@ -2,6 +2,7 @@ package com.example.kerklyv5
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.ContentValues.TAG
@@ -186,10 +187,29 @@ class  SolicitarServicio : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
            // setFragmentHome(telefono)
+            showExitConfirmationDialog()
         }
-        finish()
+       // finish()
     }
 
+    private fun showExitConfirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Salir de la aplicación")
+        builder.setMessage("¿Está seguro de que desea salir?")
+
+        builder.setPositiveButton("Sí") { _, _ ->
+            // Si el usuario selecciona "Sí", cierra la aplicación
+            finish()
+        }
+
+        builder.setNegativeButton("No") { dialog, _ ->
+            // Si el usuario selecciona "No", cierra el diálogo
+            dialog.dismiss()
+        }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+    }
     private fun SeleecionarFoto() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             when {
