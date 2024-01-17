@@ -47,6 +47,21 @@ class FirebaseNoti: FirebaseMessagingService() {
                 val tokenCliente: String = message.getData().get("tokenCliente")!!
                 val uidCliente: String = message.getData().get("uidCliente")!!
                 val uidKerkly: String = message.getData().get("uidKerkly")!!
+
+                // Imprimir cada valor
+                println("titulo: $titulo")
+                println("detalle: $detalle")
+                println("nombreCompletoK: $titulo")
+                println("nombreCompletoCliente: $nombreCliente")
+                println("telefonok: $telefonoKerkly")
+                println("telefonoCliente: $telefonoCliente")
+                println("urlFotoKerkly: $fotoKerkly")
+                println("urlFotoCliente: $fotoCliente")
+                println("tokenKerkly: $tokenKerkly")
+                println("tokenCliente: $tokenCliente")
+                println("uidCliente: $uidCliente")
+                println("uidKerkly: $uidKerkly")
+
                 TraerNotificacion(titulo, detalle,nombreKerkly,nombreCliente,telefonoKerkly,telefonoCliente
                     ,fotoKerkly,fotoCliente,tokenKerkly,tokenCliente,uidCliente,uidKerkly)
             }
@@ -239,13 +254,13 @@ class FirebaseNoti: FirebaseMessagingService() {
                                   nombreCliente: String, telefonoKerkly: String,telefonoCliente:String,
                                   fotoKerkly: String, fotoCliente:String, tokenKerkly: String,
                                   tokenCliente: String, uidCliente: String, uidKerkly: String) {
-        val id = "mensajeCliente"
+        val id = "mensajeKerkly"
         val id2 = id.hashCode()
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val builder = NotificationCompat.Builder(this, id)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val nc = NotificationChannel(id, "nuevoCliente", NotificationManager.IMPORTANCE_HIGH)
+            val nc = NotificationChannel(id, "nuevokerkly", NotificationManager.IMPORTANCE_HIGH)
             nc.setShowBadge(true)
             assert(nm != null)
             nm!!.createNotificationChannel(nc)
@@ -281,19 +296,19 @@ class FirebaseNoti: FirebaseMessagingService() {
         //  "urlC $fotoKerkly uid c $uidCliente kerkly $uidKerkly  token k $tokenKerkly token c $tokenCliente")
         nf.putExtra("nombreCompletoK", nombreKerkly)
         nf.putExtra("nombreCompletoCliente", nombreCliente)
-        nf.putExtra("telefonok", telefonoKerkly)
-        nf.putExtra("telefonoCliente",telefonoCliente)
         nf.putExtra("urlFotoKerkly", fotoKerkly)
         nf.putExtra("urlFotoCliente", fotoCliente)
+        nf.putExtra("telefonok", telefonoKerkly)
+        nf.putExtra("telefonoCliente",telefonoCliente)
+
+        println("fotokerkly clik $fotoKerkly")
+
         nf.putExtra("tokenKerkly", tokenKerkly)
         nf.putExtra("tokenCliente", tokenCliente)
         nf.putExtra("uidCliente", uidCliente)
         nf.putExtra("uidKerkly", uidKerkly)
         nf.putExtra("Noti", "Noti")
 
-        println("url cliente $fotoCliente")
-
-        println("url kerkly $fotoKerkly")
 
 
         // nf.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP

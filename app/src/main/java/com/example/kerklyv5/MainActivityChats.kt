@@ -112,7 +112,7 @@ class MainActivityChats : AppCompatActivity() {
         uidCliente = b!!.getString("uidCliente").toString()
         uidKerkly = b!!.getString("uidKerkly").toString()
         Noti = b.getString("Noti").toString()
-        //println("uid Cliente $uidCliente uidKerkly $uidKerkly")
+        println("uid Cliente $uidCliente uidKerkly $uidKerkly fotokerkly $fotoKerkly")
         //println("aquii---> Nombre k $nombreKerkly Cliente $nombreCompletoCliente telek $telefonoKerkly")
 
         val photoUrl = Uri.parse(fotoKerkly)

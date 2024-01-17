@@ -4,18 +4,20 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 class OrdenPendiente {
-
+    @SerializedName("idPresupuesto")
+    @Expose
+    var idContrato: Int = 1
     @SerializedName("nombreO")
     @Expose
     var nombreO: String = ""
 
-    @SerializedName("idPresupuesto")
-    @Expose
-    var idContrato: Int = 1
-
     @SerializedName("Fecha_Inicio")
     @Expose
     var Fecha_Inicio: String = ""
+
+    @SerializedName("Curp")
+    @Expose
+    var Curp: String = ""
 
     @SerializedName("Nombre")
     @Expose

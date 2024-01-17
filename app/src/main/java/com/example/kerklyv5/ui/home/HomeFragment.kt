@@ -31,6 +31,7 @@ import com.example.kerklyv5.SQLite.DataManager
 import com.example.kerklyv5.SQLite.MisOficios
 import com.example.kerklyv5.controlador.AdapterSpinnercopia
 import com.example.kerklyv5.controlador.setProgressDialog
+import com.example.kerklyv5.databinding.FragmentHomeBinding
 import com.example.kerklyv5.vista.MapsActivity
 import com.firebase.ui.auth.AuthUI.getApplicationContext
 import com.google.android.material.button.MaterialButton
@@ -68,10 +69,18 @@ class HomeFragment : Fragment(){
     private lateinit var scrollview: ScrollView
     private lateinit var buttonObtenerSeleccion: ImageView
     private var clik_Otro: Boolean = false
+    private lateinit var listita: ArrayList<String>
+
+    private var _binding: FragmentHomeBinding? = null
+   private val binding get() = _binding
 
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
+
+      //  val root = inflater.inflate(R.layout.fragment_home, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val root: View = binding!!.root
+
         b = Bundle()
         dataManager = DataManager(requireContext())
         spinner = root.findViewById(R.id.spinnerNormal)
@@ -184,13 +193,11 @@ class HomeFragment : Fragment(){
             override fun afterTextChanged(p0: Editable?) {
                 val p = p0.toString()
                 val parts: List<String> = p.split(" ")
-
                 // Verificar si se eliminó una palabra
                 val palabrasEliminadas = encontrarPalabrasEliminadas(textoAnterior, p)
                 if (palabrasEliminadas.isNotEmpty()) {
                     if (clik_Otro == false){
                     println("Palabras eliminadas: $palabrasEliminadas")
-
                     // Eliminar las palabras asociadas de listaPalabrasAsociadas
                     for (palabraEliminada in palabrasEliminadas) {
                         val palabraAsociadaEliminada = palabrasClave[palabraEliminada]
@@ -208,7 +215,30 @@ class HomeFragment : Fragment(){
                             listaPalabrasAsociadas
                         )
                     )
+                    }else{
+                        for (palabraEliminada in palabrasEliminadas) {
+                            val palabraAsociadaEliminada = palabrasClave[palabraEliminada]
+                            if (palabraAsociadaEliminada != null) {
+                                listaPalabrasAsociadas.remove(palabraAsociadaEliminada)
+                                println("Palabra asociada eliminada: $palabraAsociadaEliminada")
+                            }
+                        }
+
+                        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listita)
+                        spinner.adapter = adapter
+
+                        // Actualizar el Spinner con la nueva lista
+                       /* spinner.setAdapter(
+                            ArrayAdapter<String>(
+                                requireContext(),
+                                android.R.layout.simple_spinner_dropdown_item,
+                                listaPalabrasAsociadas
+                            )
+                        )*/
+                       /* listaPalabrasAsociadas.add("Selecciona un oficio")
+                        listita.add("Otro")*/
                     }
+
                 } else {
                     println("No se eliminaron palabras.")
                 }
@@ -233,30 +263,15 @@ class HomeFragment : Fragment(){
                             banPalabaraAsosiada = true
 
                             if (!listaPalabrasAsociadas.contains(palabraAsociada)) {
-                                listaPalabrasAsociadas.add(0, palabraAsociada)
-                                println("palabra agregada a lista")
-                                buttonObtenerSeleccion.visibility = View.VISIBLE
+                                    listaPalabrasAsociadas.add(0, palabraAsociada)
+                                    //listaPalabrasAsociadas.add("Otro")
+                                    println("palabra agregada a lista")
+                                    buttonObtenerSeleccion.visibility = View.VISIBLE
+
                             }
-                            spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaPalabrasAsociadas))
-                            contienePalabraAsociada = true
+                                spinner.setAdapter(ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, listaPalabrasAsociadas))
+                                contienePalabraAsociada = true
 
-                          /*  spinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
-                                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                                    // La lógica que deseas ejecutar cuando se selecciona un oficio
-                                    val selectedOficio = parentView.getItemAtPosition(position).toString()
-
-                                    // Puedes realizar acciones basadas en el oficio seleccionado
-                                    // Por ejemplo, mostrar un Toast con el oficio seleccionado
-                                    Toast.makeText(requireContext(), "Oficio seleccionado: $selectedOficio", Toast.LENGTH_SHORT).show()
-
-                                    // Aquí puedes usar "selectedOficio" como desees
-                                    // Por ejemplo, pasarlo a una función o realizar alguna acción específica
-                                }
-
-                                override fun onNothingSelected(parentView: AdapterView<*>?) {
-                                    // Este método se llama cuando no se ha seleccionado ningún elemento.
-                                }
-                            })*/
 
                         } else {
 
@@ -273,7 +288,6 @@ class HomeFragment : Fragment(){
                         }
                     }
                 }
-
                 if (p0.toString().isBlank() && !contienePalabraAsociada) {
                     // Llamar al método cuando el texto está vacío y no contiene ninguna palabra asociada
                     if (clik_Otro == false){
@@ -282,12 +296,10 @@ class HomeFragment : Fragment(){
                         println("borrado..")
                         buttonObtenerSeleccion.visibility = View.GONE
                     }
-
                 }
+
             }
         })
-
-
 
         buttonObtenerSeleccion.setOnClickListener {
             val selectedOficio = spinner.selectedItem.toString()
@@ -328,7 +340,6 @@ class HomeFragment : Fragment(){
     }
 
     private fun llenarSpinner(){
-        lateinit var listita: ArrayList<String>
         listita = ArrayList()
         listita.add("Selecciona un oficio")
         listita.add("Otro")
@@ -418,5 +429,10 @@ fun obtenerOficiosDB(){
                // palC.add(pa)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_usuarios_view"
     android:layout_width="match_parent"
-    app:cardBackgroundColor="@color/black"
+    app:cardBackgroundColor="#111112"
     app:cardElevation="0dp"
     android:layout_height="wrap_content"
     android:orientation="vertical">

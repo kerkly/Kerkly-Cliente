@@ -15,6 +15,7 @@ import com.example.kerklyv5.modelo.serial.OrdenPendiente
 import com.example.kerklyv5.vista.fragmentos.LoadMoreListener
 import com.google.firebase.database.core.Context
 import java.security.AlgorithmConstraints
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AdapterOrdenPendiente(val dataset: ArrayList<OrdenPendiente>):
@@ -37,18 +38,21 @@ class AdapterOrdenPendiente(val dataset: ArrayList<OrdenPendiente>):
         val txtFecha: TextView = view.findViewById(R.id.fecha_txt_orden)
         val txtnombrek: TextView = view.findViewById(R.id.oficio_txt_NombreKerkly)
         val txtcorreok: TextView = view.findViewById(R.id.oficio_txt_correokerkly)
+        val txtProblema: TextView = view.findViewById(R.id.txt_problema)
 
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.txtFecha.text = dataset[position].Fecha_Inicio
         viewHolder.txt_folio.text = "Folio No. ${dataset[position].idContrato}"
-        viewHolder.txt_oficio.text = "Servicio ${dataset[position].nombreO}"
-        viewHolder.txtcorreok.text = "${dataset[position].correo_electronico}"
-        viewHolder.txtnombrek.text = "${dataset[position].NombreK}"
-        viewHolder.txtFecha.text = "${dataset[position].fechaP}"
+        val fechaFormateada = formatearFecha(dataset[position].fechaP)
+        viewHolder.txtFecha.text = fechaFormateada
+        viewHolder.txt_oficio.text = "Tipo de Servicio: ${dataset[position].nombreO}"
+       // viewHolder.txtcorreok.text = "${dataset[position].correo_electronico}"
+        viewHolder.txtnombrek.text = "kerkly: ${dataset[position].NombreK}"
+       // viewHolder.txtFecha.text = "${dataset[position].fechaP}"
+        viewHolder.txtProblema.text = " Problema: ${dataset[position].problema}"
 
         // Verificar si estamos cerca del final y se debe cargar más
         if (loadMoreListener != null && position == dataset.size - 1 && !isLoading) {
@@ -58,11 +62,31 @@ class AdapterOrdenPendiente(val dataset: ArrayList<OrdenPendiente>):
         }
     }
 
+    fun formatearFecha(fechaOriginal: String): String {
+        try {
+            // Formato de la fecha y hora devuelto por el servidor
+            val formatoOriginal = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+            // Parsear la fecha y hora original
+            val fechaParseada = formatoOriginal.parse(fechaOriginal)
+
+            // Nuevo formato deseado
+            val nuevoFormato = SimpleDateFormat("h:mm a 'del' EEEE d 'de' MMMM yyyy", Locale.getDefault())
+
+            // Formatear la fecha y hora parseada en el nuevo formato
+            return nuevoFormato.format(fechaParseada!!)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return fechaOriginal // En caso de error, devolver la fecha original sin formato
+        }
+    }
+
+
     // Create new views (invoked by the layout manager)
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.recycler_orden_pendiente, viewGroup, false)
+            .inflate(R.layout.recycler_orden_pendiente_normal, viewGroup, false)
 
         view.setOnClickListener(this)
 

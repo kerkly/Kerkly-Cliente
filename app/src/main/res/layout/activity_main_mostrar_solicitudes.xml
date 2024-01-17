@@ -7,6 +7,26 @@
     android:orientation="vertical"
     tools:context=".vista.fragmentos.MainActivityMostrarSolicitudes">
 
+    <LinearLayout
+        android:id="@+id/contenedorFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <fragment
+            android:id="@+id/miGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:name="com.example.kerklyv5.ui.gallery.GalleryFragment"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutOcultar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
@@ -37,4 +57,5 @@
         android:layout_gravity="center"
         android:lines="2"
         android:textSize="20sp"/>
+    </LinearLayout>
 </LinearLayout>

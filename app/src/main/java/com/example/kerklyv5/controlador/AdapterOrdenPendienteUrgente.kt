@@ -12,6 +12,7 @@ import com.example.kerklyv5.R
 import com.example.kerklyv5.modelo.serial.OrdenPendiente
 import com.example.kerklyv5.modelo.serial.OrdenPendienteUrgente
 import com.example.kerklyv5.vista.fragmentos.LoadMoreListener
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 
@@ -36,17 +37,21 @@ class AdapterOrdenPendienteUrgente(val dataset: ArrayList<OrdenPendienteUrgente>
 
         init {}
         val txtFecha: TextView = view.findViewById(R.id.fecha_txt_orden)
-       // val txtnombrek: TextView = view.findViewById(R.id.oficio_txt_NombreKerkly)
+
         //val txtcorreok: TextView = view.findViewById(R.id.oficio_txt_correokerkly)
         init {}
+        val problema : TextView = view.findViewById(R.id.txt_problema)
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.txtFecha.text = dataset[position].fechaP
+        val fechaFormateada = formatearFecha(dataset[position].fechaP)
+        viewHolder.txtFecha.text = fechaFormateada
         viewHolder.txt_folio.text = "Folio No. ${dataset[position].idPresupuesto}"
-        viewHolder.txt_oficio.text = "Servicio ${dataset[position].nombreO}"
+        viewHolder.txt_oficio.text = "Tipo de Servicio: ${dataset[position].nombreO}"
+       // viewHolder.txtnombrek.text = "kerkly: ${dataset[position].n}"
+        viewHolder.problema.text = " Problema: ${dataset[position].problema}"
       //  println("id ${datset[position].idPresupuesto} nombre ${datset[position].Nombre}")
        // viewHolder.txtcorreok.text = "${datset[position].correo_electronico}"
      //   viewHolder.txtnombrek.text = "${datset[position].NombreK}"
@@ -56,6 +61,25 @@ class AdapterOrdenPendienteUrgente(val dataset: ArrayList<OrdenPendienteUrgente>
             isLoading = true
             loadMoreListener.onLoadMore()
             println("Scroll detectado - position: $position, datset.size: ${dataset.size}")
+        }
+    }
+
+    fun formatearFecha(fechaOriginal: String): String {
+        try {
+            // Formato de la fecha y hora devuelto por el servidor
+            val formatoOriginal = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+            // Parsear la fecha y hora original
+            val fechaParseada = formatoOriginal.parse(fechaOriginal)
+
+            // Nuevo formato deseado
+            val nuevoFormato = SimpleDateFormat("h:mm a 'del' EEEE d 'de' MMMM yyyy", Locale.getDefault())
+
+            // Formatear la fecha y hora parseada en el nuevo formato
+            return nuevoFormato.format(fechaParseada!!)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return fechaOriginal // En caso de error, devolver la fecha original sin formato
         }
     }
 

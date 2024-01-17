@@ -197,6 +197,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         //termina
 
         BotonEnviarU.setOnClickListener {
+            BotonEnviarU.visibility = View.GONE
             locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -530,7 +531,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             val direccion: List<Address>
             geocoder = Geocoder(this, Locale.getDefault())
 
-            direccion = geocoder.getFromLocation(latitud, longitud, 1)!! // 1 representa la cantidad de resultados a obtener
+            direccion = geocoder.getFromLocation(latitud, longitud, 1) ?: emptyList()
+
+            if (direccion.isNotEmpty()) {
                 ciudad = direccion[0].locality ?: "Sin nombre"
                 estado = direccion[0].adminArea ?: "Sin nombre"
                 pais = direccion[0].countryName ?: "Sin Nombre"
@@ -539,62 +542,67 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 colonia = direccion[0].subLocality ?: "Sin Nombre"
                 num_ext = direccion[0].subThoroughfare ?: "Sin número"
 
-            Direccion= "$pais $estado $ciudad $cp $colonia $calle $num_ext"
-            calle_edit.setText(calle)
-            colonia_edit.setText(colonia)
-            numero_extEdit.setText(num_ext)
-            edit_cp.setText(cp)
-            var ubicacion: String = "$ciudad, $estado, $pais"
-            editCiudad.setText(ubicacion)
-            calle_edit.setText(calle)
-            colonia_edit.setText(colonia)
+                Direccion = "$pais $estado $ciudad $cp $colonia $calle $num_ext"
+            } else {
+                // Si no se puede obtener la información de dirección, asigna valores predeterminados
+                ciudad = "Sin nombre"
+                estado = "Sin nombre"
+                pais = "Sin Nombre"
+                cp = "NULL"
+                calle = "Sin Nombre"
+                colonia = "Sin Nombre"
+                num_ext = "Sin número"
 
+                Direccion = "$pais $estado $ciudad $cp $colonia $calle $num_ext"
+            }
+
+            // Resto del código...
 
         } catch (e: IOException) {
             e.printStackTrace()
-            Log.d("direccion","No se pudo Obtener la dirección ${e.message}")
+            BotonEnviarU.visibility = View.VISIBLE
+            Log.d("direccion", "No se pudo obtener la dirección ${e.message}")
         }
-
-}
-
+    }
 
 
-  /*  private fun handleAddressResult(address: Address) {
-        ciudad = address.locality ?: "Sin nombre"
-        estado = address.adminArea ?: "Sin nombre"
-        pais = address.countryName ?: "Sin nombre"
-        cp = address.postalCode ?: "NULL"
-        calle = address.thoroughfare ?: "Sin Nombre"
-        colonia = address.subLocality ?: "Sin nombre"
-        num_ext = address.subThoroughfare ?: "Sin número"
-        Direccion = "$calle $colonia $num_ext $cp"
-        if (!band){
-            val i = Intent(applicationContext, KerklyListActivity::class.java)
-            correoCliente = b.getString("correo").toString()
-            b.putString("correo", correoCliente)
-            b.putString("Calle", calle)
-            b.putString("Colonia", colonia)
-            b.putString("Código Postal", cp)
-            b.putString("Exterior", num_ext)
-            b.putDouble("Latitud", latitud)
-            b.putDouble("Longitud", longitud)
-            b.putString("Ciudad", ciudad)
-            b.putString("Estado", estado)
-            b.putString("Pais", pais)
-            b.putString("nombreCliente", nombreCliente)
-            b.putString("uid", uid)
-            b.putString("direccion",Direccion)
-            b.putString("telefonoCliente",telefonoCliente)
-            i.putExtras(b)
-            startActivity(i)
-            finish()
-        }else{
-            println("entroooo")
-            ingresarPresupuesto()
-        }
+
+    /*  private fun handleAddressResult(address: Address) {
+          ciudad = address.locality ?: "Sin nombre"
+          estado = address.adminArea ?: "Sin nombre"
+          pais = address.countryName ?: "Sin nombre"
+          cp = address.postalCode ?: "NULL"
+          calle = address.thoroughfare ?: "Sin Nombre"
+          colonia = address.subLocality ?: "Sin nombre"
+          num_ext = address.subThoroughfare ?: "Sin número"
+          Direccion = "$calle $colonia $num_ext $cp"
+          if (!band){
+              val i = Intent(applicationContext, KerklyListActivity::class.java)
+              correoCliente = b.getString("correo").toString()
+              b.putString("correo", correoCliente)
+              b.putString("Calle", calle)
+              b.putString("Colonia", colonia)
+              b.putString("Código Postal", cp)
+              b.putString("Exterior", num_ext)
+              b.putDouble("Latitud", latitud)
+              b.putDouble("Longitud", longitud)
+              b.putString("Ciudad", ciudad)
+              b.putString("Estado", estado)
+              b.putString("Pais", pais)
+              b.putString("nombreCliente", nombreCliente)
+              b.putString("uid", uid)
+              b.putString("direccion",Direccion)
+              b.putString("telefonoCliente",telefonoCliente)
+              i.putExtras(b)
+              startActivity(i)
+              finish()
+          }else{
+              println("entroooo")
+              ingresarPresupuesto()
+          }
 
 
-    }*/
+      }*/
 
 
     fun insertarSolicitudFirebaseUrgente(idgenerado:String,
@@ -658,9 +666,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                             BotonEnviarU.visibility = View.VISIBLE
                         }
                        showAlertDialog("Sin resultados", "No se encontraron kerklys cercanos en esta área. ¿Deseas aumentar el radio de búsqueda?",radio)
+
                     } else {
                         runOnUiThread {
-                            BotonEnviarU.isEnabled = true
                             progressBar.visibility = View.GONE
                         }
                         if (!band) {

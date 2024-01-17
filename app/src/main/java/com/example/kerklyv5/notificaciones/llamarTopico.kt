@@ -230,6 +230,7 @@ class llamarTopico {
             notificacion.put("uidKerkly", uidKerkly)
             notificacion.put("Noti", "Noti")
 
+            println("notificacion enviada")
             //  notificacion.put("foto", url_foto)
             json.put("data", notificacion)
             val URL = "https://fcm.googleapis.com/fcm/send"

@@ -62,12 +62,14 @@ class HistorialFragment : Fragment() {
         recyclerview = v.findViewById(R.id.recycler_historial)
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(context)
-        telefono = arguments?.getString("Telefono").toString()
+        telefono = arguments?.getString("telefono").toString()
 
         img = v.findViewById(R.id.img_historial)
         txt = v.findViewById(R.id.txt_historial)
+        if (telefono != ""){
+            getHistorial()
+        }
 
-        getHistorial()
 
         return v
     }
@@ -128,4 +130,6 @@ class HistorialFragment : Fragment() {
 
         })
     }
+
+
 }

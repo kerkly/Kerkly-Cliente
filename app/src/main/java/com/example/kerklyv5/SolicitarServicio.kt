@@ -55,7 +55,6 @@ import com.example.kerklyv5.modelo.serial.ClienteModelo
 import com.example.kerklyv5.modelo.serial.Oficio
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.modelo.usuariosSqlite
-import com.example.kerklyv5.ui.home.HomeFragment
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.example.kerklyv5.vista.MainActivity
@@ -89,6 +88,7 @@ import java.util.*
 class  SolicitarServicio : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivitySolicitarServicioBinding
+    private lateinit var drawerLayout:DrawerLayout
     var b: Bundle? = null
     private lateinit var txt_nombre: TextView
     private lateinit var txt_correo: TextView
@@ -96,7 +96,6 @@ class  SolicitarServicio : AppCompatActivity() {
     private var nombre: String? = null
     private lateinit var correo: String
     private lateinit var id: String
-    private lateinit var drawerLayout: DrawerLayout
     private var presupuestoListo = false
     private lateinit var dialog2: Dialog
     var NombreF: String? = null
@@ -125,19 +124,76 @@ class  SolicitarServicio : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        dialog2 = Dialog(this)
+
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
+         drawerLayout = binding.drawerLayout
+        val navView: NavigationView = binding.navView
+        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+        val view = navView.getHeaderView(0)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_home,
+                R.id.nav_gallery,
+                R.id.nav_slideshow,
+                R.id.nav_historial
+
+            ), drawerLayout)
+        //  sesion(correo)
+
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    // Hacer algo cuando se selecciona Home
+                    navegarAHome()
+                    true
+                }
+                R.id.nav_gallery -> {
+                    // Llamar al método navegarAGallery() cuando se selecciona Gallery
+                    navegarAGallery()
+                    true
+                }
+                R.id.nav_slideshow -> {
+                    // Hacer algo cuando se selecciona Slideshow
+                    navegarASlideshow()
+                    true
+                }
+                // Otros elementos del menú aquí...
+                R.id.nav_historial -> {
+                    navegarAHistorial()
+                    true
+                }
+                R.id.nav_cerrarSesion -> {
+                    cerrarSesion()
+                    true
+                }
+                else -> false
+            }
+        }
+
+
+        /* navView.setNavigationItemSelectedListener {
+             when (it.itemId) {
+                 // R.id.nav_home -> setFragmentHome(nombre.toString())
+ //                R.id.nav_mensajes -> setContactosPresupuesto()
+               //  R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
+                // R.id.fragment_historial -> setFragmentHistorial()
+                 R.id.nav_cerrarSesion -> cerrarSesion()
+             }
+             drawerLayout.closeDrawer(GravityCompat.START)
+             true
+         }*/
+        dialog2 = Dialog(this)
         setProgressDialog.setProgressDialog(this)
         b = intent.extras!!
         telefono = b!!.getString("Telefono").toString()
+        println("telefono nav $telefono")
         id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         presupuestoListo = b!!.getBoolean("PresupuestoListo")
         dataManager = DataManager(this)
-        drawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
 
-        val view = navView.getHeaderView(0)
+
         txt_nombre = view.findViewById(R.id.nombre_txt)
         txt_correo = view.findViewById(R.id.correo_txt)
         fotoPerfil = view.findViewById(R.id.ImagenDePerfil)
@@ -145,29 +201,6 @@ class  SolicitarServicio : AppCompatActivity() {
            // SeleecionarFoto()
         }
 
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home,
-                R.id.ordenesPendientesFragment,
-                //R.id.fragment_historial,
-                R.id.nav_mensajes
-            ), drawerLayout
-        )
-        //  sesion(correo)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-        navView.setNavigationItemSelectedListener {
-            when (it.itemId) {
-                // R.id.nav_home -> setFragmentHome(nombre.toString())
-                R.id.nav_notificaciones -> setNoficiaciontes()
-                R.id.nav_mensajes -> setContactosPresupuesto()
-                R.id.ordenesPendientesFragment -> setFragmentOrdenesPendientes()
-                R.id.fragment_historial -> setFragmentHistorial()
-                R.id.nav_cerrarSesion -> cerrarSesion()
-            }
-            drawerLayout.closeDrawer(GravityCompat.START)
-            true
-        }
         if (presupuestoListo) {
             dialog2.setContentView(R.layout.presupuesto_solicitud)
             dialog2.show()
@@ -182,13 +215,48 @@ class  SolicitarServicio : AppCompatActivity() {
 
     }
 
+    private fun navegarAHistorial() {
+        val bundle = Bundle()
+        bundle.putString("telefono", telefono)
+        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+        navController.navigate(R.id.nav_historial, bundle)
+        // Cierra el DrawerLayout después de la navegación
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    private fun navegarASlideshow() {
+        val bundle = Bundle()
+        println("click $telefono")
+        bundle.putString("telefono", telefono)
+        bundle.putString("nombreCliente",currentUser!!.displayName.toString())
+        bundle.putString("uid", currentUser!!.uid)
+        bundle.putString("tokenCliente", tokenCliente)
+        bundle.putString("fotoCliente", currentUser!!.uid)
+        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+        navController.navigate(R.id.nav_slideshow, bundle)
+        // Cierra el DrawerLayout después de la navegación
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
+    private fun navegarAHome() {
+        val bundle = Bundle()
+        println("click $telefono")
+        bundle.putString("telefono", telefono)
+        bundle.putString("nombreCompletoCliente",currentUser!!.displayName.toString())
+        bundle.putString("uid", currentUser!!.uid)
+        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+        navController.navigate(R.id.nav_home, bundle)
+        // Cierra el DrawerLayout después de la navegación
+        drawerLayout.closeDrawer(GravityCompat.START)
+    }
+
     override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        /*if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
+        } else {*/
            // setFragmentHome(telefono)
             showExitConfirmationDialog()
-        }
+        //}
        // finish()
     }
 
@@ -265,7 +333,7 @@ class  SolicitarServicio : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setFragmentHome(telefono: String) {
+  /*  private fun setFragmentHome(telefono: String) {
         val f = HomeFragment()
         b!!.putString("Telefono", telefono)
         // Toast.makeText(this,"Nombre ${nombre.toString()}", Toast.LENGTH_LONG).show()
@@ -273,18 +341,7 @@ class  SolicitarServicio : AppCompatActivity() {
         var fm = supportFragmentManager.beginTransaction().apply {
             replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
         }
-    }
-    private fun setFragmentOrdenesPendientes() {
-        val f = OrdenesPendientesFragment()
-        val args = Bundle()
-        args.putString("Telefono", telefono)
-        args!!.putString("nombreCompletoCliente", currentUser!!.displayName)
-        args!!.putString("uid",currentUser!!.uid)
-        f.arguments = args
-        var fm = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_content_solicitar_servicio, f).commit()
-        }
-    }
+    }*/
 
     private fun setFragmentHistorial() {
         val f = HistorialFragment()
@@ -323,9 +380,9 @@ class  SolicitarServicio : AppCompatActivity() {
         }
     }
 
-    private fun setNoficiaciontes() {
+   /* private fun setNoficiaciontes() {
 
-    }
+    }*/
 
     private fun sesion(correo: String) {
         println("correo: $correo  id : $id")
@@ -399,86 +456,6 @@ class  SolicitarServicio : AppCompatActivity() {
             })
     }
 
-    /*private fun getJson2() {
-      //  setProgressDialog.setProgressDialog(this)
-        val ROOT_URL = Url().url
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
-        val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-        val retrofit = Retrofit.Builder()
-            .baseUrl("$ROOT_URL/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val presupuestoGET = retrofit.create(ObtenerClienteInterface::class.java)
-        val call = presupuestoGET.getCliente(telefono)
-        call?.enqueue(object : Callback<List<ClienteModelo?>?> {
-
-            override fun onResponse(
-                call: Call<List<ClienteModelo?>?>, response: Response<List<ClienteModelo?>?>) {
-                val postList: ArrayList<ClienteModelo> = response.body() as ArrayList<ClienteModelo>
-                if(postList.size == null){
-                    System.out.println("no hay nada")
-                   setProgressDialog.dialog.dismiss()
-                    //carsModels = response.body() as ArrayList<presupuestok>
-                    //    Log.d("Lista", postList[0].toString())
-                }else{
-                    NombreF = postList[0].Nombre
-                    val ap = postList[0].Apellido_Paterno
-                    val am = postList[0].Apellido_Materno
-                    val foto = postList[0].fotoPerfil
-                    //    Log.d("nombre", n)
-                    nombre = "$NombreF $ap $am"
-                    correo = postList[0].Correo
-                    nombreCompletoCliente = nombre as String
-                 //   txt_nombre.text = nombre
-                //    txt_correo.text = correo
-                    if (foto ==null){
-                      //  Toast.makeText(this@SolicitarServicio, "No hay foto de perfil", Toast.LENGTH_SHORT).show()
-                        //hay que poner una imagen por defecto
-                        if (photoUrl == null){
-                            setProgressDialog.dialog.dismiss()
-                        }else{
-                            val foto2 = photoUrl
-                           // cargarImagen(foto2!!)
-                            setProgressDialog.dialog.dismiss()
-                        }
-                    }else{
-                        //cargarImagen(foto)
-                        setProgressDialog.dialog.dismiss()
-                    }
-                    Glide.with(this@SolicitarServicio)
-                        .asBitmap()
-                        .load(photoUrl)
-                        .into(object : SimpleTarget<Bitmap>() {
-                            override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap>?) {
-                                // Aquí tienes el objeto Bitmap de la foto
-                                // Puedes continuar trabajando con el bitmap según tus necesidades
-                                // Por ejemplo, puedes convertir el Bitmap en un ByteArray
-                                val outputStream = ByteArrayOutputStream()
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                                val photoByteArray = outputStream.toByteArray()
-                                val usuarios: usuariosSqlite
-                                val tel = telefono.toLong()
-                                usuarios = usuariosSqlite(tel,photoByteArray, nombre!!,ap,am,correo)
-                                dataManager.verificarSiElUsarioExiste(this@SolicitarServicio,fotoPerfil,txt_nombre,txt_correo, photoByteArray,usuarios,telefono,nombre.toString(),ap,am,correo)
-                                // Luego, puedes guardar el photoByteArray en la base de datos SQLite o realizar otras operaciones
-                            }
-                        })
-                    setFragmentHome(nombre!!)
-                    sesion(correo)
-                }
-            }
-            override fun onFailure(call: Call<List<ClienteModelo?>?>, t: Throwable) {
-                Toast.makeText(
-                    applicationContext,
-                    "Codigo de respuesta de error: $t",
-                    Toast.LENGTH_SHORT
-                ).show();
-                setProgressDialog.dialog.dismiss()
-            }
-        })
-    }*/
     private fun EnviarFotoPerfil(fotoPerfil: String?, telefonoCliente: String, nombref: String) {
         val ROOT_URL = Url().url
         //Mostrar el diálogo de progreso
@@ -672,9 +649,16 @@ class  SolicitarServicio : AppCompatActivity() {
                                             correo
                                         )*/
                                         getOficios()
-                                        setFragmentHome(telefono.toString())
-
-
+                                       // setFragmentHome(telefono.toString())
+                                        //adctualizar homeFragment
+                                        val args = Bundle()
+                                        args.putString("telefono", telefono.toString())
+                                        args.putString("nombreCompletoCliente",currentUser!!.displayName.toString())
+                                        args.putString("uid", currentUser!!.uid)
+                                        // Encuentra el NavController asociado con el fragmento de la actividad
+                                        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+                                        // Navega al HomeFragment con los nuevos argumentos
+                                        navController.navigate(R.id.nav_home, args)
                                     }
                                 })
                             //  cargarImagen(foto2!!)
@@ -757,7 +741,9 @@ class  SolicitarServicio : AppCompatActivity() {
                 )
                 referencia = Instancias()
                 val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
-                setFragmentHome(telefono)
+                //setFragmentHome(telefono)
+
+                getOficios()
                 dataRefe.setValue(u) { error, ref ->
                     // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
                     setProgressDialog.dialog.dismiss()
@@ -767,6 +753,17 @@ class  SolicitarServicio : AppCompatActivity() {
             cargarImagen(currentUser!!.photoUrl.toString())
             txt_nombre.text = currentUser!!.displayName
             txt_correo.text = currentUser!!.email.toString()
+
+            //adctualizar homeFragment
+            val args = Bundle()
+            args.putString("telefono", telefono.toString())
+            args.putString("nombreCompletoCliente",currentUser!!.displayName.toString())
+            args.putString("uid", currentUser!!.uid)
+            // Encuentra el NavController asociado con el fragmento de la actividad
+            val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+            // Navega al HomeFragment con los nuevos argumentos
+            navController.navigate(R.id.nav_home, args)
+
         }else {
             muestraOpciones()
             setProgressDialog.dialog.dismiss()
@@ -838,7 +835,9 @@ class  SolicitarServicio : AppCompatActivity() {
                  //   println("oficio $oficio Palabras Claves: " + listaArrayOficios[i].PalabrasClaves)
                     oficios = MisOficios(i,listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO,listaArrayOficios[i].Descripcion)
                     dataManager.insertOrUpdateOficio(listaArrayOficios[i].PalabrasClaves,listaArrayOficios[i].nombreO,listaArrayOficios[i].Descripcion)
-               setFragmentHome(telefono)
+              // setFragmentHome(telefono)
+
+
                 }
                 //expresion = "$inicio$pal"+"$final"
                // println("expresion armada $inicio"+pal+final)
@@ -884,6 +883,19 @@ class  SolicitarServicio : AppCompatActivity() {
             }
 
         })
+    }
+
+
+    private fun navegarAGallery() {
+        val bundle = Bundle()
+        println("click $telefono")
+        bundle.putString("telefono", telefono)
+        bundle.putString("nombreCompletoCliente",currentUser!!.displayName.toString())
+        bundle.putString("uid", currentUser!!.uid)
+        val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+        navController.navigate(R.id.nav_gallery, bundle)
+        // Cierra el DrawerLayout después de la navegación
+        drawerLayout.closeDrawer(GravityCompat.START)
     }
 
 

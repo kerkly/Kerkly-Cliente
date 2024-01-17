@@ -9,17 +9,6 @@ class OrdenPendienteUrgente {
     @Expose
     var nombreO: String = ""
 
-    @SerializedName("Nombre")
-    @Expose
-    var Nombre: String = ""
-
-    @SerializedName("Apellido_Paterno")
-    @Expose
-    var Apellido_Paterno: String = ""
-
-    @SerializedName("ApellidoMaterno")
-    @Expose
-    var Apellido_Materno: String = ""
 
     @SerializedName("idPresupuesto")
     @Expose

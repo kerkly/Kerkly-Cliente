@@ -10,9 +10,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kerklyv5.MainActivityChats
@@ -26,6 +28,7 @@ import com.example.kerklyv5.modelo.serial.OrdenPendiente
 import com.example.kerklyv5.modelo.serial.OrdenPendienteUrgente
 import com.example.kerklyv5.modelo.usuarios
 import com.example.kerklyv5.pasarelaPagos.CheckoutActivity
+import com.example.kerklyv5.ui.gallery.GalleryFragment
 import com.example.kerklyv5.url.Instancias
 import com.example.kerklyv5.url.Url
 import com.google.firebase.auth.FirebaseAuth
@@ -57,7 +60,7 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
     private lateinit var dabaseReference: DatabaseReference
     val setProgress= setProgressDialog()
     private lateinit var TipoSolicitud: String
-    private lateinit var b: Bundle
+    //private lateinit var b: Bundle
     private lateinit var instancias: Instancias
     private lateinit var  uidCliente:String
     private lateinit var Noti: String
@@ -85,7 +88,8 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
     private var isLoading = false
     private var shouldLoadMoreData = true
 
-
+    private var backButtonPressedTwice = false
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_mostrar_solicitudes)
@@ -98,17 +102,17 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
         instancias = Instancias()
         mAuth = FirebaseAuth.getInstance()
          currentUser = mAuth!!.currentUser
-        b = intent.extras!!
-        TipoSolicitud = b!!.getString("TipoDeSolicitud").toString()
-        telefonoCliente = b!!.getString("Telefono").toString()
-        nombreCompletoCliente =  b!!.getString("nombreCompletoCliente").toString()
-        uidCliente = b!!.getString("uidCliente")!!
-        Noti = b!!.getString("Noti")!!
+      //  b = intent.extras!!
+        // Recuperar datos del Intent
+         TipoSolicitud = intent.getStringExtra("TipoDeSolicitud").toString()
+         uidCliente = intent.getStringExtra("uidCliente").toString()
+         Noti = intent.getStringExtra("Noti").toString()
+         telefonoCliente= intent.getStringExtra("Telefono").toString()
+        nombreCompletoCliente = intent.getStringExtra("nombreCompletoCliente").toString()
 
         println("tel $telefonoCliente uid $uidCliente Tipo $TipoSolicitud")
         searchView = findViewById(R.id.searchView)
         searchView.setOnQueryTextListener(this)
-
 
         if (TipoSolicitud == "normal"){
             getOrdenesNormal()
@@ -144,16 +148,16 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
 
                 //Log.d("lista", postList.toString())
                 // postList.clear()
+                adapterUrgente = AdapterOrdenPendienteUrgente(postListUrgente)
                 if (postListUrgente.size == 0) {
                     recyclerview.visibility = View.GONE
                     setProgress.dialog.dismiss()
                 } else {
                     img.visibility = View.GONE
                     txt.visibility = View.GONE
-                    adapterUrgente = AdapterOrdenPendienteUrgente(postListUrgente)
+
                     currentPage++
                     adapterUrgente.loadMoreListener = this@MainActivityMostrarSolicitudes
-
                     setProgress.dialog.dismiss()
                     adapterUrgente.setOnClickListener {
                         var oficio = postListUrgente[recyclerview.getChildAdapterPosition(it)].nombreO
@@ -278,20 +282,20 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
                             Toast.makeText(this@MainActivityMostrarSolicitudes, "uid $uidKerkly", Toast.LENGTH_SHORT).show()
                             if (uidKerkly == ""){
                                 val i = Intent(this@MainActivityMostrarSolicitudes, MensajesExpress::class.java)
-                                b.putString("NombreCliente", nombreCompletoCliente)
-                                b.putString("tipoServicio", "Registrado")
-                                b.putString("Telefono", telefonoCliente)
-                                b.putString("Fecha", fechaDeSolicitud)
-                                b.putString("Problema", problemaDeSolictud)
-                                b.putInt("Folio", numFolio)
-                                b.putString("pagoTotal", pagoTotal.toString())
-                                b.putString("Oficio", oficio)
-                                b.putString("telefonoKerkly", telefonoKerkly)
-                                b.putString("nombreCompletoKerkly", nombre_completo_kerkly)
-                                b.putString("direccionKerkly", direccionKerkly)
-                                b.putString("correoKerkly", correoKerkly)
-                                b.putString("uidKerkly", uidKerkly)
-                                i.putExtras(b)
+                                i.putExtra("NombreCliente", nombreCompletoCliente)
+                                i.putExtra("tipoServicio", "Registrado")
+                                i.putExtra("Telefono", telefonoCliente)
+                                i.putExtra("Fecha", fechaDeSolicitud)
+                                i.putExtra("Problema", problemaDeSolictud)
+                                i.putExtra("Folio", numFolio)
+                                i.putExtra("pagoTotal", pagoTotal.toString())
+                                i.putExtra("Oficio", oficio)
+                                i.putExtra("telefonoKerkly", telefonoKerkly)
+                                i.putExtra("nombreCompletoKerkly", nombre_completo_kerkly)
+                                i.putExtra("direccionKerkly", direccionKerkly)
+                                i.putExtra("correoKerkly", correoKerkly)
+                                i.putExtra("uidKerkly", uidKerkly)
+                                //i.putExtras(b)
                                 startActivity(i)
                             }else {
                                 showCustomAlertDialog(true,"normal")
@@ -588,7 +592,34 @@ class MainActivityMostrarSolicitudes : AppCompatActivity(), SearchView.OnQueryTe
             }
         })
     }
+    override fun onBackPressed() {
+        if (backButtonPressedTwice) {
+            // Si el botón de retroceso se ha presionado dos veces, finaliza la actividad
+            finish()
+        } else {
+            // mostrar el fragmento y reiniciar el tiempo de presionado del botón de retroceso
+            val nuevoFragment = GalleryFragment()
 
+            // Puedes agregar datos al fragmento utilizando Bundle
+            val bundle = Bundle()
+            bundle.putString("telefono",telefonoCliente)
+            bundle.putString("nombreCompletoCliente",nombreCompletoCliente)
+            bundle.putString("uid",uidCliente)
 
+            nuevoFragment.arguments = bundle
+
+            val contenedorFragment = findViewById<LinearLayout>(R.id.contenedorFragment)
+            val linearLayout = findViewById<LinearLayout>(R.id.linearLayoutOcultar)
+
+            contenedorFragment.visibility = View.VISIBLE
+            linearLayout.visibility = View.GONE
+
+            supportFragmentManager.beginTransaction()
+                .replace(contenedorFragment.id, nuevoFragment)
+                .addToBackStack(null)
+                .commit()
+            backButtonPressedTwice = true
+        }
+    }
 
 }
