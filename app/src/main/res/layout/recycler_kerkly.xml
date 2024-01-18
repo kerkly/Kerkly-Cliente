@@ -14,7 +14,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:src="@drawable/ic_frame_46"
+            android:src="@drawable/usuariok"
             android:id="@+id/image_kerkly"
             android:layout_marginEnd="10dp"
             android:layout_gravity="center"

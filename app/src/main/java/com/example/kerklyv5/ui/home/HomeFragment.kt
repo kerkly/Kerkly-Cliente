@@ -46,7 +46,7 @@ class HomeFragment : Fragment(){
     private lateinit var layoutProblem: TextInputLayout
     private lateinit var oficio: String
     private lateinit var botonPresupuesto: MaterialButton
-    private lateinit var b: Bundle
+    //private lateinit var b: Bundle
     private lateinit var telefono: String
     private lateinit var problema: String
     private lateinit var boton_servicioUrgente: MaterialButton
@@ -81,7 +81,7 @@ class HomeFragment : Fragment(){
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding!!.root
 
-        b = Bundle()
+        //b = Bundle()
         dataManager = DataManager(requireContext())
         spinner = root.findViewById(R.id.spinnerNormal)
         textProblem = root.findViewById(R.id.inputProblematica)
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(){
                 val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(settingsIntent)
             }else {
-                telefono = arguments?.getString("Telefono")!!
+                telefono = arguments?.getString("telefono")!!
                 oficio = spinner.getSelectedItem().toString()
                // showMessage(oficio)
                 problema = textProblem.text.toString()
@@ -134,27 +134,25 @@ class HomeFragment : Fragment(){
                     if (clik_Otro == true){
                         layoutProblem.error = null
                         val i = Intent(context, MapsActivity::class.java)
-                        b.putBoolean("Express", true)
-                        b.putString("Oficio", oficio)
-                        b.putString("Telefono", telefono)
-                        b.putString("Nombre", currentUser!!.displayName)
-                        b.putString("correo", currentUser!!.email)
-                        b.putString("Problema", problema)
-                        b.putString("uid", currentUser!!.uid)
-                        i.putExtras(b)
+                        i.putExtra("Express", true)
+                        i.putExtra("Oficio", oficio)
+                        i.putExtra("Telefono", telefono)
+                        i.putExtra("Nombre", currentUser!!.displayName)
+                        i.putExtra("correo", currentUser!!.email)
+                        i.putExtra("Problema", problema)
+                        i.putExtra("uid", currentUser!!.uid)
                         startActivity(i)
                     }else{
                     if (banPalabaraAsosiada == true){
                         layoutProblem.error = null
                         val i = Intent(context, MapsActivity::class.java)
-                        b.putBoolean("Express", true)
-                        b.putString("Oficio", oficio)
-                        b.putString("Telefono", telefono)
-                        b.putString("Nombre", currentUser!!.displayName)
-                        b.putString("correo", currentUser!!.email)
-                        b.putString("Problema", problema)
-                        b.putString("uid", currentUser!!.uid)
-                        i.putExtras(b)
+                        i.putExtra("Express", true)
+                        i.putExtra("Oficio", oficio)
+                        i.putExtra("Telefono", telefono)
+                        i.putExtra("Nombre", currentUser!!.displayName)
+                        i.putExtra("correo", currentUser!!.email)
+                        i.putExtra("Problema", problema)
+                        i.putExtra("uid", currentUser!!.uid)
                         startActivity(i)
                     }else{
                         //showMessage(R.string.)
@@ -335,7 +333,6 @@ class HomeFragment : Fragment(){
     private fun encontrarPalabrasEliminadas(textoAnterior: String, textoActual: String): List<String> {
         val palabrasAntes = textoAnterior.split(" ")
         val palabrasDespues = textoActual.split(" ")
-
         return palabrasAntes.filterNot { palabrasDespues.contains(it) }
     }
 
@@ -375,23 +372,21 @@ class HomeFragment : Fragment(){
     private fun seleccionarKerkly() {
       //  oficio = spinner.selectedItem.toString()
         oficio = spinner.getSelectedItem().toString()
-        telefono = arguments?.getString("Telefono")!!
+        telefono = arguments?.getString("telefono")!!
 
-        b.putString("Oficio", oficio)
-        b.putString("Telefono", telefono)
         problema = textProblem.text.toString()
-        b.putString("Problema", problema)
-        b.putString("correo", currentUser!!.email)
-
         if (problema.isEmpty()) {
             layoutProblem.error = getString(R.string.campo_requerido)
         } else {
             layoutProblem.error = null
-                val i = Intent(context, MapsActivity::class.java)
-                b.putBoolean("Express", false)
-                b.putString("Nombre", currentUser!!.displayName)
-                b.putString("uid", currentUser!!.uid)
-                i.putExtras(b)
+            val i = Intent(context, MapsActivity::class.java)
+            i.putExtra("Express", false)
+            i.putExtra("Nombre", currentUser!!.displayName)
+            i.putExtra("uid", currentUser!!.uid)
+            i.putExtra("Oficio", oficio)
+            i.putExtra("Telefono", telefono)
+            i.putExtra("Problema", problema)
+            i.putExtra("correo", currentUser!!.email)
                 startActivity(i)
             }
        // }

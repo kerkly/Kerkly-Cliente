@@ -119,12 +119,14 @@ class  SolicitarServicio : AppCompatActivity() {
     private lateinit var dataManager: DataManager
     lateinit var referencia : Instancias
 
+    //controlar los procesos
+    private var procesosEjecutados = false
+
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySolicitarServicioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.appBarSolicitarServicio.toolbar)
          drawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -146,7 +148,7 @@ class  SolicitarServicio : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.nav_home -> {
                     // Hacer algo cuando se selecciona Home
-                    navegarAHome()
+                   // navegarAHome()
                     true
                 }
                 R.id.nav_gallery -> {
@@ -168,6 +170,7 @@ class  SolicitarServicio : AppCompatActivity() {
                     cerrarSesion()
                     true
                 }
+
                 else -> false
             }
         }
@@ -267,7 +270,7 @@ class  SolicitarServicio : AppCompatActivity() {
 
         builder.setPositiveButton("Sí") { _, _ ->
             // Si el usuario selecciona "Sí", cierra la aplicación
-            finish()
+            finishAffinity()
         }
 
         builder.setNegativeButton("No") { dialog, _ ->
@@ -695,78 +698,69 @@ class  SolicitarServicio : AppCompatActivity() {
         super.onStart()
         currentUser = mAuth!!.currentUser
         if (currentUser != null) {
-           /* Glide.with(this@SolicitarServicio)
-                .asBitmap()
-                .load(currentUser!!.photoUrl)
-                .into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        bitmap: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        val outputStream = ByteArrayOutputStream()
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                        val photoByteArray = outputStream.toByteArray()
+            if (!procesosEjecutados) {
+                sesion(currentUser!!.email.toString())
 
+                //    dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
+                //  sesionAbierta(currentUser!!.email.toString())
+                var firebaseMessaging =
+                    FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
+                firebaseMessaging.addOnCompleteListener {
+                    //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+                }
+                FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        // Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                        return@OnCompleteListener
                     }
-                })*/
-            sesion(currentUser!!.email.toString())
+                    tokenCliente = task.result
+                    val name = currentUser!!.displayName
+                    val email = currentUser!!.email
+                    photoUrl = currentUser!!.photoUrl.toString()
+                    val uid = currentUser!!.uid
+                    val foto = photoUrl.toString()
 
-        //    dataManager.mostrarInformacion(this, fotoPerfil,txt_nombre,txt_correo)
-          //  sesionAbierta(currentUser!!.email.toString())
-            var firebaseMessaging = FirebaseMessaging.getInstance().subscribeToTopic("EnviarNoti")
-            firebaseMessaging.addOnCompleteListener {
-                //Toast.makeText(this@MainActivityChats, "Registrado:", Toast.LENGTH_SHORT).show()
+                    val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+                    val u = usuarios(
+                        telefono,
+                        email.toString(),
+                        name.toString(),
+                        foto,
+                        currentDateTimeString,
+                        tokenCliente,
+                        uid
+                    )
+                    referencia = Instancias()
+                    val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
+                    //setFragmentHome(telefono)
+
+                    getOficios()
+                    dataRefe.setValue(u) { error, ref ->
+                        // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
+                        setProgressDialog.dialog.dismiss()
+                        //dataManager.getAllOficios()
+                    }
+                })
+                cargarImagen(currentUser!!.photoUrl.toString())
+                txt_nombre.text = currentUser!!.displayName
+                txt_correo.text = currentUser!!.email.toString()
+
+                //adctualizar homeFragment
+                val args = Bundle()
+                args.putString("telefono", telefono.toString())
+                args.putString("nombreCompletoCliente", currentUser!!.displayName.toString())
+                args.putString("uid", currentUser!!.uid)
+                // Encuentra el NavController asociado con el fragmento de la actividad
+                val navController =
+                    findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
+                // Navega al HomeFragment con los nuevos argumentos
+                navController.navigate(R.id.nav_home, args)
+
+            } else {
+                muestraOpciones()
+                setProgressDialog.dialog.dismiss()
             }
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                   // Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                    return@OnCompleteListener
-                }
-                tokenCliente = task.result
-                val name = currentUser!!.displayName
-                val email = currentUser!!.email
-                photoUrl = currentUser!!.photoUrl.toString()
-                val uid = currentUser!!.uid
-                val foto = photoUrl.toString()
-
-                val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
-                val u = usuarios(
-                    telefono,
-                    email.toString(),
-                    name.toString(),
-                    foto,
-                    currentDateTimeString,
-                    tokenCliente,
-                    uid
-                )
-                referencia = Instancias()
-                val dataRefe = referencia.referenciaInformacionDelUsuario(currentUser!!.uid)
-                //setFragmentHome(telefono)
-
-                getOficios()
-                dataRefe.setValue(u) { error, ref ->
-                    // Toast.makeText(this@SolicitarServicio, "Bienvenido $token", Toast.LENGTH_SHORT) .show()
-                    setProgressDialog.dialog.dismiss()
-                    //dataManager.getAllOficios()
-                }
-            })
-            cargarImagen(currentUser!!.photoUrl.toString())
-            txt_nombre.text = currentUser!!.displayName
-            txt_correo.text = currentUser!!.email.toString()
-
-            //adctualizar homeFragment
-            val args = Bundle()
-            args.putString("telefono", telefono.toString())
-            args.putString("nombreCompletoCliente",currentUser!!.displayName.toString())
-            args.putString("uid", currentUser!!.uid)
-            // Encuentra el NavController asociado con el fragmento de la actividad
-            val navController = findNavController(R.id.nav_host_fragment_content_solicitar_servicio)
-            // Navega al HomeFragment con los nuevos argumentos
-            navController.navigate(R.id.nav_home, args)
-
-        }else {
-            muestraOpciones()
-            setProgressDialog.dialog.dismiss()
+            procesosEjecutados =  true
         }
     }
     fun muestraOpciones() {
